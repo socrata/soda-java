@@ -18,6 +18,6 @@ public class SodaError extends Exception
     public SodaError(String error)
     {
         super(error);
-        this.sodaErrorResponse = new SodaErrorResponse("", error, "");
+        this.sodaErrorResponse = new SodaErrorResponse("", error, "", null);
     }
 }

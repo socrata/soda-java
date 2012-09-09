@@ -100,6 +100,26 @@ public class Soda2Producer extends Soda2Consumer
         }
     }
 
+    /**
+     * Add an object using SODA2, the object will be added to the dataset with the specified resource ID.
+     *
+     * @param resourceId unique id or resource name of the dataset
+     * @param object object to add
+     * @param retType the type of object to return
+     *
+     * @return the metadata of the row added, including the system identifier
+     * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
+     * @throws InterruptedException throws is the thread is interrupted.
+     */
+    public <T> T addObject(String resourceId, T object, Class<T> retType) throws SodaError, InterruptedException
+    {
+        try {
+            return getHttpLowLevel().add(resourceId, object, retType);
+        } catch (LongRunningQueryException e) {
+            return (T) getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, retType);
+        }
+    }
+
 
     /**
      * "Upserts" a list of objects.  What this means is that it will:

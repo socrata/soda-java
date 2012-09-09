@@ -11,6 +11,6 @@ public class InvalidLocationError extends SodaError
 
     public InvalidLocationError(final String locationSent)
     {
-        super(new SodaErrorResponse(ERROR_CODE, "Invalid location from server.", locationSent));
+        super(new SodaErrorResponse(ERROR_CODE, "Invalid location from server.", locationSent, null));
     }
 }

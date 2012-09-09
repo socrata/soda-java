@@ -254,6 +254,32 @@ public final class HttpLowLevel
     }
 
     /**
+     * Adds a single row to a dataset.
+     *
+     * @param resourceId  The id of the resource to query.  This can either be the resource endpoint name
+     *                    set in the metadata, or the unique ID given to the resource.
+     * @param object The object that should be serialized to JSON and added to the dataset.  Jackson is used for serialization
+     *               and deserialization.
+     * @param retType type that should be returned from here.
+     *
+     * @return the metadata for the object just added.  This will include the unique ID for the row, so it can be
+     * unambigously loaded through getById
+     * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
+     * the caller likely wants to call follow202.
+     * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
+     */
+    public <T> T add(String resourceId, T object, Class<T> retType) throws LongRunningQueryException, SodaError
+    {
+
+        final UriBuilder builder = UriBuilder.fromUri(url)
+                                             .path(SODA_BASE_PATH)
+                                             .path(resourceId);
+
+        final ClientResponse response = postRaw(builder.build(), object);
+        return response.getEntity(retType);
+    }
+
+    /**
      * Adds a collection of rows to a dataset.
      *
      * @param resourceId  The id of the resource to query.  This can either be the resource endpoint name
