@@ -33,7 +33,7 @@ import java.util.UUID;
  */
 public class DatesTest extends TestBase
 {
-    public static final String NOMINATION_DATA_SET = "nominations";
+    public static final String NOMINATION_DATA_SET = "nominationsCopy";
     public static final String UPDATE_DATA_SET = "testupdate";
 
 
