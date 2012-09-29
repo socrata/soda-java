@@ -65,7 +65,7 @@ public class ApiTest extends TestBase
 
         //
         //   Issue query as a full query
-        final ClientResponse responseFullQuery = connection.query(dataset, query.toString());
+        final ClientResponse responseFullQuery = connection.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
         final List<ToxinData> resultsFullQuery = responseFullQuery.getEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, resultsFullQuery.size());
         for (ToxinData toxinData : resultsFullQuery) {
@@ -76,7 +76,7 @@ public class ApiTest extends TestBase
         //
         //   Issue query as a through $where, etc.
 
-        final ClientResponse response = connection.query(dataset, query);
+        final ClientResponse response = connection.query(dataset, HttpLowLevel.JSON_TYPE,query);
         final List<ToxinData> results = response.getEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, results.size());
         for (ToxinData toxinData : results) {

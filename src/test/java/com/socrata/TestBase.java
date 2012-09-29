@@ -24,6 +24,10 @@ public class TestBase
     public static final String PASSWORD_PROP = "password";
     public static final String API_KEY_PROP = "token";
 
+    public static final String NOMINATION_DATA_SET = "nominationsCopy";
+    public static final String UPDATE_DATA_SET = "testupdate";
+
+
 
     static {
         // Create a trust manager that does not validate certificate chains.  This is only

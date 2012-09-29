@@ -69,10 +69,10 @@ public class Soda2Consumer extends Soda2Base
     public <T> T getById(String resourceId, String id, Class<T> cls) throws SodaError, InterruptedException
     {
         try {
-            final ClientResponse    response = getHttpLowLevel().getById(resourceId, id);
+            final ClientResponse    response = getHttpLowLevel().getById(resourceId, HttpLowLevel.JSON_TYPE, id);
             return response.getEntity(new GenericType<T>(cls));
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<T>(cls));
+            return getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<T>(cls));
         }
     }
 
@@ -93,10 +93,10 @@ public class Soda2Consumer extends Soda2Base
     {
 
         try {
-            final ClientResponse    response = getHttpLowLevel().query(resourceId, query);
+            final ClientResponse    response = getHttpLowLevel().query(resourceId, HttpLowLevel.JSON_TYPE, query);
             return response.getEntity(genericType);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, genericType);
+            return getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, genericType);
         }
 
 
@@ -117,10 +117,10 @@ public class Soda2Consumer extends Soda2Base
     public <T> List<T>  query(String resourceId, String query, GenericType<List<T>> genericType) throws SodaError, InterruptedException
     {
         try {
-            final ClientResponse    response = getHttpLowLevel().query(resourceId, query);
+            final ClientResponse    response = getHttpLowLevel().query(resourceId, HttpLowLevel.JSON_TYPE, query);
             return response.getEntity(genericType);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, genericType);
+            return getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, genericType);
         }
     }
 

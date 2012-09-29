@@ -53,6 +53,9 @@ public final class HttpLowLevel
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
 
+    public static final MediaType JSON_TYPE = MediaType.APPLICATION_JSON_TYPE;
+    public static final MediaType CSV_TYPE = new MediaType("text", "csv");
+
     private final Client client;
     private final String url;
 
@@ -135,13 +138,13 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse query(String resourceId, SoqlQuery query) throws LongRunningQueryException, SodaError
+    public ClientResponse query(String resourceId, MediaType mediaType, SoqlQuery query) throws LongRunningQueryException, SodaError
     {
         final UriBuilder builder = UriBuilder.fromUri(url)
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        return queryRaw(query.toSodaUri(builder).build());
+        return queryRaw(query.toSodaUri(builder).build(), mediaType);
     }
 
     /**
@@ -156,7 +159,7 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse query(String resourceId, String query) throws LongRunningQueryException, SodaError
+    public ClientResponse query(String resourceId, MediaType mediaType, String query) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = UriBuilder.fromUri(url)
@@ -164,7 +167,7 @@ public final class HttpLowLevel
                                              .path(resourceId)
                                              .queryParam(SODA_QUERY, query);
 
-        return queryRaw(builder.build());
+        return queryRaw(builder.build(), mediaType);
     }
 
     /**
@@ -180,13 +183,13 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse getById(String resourceId, String uniqueId) throws LongRunningQueryException, SodaError
+    public ClientResponse getById(String resourceId,  MediaType mediaType, String uniqueId) throws LongRunningQueryException, SodaError
     {
         final UriBuilder builder = UriBuilder.fromUri(url)
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId)
                                              .path(uniqueId);
-        return queryRaw(builder.build());
+        return queryRaw(builder.build(), mediaType);
     }
 
     /**
@@ -249,7 +252,7 @@ public final class HttpLowLevel
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = postRaw(builder.build(), object);
+        final ClientResponse response = postRaw(builder.build(), JSON_TYPE, object);
         return response.getEntity(Meta.class);
     }
 
@@ -275,7 +278,7 @@ public final class HttpLowLevel
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = postRaw(builder.build(), object);
+        final ClientResponse response = postRaw(builder.build(), JSON_TYPE, object);
         return response.getEntity(retType);
     }
 
@@ -299,16 +302,17 @@ public final class HttpLowLevel
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = postRaw(builder.build(), objects);
+        final ClientResponse response = postRaw(builder.build(), JSON_TYPE, objects);
         return response.getEntity(UpsertResult.class);
     }
 
     /**
-     * Adds a collection of rows to a dataset, but does so by simply streaming a datastream to the SODA2 server.  It is up
-     * to the caller to make sure the stream is proper JSON.
+     * Adds a collection of rows to a dataset, but does so by simply streaming a datastream to the SODA2 server.  Whether
+     * the stream is JSON or CSV is set by the mediaType
      *
      * @param resourceId  The id of the resource to query.  This can either be the resource endpoint name
      *                    set in the metadata, or the unique ID given to the resource.
+     * @param mediaType The media type for the stream (normally JSON or CSV)
      * @param stream The objects to add, already serialized in a stream.
      *
      * @return The upsert result describing succeful and unsucessful operations.
@@ -316,16 +320,18 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public UpsertResult addStream(String resourceId, InputStream stream) throws LongRunningQueryException, SodaError
+    public UpsertResult addStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = UriBuilder.fromUri(url)
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = postRaw(builder.build(), stream);
+        final ClientResponse response = postRaw(builder.build(), mediaType, stream);
         return response.getEntity(UpsertResult.class);
     }
+
+
 
     /**
      * Update an object.
@@ -350,7 +356,7 @@ public final class HttpLowLevel
                                              .path(resourceId)
                                              .path(uniqueId.toString());
 
-        final ClientResponse response = putRaw(builder.build(), object);
+        final ClientResponse response = putRaw(builder.build(), JSON_TYPE, object);
         return response.getEntity(Meta.class);
     }
 
@@ -366,7 +372,7 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse follow202(final URI uri, final long retryTime) throws InterruptedException, LongRunningQueryException, SodaError
+    public ClientResponse follow202(final URI uri, final MediaType mediaType, final long retryTime) throws InterruptedException, LongRunningQueryException, SodaError
     {
         final long timeToWait = System.currentTimeMillis() - retryTime;
         if (timeToWait > 0) {
@@ -375,7 +381,7 @@ public final class HttpLowLevel
             }
         }
 
-        return queryRaw(uri);
+        return queryRaw(uri, mediaType);
     }
 
 
@@ -409,10 +415,10 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    protected ClientResponse queryRaw(final URI uri) throws LongRunningQueryException, SodaError
+    protected ClientResponse queryRaw(final URI uri, final MediaType mediaType) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                    .accept("application/json");
+                                                    .accept(mediaType);
 
         final ClientResponse response = builder.get(ClientResponse.class);
         return processErrors(response);
@@ -423,17 +429,21 @@ public final class HttpLowLevel
      * and throw if there are any.
      *
      * @param uri URI to issue a request to.  Any id information should have already been added.
+     * @param mediaType the MIME type the object is to be sent to the server as.
+     * @param object the object to send down to the server.  This can be a Jackson serializable object or a raw
+     *               InputStream.
      * @return the raw ClientReponse to the request.  Any errors will have already been processed, and have thrown
      * and exception.
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    protected <T> ClientResponse postRaw(final URI uri, final Object object) throws LongRunningQueryException, SodaError
+    protected <T> ClientResponse postRaw(final URI uri, final MediaType mediaType, final Object object) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
                 .accept("application/json")
-                .type(MediaType.APPLICATION_JSON_TYPE);
+                //.accept(mediaType)
+                .type(mediaType);
 
         final ClientResponse response = builder.post(ClientResponse.class, object);
         return processErrors(response);
@@ -444,21 +454,26 @@ public final class HttpLowLevel
      * and throw if there are any.
      *
      * @param uri URI to issue a request to.  Any id information should have already been added.
+     * @param mediaType the MIME type the object is to be sent to the server as.
+     * @param object the object to send down to the server.  This can be a Jackson serializable object or a raw
+     *               InputStream.
      * @return the raw ClientReponse to the request.  Any errors will have already been processed, and have thrown
      * and exception.
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    protected <T> ClientResponse putRaw(final URI uri, final Object object) throws LongRunningQueryException, SodaError
+    protected <T> ClientResponse putRaw(final URI uri, final MediaType mediaType, final Object object) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
                                                   .accept("application/json")
-                                                  .type(MediaType.APPLICATION_JSON_TYPE);
+                                                  .type(mediaType);
 
         final ClientResponse response = builder.post(ClientResponse.class, object);
         return processErrors(response);
     }
+
+
 
     /**
      * Internal API to add any common parameters.  In this case, it sets the version parameter

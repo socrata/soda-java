@@ -33,9 +33,6 @@ import java.util.UUID;
  */
 public class DatesTest extends TestBase
 {
-    public static final String NOMINATION_DATA_SET = "nominationsCopy";
-    public static final String UPDATE_DATA_SET = "testupdate";
-
 
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.

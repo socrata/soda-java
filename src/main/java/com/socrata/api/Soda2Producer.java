@@ -6,6 +6,7 @@ import com.socrata.model.UpsertResult;
 import com.socrata.model.Meta;
 import com.sun.jersey.api.client.GenericType;
 
+import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             getHttpLowLevel().truncate(resourceId);
         } catch (LongRunningQueryException e) {
-            getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
+            getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
         }
     }
 
@@ -76,7 +77,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             getHttpLowLevel().delete(resourceId, id);
         } catch (LongRunningQueryException e) {
-            getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
+            getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
         }
 
     }
@@ -160,21 +161,23 @@ public class Soda2Producer extends Soda2Consumer
      *   an :id.
      *
      * @param resourceId unique id or resource name of the dataset
+     * @param mediaType what the format of the stream is.  Normally, HttpLowLevel.JSON_TYPE or HttpLowLevel.CSV_TYPE
      * @param stream  JSON stream of objects to update
      *
      * @return result of objects added, removed and modified.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    public UpsertResult upsertStream(String resourceId, InputStream stream) throws SodaError, InterruptedException
+    public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream) throws SodaError, InterruptedException
     {
 
         try {
-            return getHttpLowLevel().addStream(resourceId, stream);
+            return getHttpLowLevel().addStream(resourceId, mediaType, stream);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
+            return getAsyncResults(e.location, mediaType, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
         }
     }
+
 
 
     /**
@@ -193,7 +196,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             return getHttpLowLevel().update(resourceId, id, object);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<Meta>(Meta.class));
+            return getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<Meta>(Meta.class));
         }
 
     }

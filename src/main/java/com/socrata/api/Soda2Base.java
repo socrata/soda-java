@@ -5,6 +5,7 @@ import com.socrata.exceptions.SodaError;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 
+import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.util.List;
 
@@ -38,13 +39,13 @@ public class Soda2Base
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public ClientResponse getAsyncResults(URI uri, long waitTime, long numRetries) throws SodaError, InterruptedException
+    final public ClientResponse getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries) throws SodaError, InterruptedException
     {
 
         for (int i=0; i<numRetries; i++) {
 
             try {
-                final ClientResponse response = httpLowLevel.follow202(uri, waitTime);
+                final ClientResponse response = httpLowLevel.follow202(uri, mediaType, waitTime);
                 return response;
             } catch (LongRunningQueryException e) {
                 uri = e.location;
@@ -70,7 +71,7 @@ public class Soda2Base
     final public <T> T getAsyncResults(URI uri, long waitTime, long numRetries, Class<T> cls) throws SodaError, InterruptedException
     {
 
-        final ClientResponse response = getAsyncResults(uri, waitTime, numRetries);
+        final ClientResponse response = getAsyncResults(uri, HttpLowLevel.JSON_TYPE, waitTime, numRetries);
         return response.getEntity(cls);
     }
 
@@ -86,9 +87,9 @@ public class Soda2Base
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public <T> T getAsyncResults(URI uri, long waitTime, long numRetries, GenericType<T> cls) throws SodaError, InterruptedException
+    final public <T> T getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, GenericType<T> cls) throws SodaError, InterruptedException
     {
-        final ClientResponse response = getAsyncResults(uri, waitTime, numRetries);
+        final ClientResponse response = getAsyncResults(uri, mediaType, waitTime, numRetries);
         return response.getEntity(cls);
     }
 

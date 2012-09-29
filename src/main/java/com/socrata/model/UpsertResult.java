@@ -19,12 +19,12 @@ public class UpsertResult
 
 
     @JsonCreator
-    public UpsertResult(final @JsonProperty("Rows Created") long rowsCreated,
-                        final @JsonProperty("Rows Updated") long rowsUpdated,
-                        final @JsonProperty("Rows Deleted") long rowsDeleted,
-                        final @JsonProperty("Errors") long errors,
-                        final @JsonProperty("By SID") long bySid,
-                        final @JsonProperty("By RowIdentifier") long byRowIdentifier)
+    public UpsertResult(final @JsonProperty("rows_created") long rowsCreated,
+                        final @JsonProperty("rows_updated") long rowsUpdated,
+                        final @JsonProperty("rows_deleted") long rowsDeleted,
+                        final @JsonProperty("errors") long errors,
+                        final @JsonProperty("by_sid") long bySid,
+                        final @JsonProperty("by_rowidentifier") long byRowIdentifier)
     {
         this.rowsCreated = rowsCreated;
         this.rowsUpdated = rowsUpdated;
