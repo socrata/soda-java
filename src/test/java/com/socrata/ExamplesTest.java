@@ -77,7 +77,19 @@ public class ExamplesTest
     @Test
     public void readmeProducerExamples() throws Exception {
 
-        Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        //This is the White Nomination Java Bean, that I want to add
+        final Nomination NOMINATION_TO_ADD = new Nomination(
+                "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), null, null, null
+        );
+
+        //This is the White Nomination Java Bean, that I want to update to
+        final Nomination NOMINATION_TO_UPDATE = new Nomination(
+                "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
+        );
+
+
+        //Get the producer class to allow updates of the data set.
+        final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
 
         //Get get this automatically serialized into a set of Java Beans annotated with Jackson JOSN annotations
         Meta nominationAddedMeta = producer.addObject("testupdate", NOMINATION_TO_ADD);
