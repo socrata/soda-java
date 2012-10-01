@@ -10,6 +10,12 @@
   <name>Soda2 API Client</name>
   <description>A library for accessing SODA 2 endpoints.</description>
   <url>http://www.socrata.com/</url>
+  <scm>
+      <connection>scm:git:https://github.com/socrata/soda-java.git</connection>
+      <developerConnection>scm:git:https://github.com/socrata/soda-java.git</developerConnection>
+      <url>https://github.com/socrata/soda-java</url>
+  </scm>
+
   <licenses>
       <license>
           <name>The MIT License (MIT)</name>
@@ -25,6 +31,37 @@
             <organization>Socrata</organization>
         </developer>
     </developers>
+
+
+    <profiles>
+    <profile>
+        <id>release-sign-artifacts</id>
+        <activation>
+            <property>
+                <name>performRelease</name>
+                <value>true</value>
+            </property>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.1</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+    </profiles>
 
   <dependencies>
       <dependency>
@@ -72,4 +109,5 @@
           <scope>test</scope>
       </dependency>
   </dependencies>
+
 </project>
