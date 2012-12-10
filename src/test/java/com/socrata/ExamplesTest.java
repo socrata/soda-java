@@ -34,7 +34,7 @@ public class ExamplesTest
         Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
 
         //To get a raw String of the results
-        ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
+        ClientResponse response = consumer.query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
         String payload = response.getEntity(String.class);
         System.out.println(payload);
 

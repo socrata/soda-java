@@ -1,0 +1,42 @@
+{
+  "id" : "khjh-69mz",
+  "name" : "Name43068b5b-2515-49dd-94d1-431ce3734944",
+  "averageRating" : 0,
+  "createdAt" : 1351398879,
+  "downloadCount" : 0,
+  "numberOfComments" : 0,
+  "oid" : 21,
+  "publicationAppendEnabled" : false,
+  "publicationGroup" : 18,
+  "publicationStage" : "unpublished",
+  "rowsUpdatedAt" : 1351398880,
+  "rowsUpdatedBy" : "3",
+  "signed" : false,
+  "tableId" : 18,
+  "totalTimesRated" : 0,
+  "viewCount" : 0,
+  "viewLastModified" : 1351398880,
+  "viewType" : "tabular",
+  "owner" : {
+    "id" : "pe6p-uu2n",
+    "displayName" : "Test User",
+    "emailUnsubscribed" : false,
+    "privacyControl" : "login",
+    "profileLastModified" : 1351321027,
+    "roleName" : "administrator",
+    "screenName" : "Test User",
+    "rights" : [ "create_datasets", "edit_others_datasets", "edit_sdp", "edit_site_theme", "moderate_comments", "manage_users", "chown_datasets", "edit_nominations", "approve_nominations", "feature_items", "federations", "manage_stories", "manage_approval", "change_configurations", "view_domain", "view_others_datasets", "edit_pages", "create_pages" ]
+  },
+  "rights" : [ "read", "write", "add", "delete", "grant", "add_column", "remove_column", "update_column", "update_view", "delete_view" ],
+  "tableAuthor" : {
+    "id" : "pe6p-uu2n",
+    "displayName" : "Test User",
+    "emailUnsubscribed" : false,
+    "privacyControl" : "login",
+    "profileLastModified" : 1351321027,
+    "roleName" : "administrator",
+    "screenName" : "Test User",
+    "rights" : [ "create_datasets", "edit_others_datasets", "edit_sdp", "edit_site_theme", "moderate_comments", "manage_users", "chown_datasets", "edit_nominations", "approve_nominations", "feature_items", "federations", "manage_stories", "manage_approval", "change_configurations", "view_domain", "view_others_datasets", "edit_pages", "create_pages" ]
+  },
+  "flags" : [ "default" ]
+}

@@ -56,9 +56,9 @@ public class Soda2Producer extends Soda2Consumer
     {
 
         try {
-            getHttpLowLevel().truncate(resourceId);
+            doTruncate(resourceId);
         } catch (LongRunningQueryException e) {
-            getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
+            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
         }
     }
 
@@ -75,9 +75,9 @@ public class Soda2Producer extends Soda2Consumer
     {
 
         try {
-            getHttpLowLevel().delete(resourceId, id);
+            doDelete(resourceId, id);
         } catch (LongRunningQueryException e) {
-            getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
+            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<String>(String.class));
         }
 
     }
@@ -95,9 +95,9 @@ public class Soda2Producer extends Soda2Consumer
     public <T> Meta addObject(String resourceId, T object) throws SodaError, InterruptedException
     {
         try {
-            return getHttpLowLevel().add(resourceId, object);
+            return doAdd(resourceId, object);
         } catch (LongRunningQueryException e) {
-            return (Meta) getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, Meta.class);
+            return (Meta) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Meta.class);
         }
     }
 
@@ -115,9 +115,9 @@ public class Soda2Producer extends Soda2Consumer
     public <T> T addObject(String resourceId, T object, Class<T> retType) throws SodaError, InterruptedException
     {
         try {
-            return getHttpLowLevel().add(resourceId, object, retType);
+            return doAdd(resourceId, object, retType);
         } catch (LongRunningQueryException e) {
-            return (T) getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, retType);
+            return (T) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, retType);
         }
     }
 
@@ -143,9 +143,9 @@ public class Soda2Producer extends Soda2Consumer
     public UpsertResult upsert(String resourceId, List objects) throws SodaError, InterruptedException
     {
         try {
-            return getHttpLowLevel().addObjects(resourceId, objects);
+            return doAddObjects(resourceId, objects);
         } catch (LongRunningQueryException e) {
-            return (UpsertResult) getAsyncResults(e.location, e.timeToRetry, DEFAULT_MAX_RETRIES, UpsertResult.class);
+            return (UpsertResult) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, UpsertResult.class);
         }
     }
 
@@ -172,9 +172,9 @@ public class Soda2Producer extends Soda2Consumer
     {
 
         try {
-            return getHttpLowLevel().addStream(resourceId, mediaType, stream);
+            return doAddStream(resourceId, mediaType, stream);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, mediaType, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
+            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
         }
     }
 
@@ -194,9 +194,9 @@ public class Soda2Producer extends Soda2Consumer
     public <T> Meta  update(String resourceId, Object id, T object) throws SodaError, InterruptedException
     {
         try {
-            return getHttpLowLevel().update(resourceId, id, object);
+            return doUpdate(resourceId, id, object);
         } catch (LongRunningQueryException e) {
-            return getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, DEFAULT_MAX_RETRIES, new GenericType<Meta>(Meta.class));
+            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<Meta>(Meta.class));
         }
 
     }

@@ -63,9 +63,11 @@ public class ApiTest extends TestBase
                 .setWhereClause(new ConditionalExpression("primary_naics=325510"))
                 .build();
 
+        final Soda2Consumer   soda2Consumer = new Soda2Consumer(connection);
+
         //
         //   Issue query as a full query
-        final ClientResponse responseFullQuery = connection.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
+        final ClientResponse responseFullQuery = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
         final List<ToxinData> resultsFullQuery = responseFullQuery.getEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, resultsFullQuery.size());
         for (ToxinData toxinData : resultsFullQuery) {
@@ -76,7 +78,7 @@ public class ApiTest extends TestBase
         //
         //   Issue query as a through $where, etc.
 
-        final ClientResponse response = connection.query(dataset, HttpLowLevel.JSON_TYPE,query);
+        final ClientResponse response = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE,query);
         final List<ToxinData> results = response.getEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, results.size());
         for (ToxinData toxinData : results) {

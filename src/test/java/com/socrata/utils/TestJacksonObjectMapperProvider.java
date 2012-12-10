@@ -1,9 +1,12 @@
 package com.socrata.utils;
 
+import com.socrata.model.importer.Dataset;
 import junit.framework.TestCase;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParsePosition;
 import java.util.Date;
 
@@ -38,6 +41,16 @@ public class TestJacksonObjectMapperProvider
         TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00Z", new ParsePosition(0))));
         TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00.000Z", new ParsePosition(0))));
 
+    }
+
+    @Test
+    public void testViewMapping() throws IOException
+    {
+        final JacksonObjectMapperProvider objectMapperProvider = new JacksonObjectMapperProvider();
+        final ObjectMapper  mapper = objectMapperProvider.getContext(null);
+
+        Dataset v = mapper.readValue(new File("src/test/resources/view.json"), Dataset.class);
+        TestCase.assertNotNull(v);
     }
 
 }

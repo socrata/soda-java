@@ -1,0 +1,100 @@
+{
+  "fileId" : "zDOR3_CAd7p5H9FJRqSlT-WvuxHrK1fFk5uncYNpYnU",
+  "summary" : {
+    "headers" : 0,
+    "columns" : [ {
+      "name" : "Name",
+      "processed" : 3,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 3,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Position",
+      "processed" : 3,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 3,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Agency Name",
+      "processed" : 3,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 3,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Agency Website",
+      "processed" : 3,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 3,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Nomination Date",
+      "processed" : 3,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 3,
+        "calendar_date" : 2,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Confirmation Vote",
+      "processed" : 2,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 2,
+        "calendar_date" : 1,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Confirmed",
+      "processed" : 2,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 2,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    }, {
+      "name" : "Holdover",
+      "processed" : 1,
+      "suggestion" : "text",
+      "types" : {
+        "number" : 0,
+        "text" : 1,
+        "calendar_date" : 0,
+        "money" : 0,
+        "percent" : 0
+      }
+    } ],
+    "sample" : [
+      [ "Name", "Position", "Agency Name", "Agency Website", "Nomination Date", "Confirmation Vote", "Confirmed", "Holdover" ],
+      [ "Name, Test", "Member", "Testing Board", "TEST (http://www.test.com)", "02/14/2011 12:00 AM", "", "", "" ],
+      [ "Kitty, Hello", "Director of Cute", "Department of Affection", "DOA (http://www.doaff.five)", "10/18/2011 12:00 AM", "03/29/2012 12:00 AM", "true", "" ]
+    ]
+  }
+}
