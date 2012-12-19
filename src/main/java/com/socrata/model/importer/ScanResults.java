@@ -4,6 +4,7 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
+ * The results of a server scan over the csv, this is needed before importing a CSV
  */
 public class ScanResults
 {
@@ -18,11 +19,19 @@ public class ScanResults
         this.summary = summary;
     }
 
+    /**
+     * A unique ID created by the server that refers to the file that was updated.
+     * @return
+     */
     public String getFileId()
     {
         return fileId;
     }
 
+    /**
+     * Gets the summary results of the scan.
+     * @return
+     */
     public ScanSummary getSummary()
     {
         return summary;

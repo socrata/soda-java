@@ -8,6 +8,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 
 /**
+ * The summary of the results returned by scanning a CSV.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ScanSummary
@@ -18,6 +19,13 @@ public class ScanSummary
     final public List<ScanColumn> columns;
     final public List<Location> locations;
 
+    /**
+     *
+     * @param summary Human readable summary of the scan
+     * @param headers Number of rows that the scan believes contains the headers
+     * @param columns Results of the scan for each column and their suggested types
+     * @param locations
+     */
     @JsonCreator
     public ScanSummary(final @JsonProperty("summary") String summary,
                        final @JsonProperty("headers") int headers,

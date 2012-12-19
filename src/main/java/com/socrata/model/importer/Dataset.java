@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
-
+ *  A dataset that has been created.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Dataset

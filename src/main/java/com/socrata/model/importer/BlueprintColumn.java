@@ -6,14 +6,21 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.Map;
 
 /**
- *
+ * A defintion for how to import a particular column in the dataset.
  */
 public class BlueprintColumn
 {
-    final String name;
-    final String description;
-    final String datatype;
+    private final String name;
+    private final String description;
+    private final String datatype;
 
+    /**
+     * Constructor
+     *
+     * @param name name of the column to import
+     * @param description description of the column to import
+     * @param datatype the datatype for the column to be created
+     */
     @JsonCreator
     public BlueprintColumn(@JsonProperty("name") String name, @JsonProperty("description") String description, @JsonProperty("datatype") String datatype)
     {
@@ -22,18 +29,30 @@ public class BlueprintColumn
         this.datatype = datatype;
     }
 
+    /**
+     * name of the column to import
+     * @return
+     */
     @JsonProperty("name")
     public String getName()
     {
         return name;
     }
 
+    /**
+     * description of the column to import
+     * @return
+     */
     @JsonProperty("description")
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * the datatype for the column to be created
+     * @return
+     */
     @JsonProperty("datatype")
     public String getDatatype()
     {

@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.Map;
 
 /**
+ * Column returned by the scan.
  */
 public class ScanColumn
 {
@@ -14,6 +15,14 @@ public class ScanColumn
     final public int processed;
     final public Map<String, Integer> types;
 
+    /**
+     * Constructor
+     *
+     * @param name name of the column
+     * @param suggestion suggested datatyep for the column
+     * @param processed number of rows processed to create this set of recommendations
+     * @param types Map of different types
+     */
     @JsonCreator
     public ScanColumn(@JsonProperty("name") String name, @JsonProperty("suggestion") String suggestion, @JsonProperty("processed") int processed, @JsonProperty("types") Map<String, Integer> types)
     {
