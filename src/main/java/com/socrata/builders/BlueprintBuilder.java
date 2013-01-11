@@ -9,6 +9,7 @@ import com.socrata.model.importer.ScanColumn;
 import com.socrata.model.importer.ScanResults;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class BlueprintBuilder
     int skip;
     List<BlueprintColumn> columns;
 
+    public BlueprintBuilder() {
+        columns = new ArrayList<BlueprintColumn>();
+    }
 
     public BlueprintBuilder(final ScanResults scanResults) {
         skip = scanResults.getSummary().getHeaders();
@@ -49,6 +53,11 @@ public class BlueprintBuilder
 
     public BlueprintBuilder setSkip(final int skip) {
         this.skip = skip;
+        return this;
+    }
+
+    public  BlueprintBuilder addColumn(BlueprintColumn column) {
+        columns.add(column);
         return this;
     }
 

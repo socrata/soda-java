@@ -51,7 +51,7 @@ public class ApiTest extends TestBase
     public void testSimpleQueryName() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
         final HttpLowLevel connection = connect();
-        executeSimpleQuery(connection, "Test-Data");
+        executeSimpleQuery(connection, "TestData");
     }
 
 

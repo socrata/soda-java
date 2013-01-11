@@ -312,7 +312,7 @@ public class SodaImporter
     public Dataset importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
         try {
-            final String translationString =  mapper.writeValueAsString((translation != null) ? translation : generateTranslation(blueprint));
+            final String translationString =  (translation != null) ? mapper.writeValueAsString(translation) : "";
             final String blueprintString = mapper.writeValueAsString(blueprint);
 
             final String postData = "translation=" + URLEncoder.encode(translationString, "UTF-8") + "&fileId=" + scanResults.getFileId() + "&name=" + file.getName() + "&blueprint=" +  URLEncoder.encode(blueprintString, "UTF-8");

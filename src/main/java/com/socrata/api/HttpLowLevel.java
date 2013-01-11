@@ -55,6 +55,7 @@ public final class HttpLowLevel
     public static final String SODA_VERSION = "$$version";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
+    public static final String UNEXPECTED_ERROR = "uexpectedError";
 
     public static final MediaType JSON_TYPE = MediaType.APPLICATION_JSON_TYPE;
     public static final MediaType CSV_TYPE = new MediaType("text", "csv");
@@ -364,6 +365,10 @@ public final class HttpLowLevel
             } catch (URISyntaxException e) {
                 throw new InvalidLocationError(location);
             }
+        }
+
+        if (!response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, response.getEntity(String.class), null, null));
         }
 
         final SodaErrorResponse sodaErrorResponse = response.getEntity(SodaErrorResponse.class);
