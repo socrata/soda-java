@@ -3,6 +3,7 @@ package com.socrata;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Consumer;
 import com.socrata.api.Soda2Producer;
+import com.socrata.api.SodaImporter;
 import junit.framework.TestCase;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -72,5 +73,9 @@ public class TestBase
 
     protected Soda2Producer createProducer() throws IOException {
         return new Soda2Producer(connect());
+    }
+
+    protected SodaImporter createImporter() throws IOException {
+        return new SodaImporter(connect());
     }
 }

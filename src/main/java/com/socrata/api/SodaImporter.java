@@ -1,22 +1,23 @@
 package com.socrata.api;
 
+import com.google.common.collect.Collections2;
 import com.socrata.builders.BlueprintBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.GeocodingResults;
-import com.socrata.model.importer.Blueprint;
-import com.socrata.model.importer.BlueprintColumn;
-import com.socrata.model.importer.Dataset;
-import com.socrata.model.importer.ScanResults;
+import com.socrata.model.importer.*;
 import com.sun.jersey.api.client.ClientResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.Collections;
 
 /**
  * All the import client logic is in this class.
@@ -88,7 +89,7 @@ public class SodaImporter
      * @throws SodaError
      * @throws InterruptedException
      */
-    Dataset createView(Dataset view) throws SodaError, InterruptedException
+    public Dataset createView(Dataset view) throws SodaError, InterruptedException
     {
         try {
             final ClientResponse response = httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, view);
@@ -108,13 +109,18 @@ public class SodaImporter
      * @throws LongRunningQueryException
      * @throws SodaError
      */
-    Dataset loadView(final String id) throws LongRunningQueryException, SodaError
+    public Dataset loadView(final String id) throws SodaError, InterruptedException
     {
-        final URI uri = UriBuilder.fromUri(viewUri)
-                                    .path(id)
-                                    .build();
-        final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
-        return response.getEntity(Dataset.class);
+
+        try {
+            final URI uri = UriBuilder.fromUri(viewUri)
+                                        .path(id)
+                                        .build();
+            final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
+            return response.getEntity(Dataset.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
+        }
     }
 
 
@@ -127,7 +133,7 @@ public class SodaImporter
      * @throws SodaError
      * @throws InterruptedException
      */
-    Dataset updateView(Dataset view) throws SodaError, InterruptedException
+    public  Dataset updateView(Dataset view) throws SodaError, InterruptedException
     {
         try {
             URI uri = UriBuilder.fromUri(viewUri)
@@ -148,7 +154,7 @@ public class SodaImporter
      * @throws SodaError
      * @throws InterruptedException
      */
-    void deleteView(String id) throws SodaError, InterruptedException
+    public void deleteView(String id) throws SodaError, InterruptedException
     {
         try {
 
@@ -176,7 +182,7 @@ public class SodaImporter
      * @throws SodaError
      * @throws IOException
      */
-    Dataset createViewFromCsv(final String name, final String description, final File file) throws InterruptedException, SodaError, IOException
+    public Dataset createViewFromCsv(final String name, final String description, final File file) throws InterruptedException, SodaError, IOException
     {
 
         return importScanResults(name, description, file, scan(file));
@@ -289,6 +295,22 @@ public class SodaImporter
      */
     public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
+       return importScanResults(name, description, file, scanResults, null);
+    }
+
+
+    /**
+     * Imports the results of scanning a file.  This will build  a default blueprint from it, assuming the first rows are
+     * column names.
+     *
+     * @param name name of the dataset to create
+     * @param description description of the datset
+     * @param file file that was scanned
+     * @param scanResults results of the scan
+     * @return The default View object for the dataset that was just created.
+     */
+    public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String uniqueColumnName) throws SodaError, InterruptedException, IOException
+    {
         final Blueprint blueprint = new BlueprintBuilder(scanResults)
                                         .setSkip(1)
                                         .setName(name)
@@ -320,7 +342,17 @@ public class SodaImporter
             final ClientResponse response = httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, postData);
             return response.getEntity(Dataset.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, Dataset.class);
+
+            if (e.location != null) {
+                return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, Dataset.class);
+            } else {
+
+                final URI ticketUri = UriBuilder.fromUri(importUri)
+                                                .queryParam("ticket", e.ticket)
+                                                .build();
+                return getHttpLowLevel().getAsyncResults(ticketUri, e.timeToRetry, Integer.MAX_VALUE, Dataset.class);
+
+            }
         }
 
     }

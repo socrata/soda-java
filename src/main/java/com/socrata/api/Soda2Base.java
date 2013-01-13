@@ -10,6 +10,7 @@ import com.sun.jersey.api.client.GenericType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
@@ -281,4 +282,8 @@ public class Soda2Base
     {
         return httpLowLevel;
     }
+
+
+
+
 }

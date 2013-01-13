@@ -1,6 +1,9 @@
 package com.socrata.model.importer;
 
+import com.google.common.base.Function;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import javax.annotation.Nullable;
 
 /**
  */
@@ -9,6 +12,9 @@ public class Column
 {
     private static final String[] RESERVED_FIELD_NAMES = { "_id", "_uuid", "_position", "_address" };
 
+    public static final Function<Column, String>   TO_NAME = new Function<Column, String>()
+    { @Override public String apply(@Nullable Column input) { return (input != null) ? input.getName() : null; } };
+
     int id;
     String name;
     String fieldName;
@@ -16,6 +22,21 @@ public class Column
     String dataTypeName;
     int position;
     Integer width;
+
+    public Column()
+    {
+    }
+
+    public Column(int id, String name, String fieldName, String description, String dataTypeName, int position, Integer width)
+    {
+        this.id = id;
+        this.name = name;
+        this.fieldName = fieldName;
+        this.description = description;
+        this.dataTypeName = dataTypeName;
+        this.position = position;
+        this.width = width;
+    }
 
     public int getId()
     {

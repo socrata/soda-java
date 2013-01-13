@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -55,7 +56,7 @@ public class ApiTest extends TestBase
     }
 
 
-    private void executeSimpleQuery(final HttpLowLevel connection, final String dataset) throws LongRunningQueryException, SodaError
+    private void executeSimpleQuery(final HttpLowLevel connection, final String dataset) throws LongRunningQueryException, SodaError, InterruptedException
     {
 
         //Create a query that should return a single result
@@ -83,6 +84,15 @@ public class ApiTest extends TestBase
         TestCase.assertEquals(6, results.size());
         for (ToxinData toxinData : results) {
             TestCase.assertEquals(325510L, toxinData.getPrimaryNAICS());
+        }
+
+        //
+        //  Issue a query and get back maps
+        final List responseList = soda2Consumer.query(dataset,query, new GenericType<List<Object>>() {});
+        TestCase.assertEquals(6, responseList.size());
+        for (Object crimeObject : responseList) {
+            Map<String, String> crimeMap = (Map<String, String>) crimeObject;
+            TestCase.assertEquals("325510", crimeMap.get("primary_naics"));
         }
     }
 

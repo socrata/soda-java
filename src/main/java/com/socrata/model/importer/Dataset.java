@@ -171,4 +171,13 @@ public class Dataset
         this.privateMetadata = privateMetadata;
     }
 
+    public Integer getRowIdentifierColumnId()
+    {
+        return rowIdentifierColumnId;
+    }
+
+    public void setRowIdentifierColumnId(Integer rowIdentifierColumnId)
+    {
+        this.rowIdentifierColumnId = rowIdentifierColumnId;
+    }
 }

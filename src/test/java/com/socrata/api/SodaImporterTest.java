@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -31,6 +32,7 @@ public class SodaImporterTest extends TestBase
 {
 
     public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
+    public static final File  CRIMES_CSV = new File("src/test/resources/testCrimes.csv");
 
     /**
      * Tests a number of ways to connect using dataset name

@@ -4,9 +4,13 @@ import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.Meta;
+import com.socrata.utils.GeneralUtils;
 import com.sun.jersey.api.client.GenericType;
 
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -175,6 +179,43 @@ public class Soda2Producer extends Soda2Consumer
             return doAddStream(resourceId, mediaType, stream);
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
+        }
+    }
+
+
+    /**
+     * "Upserts" a list of objects.  What this means is that it will:
+     * <ol>
+     *     <li>Add the objects in the list.</li>
+     *     <li>If an object already exists with this value, it will update it.</li>
+     *     <li>If the object has a :deleted=true value, the object will be deleted.</li>
+     * </ol>
+     *   <br/>
+     *   In order to delete objects using the Upsert function, use the DeleteRecord object to map ":deleted" to
+     *   an :id.
+     *
+     * @param resourceId unique id or resource name of the dataset
+     * @param csvFile File that contains a CSV to upload
+     *
+     * @return result of objects added, removed and modified.
+     * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
+     * @throws InterruptedException throws is the thread is interrupted.
+     */
+    public UpsertResult upsertCsv(String resourceId, File csvFile) throws SodaError, InterruptedException
+    {
+        try {
+            InputStream is = new FileInputStream(csvFile);
+
+            try {
+
+                return doAddStream(resourceId, HttpLowLevel.CSV_TYPE, is);
+            } catch (LongRunningQueryException e) {
+                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class));
+            } finally {
+                GeneralUtils.closeQuietly(is);
+            }
+        } catch (IOException ioe) {
+            throw new SodaError("Cannot load CSV from the file " + GeneralUtils.bestFilePath(csvFile) + ".  Error message: " + ioe.getLocalizedMessage());
         }
     }
 

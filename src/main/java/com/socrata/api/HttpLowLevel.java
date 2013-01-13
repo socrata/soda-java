@@ -18,6 +18,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -28,11 +29,14 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Class to handle all the low level HTTP operations. This class provides the core data access methods
@@ -52,6 +56,7 @@ public final class HttpLowLevel
 
     protected static final int DEFAULT_MAX_RETRIES = 20;
     public static final long   DEFAULT_RETRY_TIME = 1000;
+
     public static final String SODA_VERSION = "$$version";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
@@ -59,6 +64,8 @@ public final class HttpLowLevel
 
     public static final MediaType JSON_TYPE = MediaType.APPLICATION_JSON_TYPE;
     public static final MediaType CSV_TYPE = new MediaType("text", "csv");
+
+    public static final GenericType<List<Object>> MAP_OBJECT_TYPE = new GenericType<List<Object>>() {};
 
     private final Client client;
     private final String url;
@@ -149,10 +156,9 @@ public final class HttpLowLevel
      */
     public ClientResponse follow202(final URI uri, final MediaType mediaType, final long retryTime) throws InterruptedException, LongRunningQueryException, SodaError
     {
-        final long timeToWait = System.currentTimeMillis() - retryTime;
-        if (timeToWait > 0) {
+        if (retryTime > 0) {
             synchronized (this) {
-                this.wait(timeToWait);
+                this.wait(retryTime);
             }
         }
 
@@ -216,8 +222,10 @@ public final class HttpLowLevel
                 final ClientResponse response = follow202(uri, mediaType, waitTime);
                 return response;
             } catch (LongRunningQueryException e) {
-                uri = e.location;
-                waitTime = Math.max((e.timeToRetry - System.currentTimeMillis()), 0);
+
+                if (e.location != null) {
+                    uri = e.location;
+                }
             }
         }
 
@@ -360,11 +368,40 @@ public final class HttpLowLevel
             final String location = response.getHeaders().getFirst("Location");
             final String retryAfter = response.getHeaders().getFirst("Retry-After");
 
-            try {
-                throw new LongRunningQueryException(new URI(location), parseRetryAfter(retryAfter));
-            } catch (URISyntaxException e) {
-                throw new InvalidLocationError(location);
+            String ticket = null;
+            URI locationUri = null;
+
+
+            //
+            //  There are actually two ways Socrata currently deals with 202s, in the newer mechanism, they use
+            //  the Location and Retry-After headers to direct where the "future" result is.  In the other mechanism,
+            //  A specific "ticket" is created that needs to be combined with the original URL to get the "future"
+            //  result.
+            //
+            if (StringUtils.isEmpty(location)) {
+
+                final String body = response.getEntity(String.class);
+                if (StringUtils.isEmpty(body)) {
+                    throw new SodaError("Illegal body for 202 response.  No location and body is empty.");
+                }
+
+                try {
+                    final ObjectMapper mapper = new ObjectMapper();
+                    final Map<String, Object> bodyProperties = (Map<String, Object>)mapper.readValue(body, Object.class);
+                    ticket = bodyProperties.get("ticket").toString();
+                } catch (IOException ioe) {
+                    throw new SodaError("Illegal body for 202 response.  No location or ticket.  Body = " + body);
+                }
+
+            } else {
+                try {
+                    locationUri = new URI(location);
+                } catch (URISyntaxException e) {
+                    throw new InvalidLocationError(location);
+                }
             }
+
+            throw new LongRunningQueryException(locationUri, parseRetryAfter(retryAfter), ticket);
         }
 
         if (!response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
