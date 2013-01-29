@@ -3,6 +3,7 @@ package com.socrata.builders;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.socrata.model.Location;
 import com.socrata.model.importer.Blueprint;
 import com.socrata.model.importer.BlueprintColumn;
 import com.socrata.model.importer.ScanColumn;
@@ -12,6 +13,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  */

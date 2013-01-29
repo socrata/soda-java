@@ -22,12 +22,22 @@ public class Dataset
     String publicationStage;
     Integer viewCount;
     String viewType;
-    Map<String, Object> metadata;
+    //Map<String, Object> metadata;
     Map<String, Object> privateMetadata;
     List<String> flags = new ArrayList<String>();
     List<String> rights = new ArrayList<String>();
     List<String> tags = new ArrayList<String>();
     List<Column> columns = new ArrayList<Column>();
+
+
+    Metadata metadata;
+    String category;
+    String externalId;
+
+    String attribution;
+    String attributionLink;
+    String licenseId;
+    License license;
 
     private static final String CUSTOM_FIELDS_ID = "custom_fields";
 
@@ -151,12 +161,12 @@ public class Dataset
         this.tags = tags;
     }
 
-    public Map<String, Object> getMetadata()
+    public Metadata getMetadata()
     {
         return metadata;
     }
 
-    public void setMetadata(Map<String, Object> metadata)
+    public void setMetadata(Metadata metadata)
     {
         this.metadata = metadata;
     }
@@ -179,5 +189,65 @@ public class Dataset
     public void setRowIdentifierColumnId(Integer rowIdentifierColumnId)
     {
         this.rowIdentifierColumnId = rowIdentifierColumnId;
+    }
+
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getExternalId()
+    {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId)
+    {
+        this.externalId = externalId;
+    }
+
+    public String getAttribution()
+    {
+        return attribution;
+    }
+
+    public void setAttribution(String attribution)
+    {
+        this.attribution = attribution;
+    }
+
+    public String getAttributionLink()
+    {
+        return attributionLink;
+    }
+
+    public void setAttributionLink(String attributionLink)
+    {
+        this.attributionLink = attributionLink;
+    }
+
+    public String getLicenseId()
+    {
+        return licenseId;
+    }
+
+    public void setLicenseId(String licenseId)
+    {
+        this.licenseId = licenseId;
+    }
+
+    public License getLicense()
+    {
+        return license;
+    }
+
+    public void setLicense(License license)
+    {
+        this.license = license;
     }
 }

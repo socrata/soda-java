@@ -23,17 +23,13 @@ import java.util.Collections;
  * All the import client logic is in this class.
  *
  */
-public class SodaImporter
+public class SodaImporter extends SodaDdl
 {
 
-    public static final String IMPORTER_BASE_PATH = "api";
     public static final String SCAN_BASE_PATH = "imports2";
-    public static final String VIEWS_BASE_PATH = "views";
     public static final String GEO_BASE_PATH = "geocoding";
 
 
-    private final HttpLowLevel  httpLowLevel;
-    private final URI           viewUri;
     private final URI           importUri;
     private final URI           geocodingUri;
 
@@ -49,12 +45,7 @@ public class SodaImporter
      */
     public SodaImporter(HttpLowLevel httpLowLevel)
     {
-        this.httpLowLevel = httpLowLevel;
-
-        viewUri = httpLowLevel.uriBuilder()
-                              .path(IMPORTER_BASE_PATH)
-                              .path(VIEWS_BASE_PATH)
-                              .build();
+        super(httpLowLevel);
 
         importUri = httpLowLevel.uriBuilder()
                               .path(IMPORTER_BASE_PATH)
@@ -68,105 +59,8 @@ public class SodaImporter
     }
 
 
-    /**
-     * Gets the underlying connection.
-     *
-     * @return the underlying connection
-     */
-    public HttpLowLevel getHttpLowLevel()
-    {
-        return httpLowLevel;
-    }
 
 
-    /**
-     * Creates an empty dataset, based on the view passed in.
-     *
-     * The new view will be unpublished.
-     *
-     * @param view view to create the new view on.  The ID should NOT be set.
-     * @return the created view, the ID will be set on this.
-     * @throws SodaError
-     * @throws InterruptedException
-     */
-    public Dataset createView(Dataset view) throws SodaError, InterruptedException
-    {
-        try {
-            final ClientResponse response = httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, view);
-            return response.getEntity(Dataset.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
-        }
-    }
-
-
-    /**
-     * Loads a dataset or view based on it's ID
-     *
-     * @param id the ID to load the view through.
-     * @return The View with the supplied ID.
-     *
-     * @throws LongRunningQueryException
-     * @throws SodaError
-     */
-    public Dataset loadView(final String id) throws SodaError, InterruptedException
-    {
-
-        try {
-            final URI uri = UriBuilder.fromUri(viewUri)
-                                        .path(id)
-                                        .build();
-            final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
-            return response.getEntity(Dataset.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
-        }
-    }
-
-
-    /**
-     * Updates a view.
-     *
-     * @param view the view to update to.  The ID MUST be set.
-     * @return the view after the update.
-     *
-     * @throws SodaError
-     * @throws InterruptedException
-     */
-    public  Dataset updateView(Dataset view) throws SodaError, InterruptedException
-    {
-        try {
-            URI uri = UriBuilder.fromUri(viewUri)
-                                .path(view.getId())
-                                .build();
-
-            final ClientResponse response = httpLowLevel.putRaw(uri, HttpLowLevel.JSON_TYPE, view);
-            return response.getEntity(Dataset.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
-        }
-    }
-
-    /**
-     * Deletes a view
-     *
-     * @param id the ID of the view to delete
-     * @throws SodaError
-     * @throws InterruptedException
-     */
-    public void deleteView(String id) throws SodaError, InterruptedException
-    {
-        try {
-
-            URI uri = UriBuilder.fromUri(viewUri)
-                                .path(id)
-                                .build();
-
-            httpLowLevel.deleteRaw(uri);
-        } catch (LongRunningQueryException e) {
-            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
-        }
-    }
 
 
     /**
@@ -334,7 +228,7 @@ public class SodaImporter
     public Dataset importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
         try {
-            final String translationString =  (translation != null) ? mapper.writeValueAsString(translation) : "";
+            final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
             final String blueprintString = mapper.writeValueAsString(blueprint);
 
             final String postData = "translation=" + URLEncoder.encode(translationString, "UTF-8") + "&fileId=" + scanResults.getFileId() + "&name=" + file.getName() + "&blueprint=" +  URLEncoder.encode(blueprintString, "UTF-8");
@@ -369,7 +263,9 @@ public class SodaImporter
 
         int i =0;
         for (BlueprintColumn column : blueprint.getColumns()) {
-            retVal[i++] = column.getName();
+            //retVal[i++] = column.getName();
+            retVal[i] = "col" + i;
+            i++;
         }
 
         return retVal;
