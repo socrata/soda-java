@@ -297,10 +297,14 @@ public final class HttpLowLevel
         return processErrors(response);
     }
 
-    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError
+    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
+        return postFileRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, file);
+    }
+
+    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final File file) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                  .accept("application/json")
+                                                  .accept(acceptType)
                                                   .type(MediaType.MULTIPART_FORM_DATA_TYPE);
 
         FormDataMultiPart form = new FormDataMultiPart();

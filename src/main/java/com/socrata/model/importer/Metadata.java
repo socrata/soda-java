@@ -13,33 +13,35 @@ import java.util.Map;
 public class Metadata
 {
 
-    Map<String, Map<String, String>>    custom_metadata;
+    Map<String, Map<String, String>>    custom_fields;
     List<String>                        warnings;
     String                              rowIdentifier;
     String                              rdfSubject;
     String                              rdfClass;
+    List<Attachment>                    attachments;
 
 
     public Metadata()
     {
     }
 
-    public Metadata(Map<String, Map<String, String>> custom_metadata, String rowIdentifier, String rdfSubject, String rdfClass)
+    public Metadata(Map<String, Map<String, String>> custom_metadata, String rowIdentifier, String rdfSubject, String rdfClass, List<Attachment> attachments)
     {
-        this.custom_metadata = custom_metadata;
+        this.custom_fields = custom_metadata;
         this.rowIdentifier = rowIdentifier;
         this.rdfSubject = rdfSubject;
         this.rdfClass = rdfClass;
+        this.attachments = attachments;
     }
 
-    public Map<String, Map<String, String>> getCustom_metadata()
+    public Map<String, Map<String, String>> getCustom_fields()
     {
-        return custom_metadata;
+        return custom_fields;
     }
 
-    public void setCustom_metadata(Map<String, Map<String, String>> custom_metadata)
+    public void setCustom_fields(Map<String, Map<String, String>> custom_metadata)
     {
-        this.custom_metadata = custom_metadata;
+        this.custom_fields = custom_metadata;
     }
 
     public String getRowIdentifier()
@@ -80,5 +82,15 @@ public class Metadata
     public void setWarnings(List<String>  warnings)
     {
         this.warnings = warnings;
+    }
+
+    public List<Attachment> getAttachments()
+    {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments)
+    {
+        this.attachments = attachments;
     }
 }

@@ -8,6 +8,8 @@ import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.*;
 import com.sun.jersey.api.client.ClientResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -28,10 +31,12 @@ public class SodaImporter extends SodaDdl
 
     public static final String SCAN_BASE_PATH = "imports2";
     public static final String GEO_BASE_PATH = "geocoding";
+    public static final String ASSET_BASE_PATH = "assets";
 
 
     private final URI           importUri;
     private final URI           geocodingUri;
+    private final URI           assetUri;
 
     private final ObjectMapper  mapper = new ObjectMapper();
     static final long ticketCheck = 10000L;
@@ -56,6 +61,11 @@ public class SodaImporter extends SodaDdl
                               .path(IMPORTER_BASE_PATH)
                               .path(GEO_BASE_PATH)
                               .build();
+
+        assetUri = httpLowLevel.uriBuilder()
+                               .path(IMPORTER_BASE_PATH)
+                               .path(ASSET_BASE_PATH)
+                               .build();
     }
 
 
@@ -271,5 +281,49 @@ public class SodaImporter extends SodaDdl
         return retVal;
     }
 
+
+    /**
+     * Adds an asset to the Socrata Service.  An Asset is a file stored as a blob on the service.
+     *
+     * @param file file to upload
+     * @return the asset ID and name
+     */
+    public AssetResponse addAsset(File file) throws SodaError, InterruptedException
+    {
+        try {
+            final ClientResponse response = httpLowLevel.postFileRaw(assetUri, MediaType.TEXT_PLAIN_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
+            return mapper.readValue(response.getEntity(InputStream.class), AssetResponse.class);
+            //return response.getEntity(AssetResponse.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, AssetResponse.class);
+        } catch (JsonMappingException e) {
+            throw new SodaError("Illegal response from the service.");
+        } catch (JsonParseException e) {
+            throw new SodaError("Invalid JSON returned from the service.");
+        } catch (IOException e) {
+            throw new SodaError("Error communicating with service.");
+        }
+    }
+
+    /**
+     * Get an asset given the ID.
+     *
+     * @param id id of the asset to load
+     * @return InputStream of the file saved as the asset
+     */
+    public InputStream getAsset(String id) throws SodaError, InterruptedException
+    {
+        final URI uri = UriBuilder.fromUri(assetUri)
+                                  .path(id)
+                                  .build();
+
+
+        try {
+            final ClientResponse response = httpLowLevel.queryRaw(uri, MediaType.WILDCARD_TYPE);
+            return response.getEntity(InputStream.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, InputStream.class);
+        }
+    }
 
 }
