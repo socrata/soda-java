@@ -6,7 +6,6 @@ package com.socrata.model.importer;
  */
 public class License
 {
-
     String name;
     String logoUrl;
     String termsLink;

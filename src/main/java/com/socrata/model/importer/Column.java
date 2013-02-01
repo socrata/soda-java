@@ -15,7 +15,7 @@ public class Column
     public static final Function<Column, String>   TO_NAME = new Function<Column, String>()
     { @Override public String apply(@Nullable Column input) { return (input != null) ? input.getName() : null; } };
 
-    int id;
+    Integer id;
     String name;
     String fieldName;
     String description;
@@ -27,7 +27,7 @@ public class Column
     {
     }
 
-    public Column(int id, String name, String fieldName, String description, String dataTypeName, int position, Integer width)
+    public Column(Integer id, String name, String fieldName, String description, String dataTypeName, int position, Integer width)
     {
         this.id = id;
         this.name = name;
@@ -38,12 +38,12 @@ public class Column
         this.width = width;
     }
 
-    public int getId()
+    public Integer getId()
     {
         return id;
     }
 
-    private void setId(int id)
+    private void setId(Integer id)
     {
         this.id = id;
     }

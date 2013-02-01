@@ -7,6 +7,7 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.*;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -14,6 +15,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -23,24 +25,23 @@ import java.net.URLEncoder;
 import java.util.Collections;
 
 /**
- * All the import client logic is in this class.
+ * This class contains all the apis for using the full file import/update apis.
+ *
+ * The update and append APIs in this class require the dataset is in a working copy.  Since, creating
+ * and publishing working copies can be expensive, when operating on large datsets or doing frequent updates
+ * you should use the Soda2Producer class.  Soda2Producer does not require creating working copies, however,
+ * when doing very large changes  or replacing a dataset working copies can be useful.
+ *
+ * Look at http://dev.socrata.com/publishers/workflow for information about the workflow process.
  *
  */
 public class SodaImporter extends SodaDdl
 {
 
     public static final String SCAN_BASE_PATH = "imports2";
-    public static final String GEO_BASE_PATH = "geocoding";
-    public static final String ASSET_BASE_PATH = "assets";
 
 
     private final URI           importUri;
-    private final URI           geocodingUri;
-    private final URI           assetUri;
-
-    private final ObjectMapper  mapper = new ObjectMapper();
-    static final long ticketCheck = 10000L;
-
 
 
     /**
@@ -53,25 +54,12 @@ public class SodaImporter extends SodaDdl
         super(httpLowLevel);
 
         importUri = httpLowLevel.uriBuilder()
-                              .path(IMPORTER_BASE_PATH)
+                              .path(API_BASE_PATH)
                               .path(SCAN_BASE_PATH)
                               .build();
 
-        geocodingUri = httpLowLevel.uriBuilder()
-                              .path(IMPORTER_BASE_PATH)
-                              .path(GEO_BASE_PATH)
-                              .build();
 
-        assetUri = httpLowLevel.uriBuilder()
-                               .path(IMPORTER_BASE_PATH)
-                               .path(ASSET_BASE_PATH)
-                               .build();
     }
-
-
-
-
-
 
     /**
      * Creates a dataset from a CSV, using all the default column types.  This will also
@@ -88,7 +76,6 @@ public class SodaImporter extends SodaDdl
      */
     public Dataset createViewFromCsv(final String name, final String description, final File file) throws InterruptedException, SodaError, IOException
     {
-
         return importScanResults(name, description, file, scan(file));
     }
 
@@ -117,74 +104,7 @@ public class SodaImporter extends SodaDdl
         }
     }
 
-    /**
-     * Publishes a dataset.
-     *
-     * @param datasetId id of the dataset to publish.
-     * @return the view of the published dataset.
-     *
-     * @throws SodaError
-     * @throws InterruptedException
-     * @throws LongRunningQueryException
-     */
-    public Dataset publish(final String datasetId) throws SodaError, InterruptedException
-    {
-        waitForPendingGeocoding(datasetId);
-        final URI publicationUri = UriBuilder.fromUri(viewUri)
-                                             .path(datasetId)
-                                             .path("publication")
-                                             .build();
 
-        try {
-
-            ClientResponse response = httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "viewId=" + datasetId);
-            return response.getEntity(Dataset.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
-        }
-    }
-
-    /**
-     * Waits for pending geocodes to be finished.  A publish won't work until all active geocoding requests are
-     * handled.
-     *
-     * @param datasetId id of the dataset to check for outstanding geocodes.
-     * @throws InterruptedException
-     * @throws SodaError
-     */
-    public void waitForPendingGeocoding(final String datasetId) throws InterruptedException, SodaError
-    {
-        GeocodingResults geocodingResults = findPendingGeocodingResults(datasetId);
-        while (geocodingResults.getTotal() > 0)
-        {
-            try { Thread.sleep(ticketCheck); } catch (InterruptedException e) {}
-            geocodingResults = findPendingGeocodingResults(datasetId);
-        }
-    }
-
-    /**
-     * Checks to see if the current dataset has any pending Geocoding results.
-     *
-     * @param datasetId id of the dataset
-     * @return The Geocoding results for this dataset.
-     *
-     * @throws SodaError
-     * @throws InterruptedException
-     */
-    public GeocodingResults findPendingGeocodingResults(final String datasetId) throws SodaError, InterruptedException
-    {
-        try {
-            final URI uri = UriBuilder.fromUri(geocodingUri)
-                                          .path(datasetId)
-                                          .queryParam("method", "pending")
-                                          .build();
-
-            final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
-            return response.getEntity(GeocodingResults.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, GeocodingResults.class);
-        }
-    }
 
 
     /**
@@ -213,7 +133,7 @@ public class SodaImporter extends SodaDdl
      * @param scanResults results of the scan
      * @return The default View object for the dataset that was just created.
      */
-    public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String uniqueColumnName) throws SodaError, InterruptedException, IOException
+    public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName) throws SodaError, InterruptedException, IOException
     {
         final Blueprint blueprint = new BlueprintBuilder(scanResults)
                                         .setSkip(1)
@@ -221,7 +141,27 @@ public class SodaImporter extends SodaDdl
                                         .setDescription(description)
                                         .build();
 
-        return importScanResults(blueprint, null, file, scanResults);
+        Dataset createdDataset = importScanResults(blueprint, null, file, scanResults);
+
+        if (rowIdentifierColumnName != null) {
+            Column  rowIdentifierColumn = null;
+            for (Column column : createdDataset.getColumns()) {
+                if (rowIdentifierColumnName.equals(column.getName())) {
+                    rowIdentifierColumn = column;
+                    break;
+                }
+            }
+
+            if (rowIdentifierColumn == null) {
+                final String columnNames = StringUtils.join(Collections2.transform(createdDataset.getColumns(), Column.TO_NAME), ",");
+                throw new IllegalArgumentException("No column named " + rowIdentifierColumnName + " exists for this dataset.  " +
+                                                           "Current column names are: " + columnNames);
+            }
+
+            createdDataset.setupRowIdentifierColumn(rowIdentifierColumn);
+            createdDataset = updateView(createdDataset);
+        }
+        return createdDataset;
     }
 
 
@@ -237,11 +177,78 @@ public class SodaImporter extends SodaDdl
      */
     public Dataset importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
-        try {
-            final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
-            final String blueprintString = mapper.writeValueAsString(blueprint);
+        final String blueprintString = mapper.writeValueAsString(blueprint);
 
-            final String postData = "translation=" + URLEncoder.encode(translationString, "UTF-8") + "&fileId=" + scanResults.getFileId() + "&name=" + file.getName() + "&blueprint=" +  URLEncoder.encode(blueprintString, "UTF-8");
+        final String blueprintBody = "blueprint="+URLEncoder.encode(blueprintString, "UTF-8");
+        return sendScanResults(blueprintBody, scanResults.getFileId(), translation, file);
+    }
+
+
+    /**
+     * This appends the contents of a file to a dataset on Socrata.  This operation requires the dataset is
+     * in a working copy, so unless you are doing large updates or your dataset is small, using the UPSERT functionality
+     * in Soda2Producer may give you better results.
+     *
+     * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
+     *
+     * @param datasetId  id of the dataset to append to
+     * @param file file with the data in it
+     * @param skip number of rows in the data to skip (normally for skipping headers)
+     * @param translation an optional translation array for translating from values in the file and values in the dataset.
+     * @return The info of the dataset after the append operation.
+     */
+    public DatasetInfo append(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
+    {
+
+        final ScanResults results = scan(file);
+        return updateFromScanResults(datasetId, "append", skip, results.getFileId(), translation, file);
+    }
+
+    /**
+     * This replaces the contents of a file to a dataset on Socrata.  This operation requires the dataset is
+     * in a working copy, which is an expensive operation.  If your dataset is large, you may want to figure out
+     * how to figure out which rows to update, rather than doing a full replace for updates.
+     *
+     * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
+     *
+     * @param datasetId  id of the dataset to append to
+     * @param file file with the data in it
+     * @param skip number of rows in the data to skip (normally for skipping headers)
+     * @param translation an optional translation array for translating from values in the file and values in the dataset.
+     * @return The info of the dataset after the append operation.
+     */
+    public DatasetInfo replace(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
+    {
+        final ScanResults results = scan(file);
+        return updateFromScanResults(datasetId, "replace", skip, results.getFileId(), translation, file);
+    }
+
+    protected Dataset updateFromScanResults(final String datasetId, final String method, final int skip, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    {
+
+
+        final StringBuilder updateBody = new StringBuilder();
+        updateBody.append("viewUid=").append(datasetId)
+                  .append("&method=").append(method)
+                  .append("&skip=").append(skip);
+
+
+        return sendScanResults(updateBody.toString(), fileId, translation, file);
+
+    }
+
+    protected Dataset sendScanResults(final String basePostBody, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    {
+        try {
+            final StringBuilder postbodyBuilder = new StringBuilder(basePostBody);
+
+            final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
+
+            postbodyBuilder.append("&fileId=").append(fileId)
+                           .append("&translation=").append(translationString)
+                           .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"));
+
+            final String postData = postbodyBuilder.toString();
 
             final ClientResponse response = httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, postData);
             return response.getEntity(Dataset.class);
@@ -260,6 +267,7 @@ public class SodaImporter extends SodaDdl
         }
 
     }
+
 
 
     /**
@@ -282,48 +290,5 @@ public class SodaImporter extends SodaDdl
     }
 
 
-    /**
-     * Adds an asset to the Socrata Service.  An Asset is a file stored as a blob on the service.
-     *
-     * @param file file to upload
-     * @return the asset ID and name
-     */
-    public AssetResponse addAsset(File file) throws SodaError, InterruptedException
-    {
-        try {
-            final ClientResponse response = httpLowLevel.postFileRaw(assetUri, MediaType.TEXT_PLAIN_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
-            return mapper.readValue(response.getEntity(InputStream.class), AssetResponse.class);
-            //return response.getEntity(AssetResponse.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, AssetResponse.class);
-        } catch (JsonMappingException e) {
-            throw new SodaError("Illegal response from the service.");
-        } catch (JsonParseException e) {
-            throw new SodaError("Invalid JSON returned from the service.");
-        } catch (IOException e) {
-            throw new SodaError("Error communicating with service.");
-        }
-    }
-
-    /**
-     * Get an asset given the ID.
-     *
-     * @param id id of the asset to load
-     * @return InputStream of the file saved as the asset
-     */
-    public InputStream getAsset(String id) throws SodaError, InterruptedException
-    {
-        final URI uri = UriBuilder.fromUri(assetUri)
-                                  .path(id)
-                                  .build();
-
-
-        try {
-            final ClientResponse response = httpLowLevel.queryRaw(uri, MediaType.WILDCARD_TYPE);
-            return response.getEntity(InputStream.class);
-        } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, InputStream.class);
-        }
-    }
 
 }

@@ -7,247 +7,107 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  A dataset that has been created.
+ *  The schema portions of a dataset.  Anything changed in this class
+ *  as opposed to it's parent class (DatasetInfo) should use a working copy.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class Dataset
+public class Dataset extends DatasetInfo
 {
+    private Integer rowIdentifierColumnId;
+    private List<String> flags = new ArrayList<String>();
+    private List<Column> columns = new ArrayList<Column>();
 
-    String id;
-    String name;
-    String description;
-    Integer rowIdentifierColumnId;
-    Long rowsUpdatedAt;
-    String displayType;
-    String publicationStage;
-    Integer viewCount;
-    String viewType;
-    //Map<String, Object> metadata;
-    Map<String, Object> privateMetadata;
-    List<String> flags = new ArrayList<String>();
-    List<String> rights = new ArrayList<String>();
-    List<String> tags = new ArrayList<String>();
-    List<Column> columns = new ArrayList<Column>();
-
-
-    Metadata metadata;
-    String category;
-    String externalId;
-
-    String attribution;
-    String attributionLink;
-    String licenseId;
-    License license;
-
-    private static final String CUSTOM_FIELDS_ID = "custom_fields";
-
-    public String getId()
-    {
-        return id;
-    }
-
-    private void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
+    /**
+     * Gets the list of columns in this dataset.
+     * @return the list of columns in this dataset.
+     */
     public List<Column> getColumns()
     {
         return columns;
     }
 
-    public void setColumns(List<Column> columns)
+    /**
+     * Sets the list of columns in this dataset.
+     *  @param columns the list of columns in this dataset.
+     */
+    public void setColumns(final List<Column> columns)
     {
         this.columns = columns;
     }
 
-    public Long getRowsUpdatedAt()
-    {
-        return rowsUpdatedAt;
-    }
-
-    private void setRowsUpdatedAt(Long rowsUpdatedAt)
-    {
-        this.rowsUpdatedAt = rowsUpdatedAt;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public String getDisplayType()
-    {
-        return displayType;
-    }
-
-    public void setDisplayType(String displayType)
-    {
-        this.displayType = displayType;
-    }
-
-    public String getPublicationStage()
-    {
-        return publicationStage;
-    }
-
-    public void setPublicationStage(String publicationStage)
-    {
-        this.publicationStage = publicationStage;
-    }
-
-    public Integer getViewCount()
-    {
-        return viewCount;
-    }
-
-    private void setViewCount(Integer viewCount)
-    {
-        this.viewCount = viewCount;
-    }
-
-    public String getViewType()
-    {
-        return viewType;
-    }
-
-    public void setViewType(String viewType)
-    {
-        this.viewType = viewType;
-    }
-
+    /**
+     * Flags describing different characteristics about the dataset.  These are mainly used by the system and shouldn't
+     * really be changed.
+     * @return list of the flags describing this dataset
+     */
     public List<String> getFlags()
     {
         return flags;
     }
 
+    /**
+     * Sets the flags describing this dataset.  These are mainly used by the system and should not really be persisted
+     * back to the server.
+     *
+     * @param flags the flags describing this dataset.
+     */
     public void setFlags(List<String> flags)
     {
         this.flags = flags;
     }
 
-    public List<String> getRights()
-    {
-        return rights;
+    /**
+     * Sets a column to be a row identifier for this dataset.  You can think of this as being the
+     * same as a primary key.
+     *
+     * @param column the column to use as the row identifier.  This MUST have the field set.
+     *               If {@code null}, this will clear out the row identifier so the dataset will use the system built-in primary key.
+     */
+    public void setupRowIdentifierColumn(final Column column) {
+
+        if (column != null) {
+            if (column.getId() == null) {
+                throw new IllegalArgumentException("A column MUST have it's ID set in order to make it a row identifier, " +
+                                                           "this ID will be set on the server when the column is created on a dataset.");
+            }
+
+            Metadata metadata = getMetadata();
+            if (metadata == null) {
+                metadata = new Metadata();
+                setMetadata(metadata);
+            }
+
+            metadata.setRowIdentifier(column.getFieldName());
+            rowIdentifierColumnId = column.getId();
+        } else {
+            rowIdentifierColumnId = null;
+            Metadata metadata = getMetadata();
+            if (metadata != null) {
+                metadata.setRowIdentifier(null);
+            }
+        }
     }
 
-    public void setRights(List<String> rights)
-    {
-        this.rights = rights;
-    }
-
-    public List<String> getTags()
-    {
-        return tags;
-    }
-
-    public void setTags(List<String> tags)
-    {
-        this.tags = tags;
-    }
-
-    public Metadata getMetadata()
-    {
-        return metadata;
-    }
-
-    public void setMetadata(Metadata metadata)
-    {
-        this.metadata = metadata;
-    }
-
-    public Map<String, Object> getPrivateMetadata()
-    {
-        return privateMetadata;
-    }
-
-    public void setPrivateMetadata(Map<String, Object> privateMetadata)
-    {
-        this.privateMetadata = privateMetadata;
-    }
-
+    /**
+     * Gets the ID of the row identifier column (like a primary key)
+     * @return the ID of the row identifier column (like a primary key)
+     */
     public Integer getRowIdentifierColumnId()
     {
         return rowIdentifierColumnId;
     }
 
-    public void setRowIdentifierColumnId(Integer rowIdentifierColumnId)
+    /**
+     * Sets the row identier column ID for the (like a primary key).  It is important to note
+     * that when changing this to update the server, you will need to set the row identifier field in the
+     * metadata field as well.  Or you can call setRowIdentifierColumn to do this for you.
+     *
+     * @param rowIdentifierColumnId the id of the row identifier column (like a primary key)
+     */
+    public void setRowIdentifierColumnId(final Integer rowIdentifierColumnId)
     {
         this.rowIdentifierColumnId = rowIdentifierColumnId;
     }
 
-    public String getCategory()
-    {
-        return category;
-    }
 
-    public void setCategory(String category)
-    {
-        this.category = category;
-    }
-
-    public String getExternalId()
-    {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId)
-    {
-        this.externalId = externalId;
-    }
-
-    public String getAttribution()
-    {
-        return attribution;
-    }
-
-    public void setAttribution(String attribution)
-    {
-        this.attribution = attribution;
-    }
-
-    public String getAttributionLink()
-    {
-        return attributionLink;
-    }
-
-    public void setAttributionLink(String attributionLink)
-    {
-        this.attributionLink = attributionLink;
-    }
-
-    public String getLicenseId()
-    {
-        return licenseId;
-    }
-
-    public void setLicenseId(String licenseId)
-    {
-        this.licenseId = licenseId;
-    }
-
-    public License getLicense()
-    {
-        return license;
-    }
-
-    public void setLicense(License license)
-    {
-        this.license = license;
-    }
 }

@@ -6,15 +6,13 @@ import com.google.common.collect.Maps;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
-import com.socrata.model.importer.Column;
-import com.socrata.model.importer.Dataset;
-import com.socrata.model.importer.License;
-import com.socrata.model.importer.Metadata;
+import com.socrata.model.importer.*;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -106,7 +104,7 @@ public class SodaDdlTest  extends TestBase
         final String name = "Name" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
-        final SodaDdl importer = new SodaDdl(connection);
+        final SodaImporter importer = new SodaImporter(connection);
 
         final Dataset view = new Dataset();
         view.setName(name);
@@ -131,6 +129,16 @@ public class SodaDdlTest  extends TestBase
         final Dataset loadedView2 = importer.loadView(createdView.getId());
         TestCase.assertEquals(1, loadedView2.getMetadata().getCustom_fields().size());
 
+        importer.publish(createdView.getId());
+
+        final DatasetInfo loadedView3 = new DatasetInfo();
+        loadedView3.setId(loadedView2.getId());
+        final Metadata metadata2 = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "FFFFF")), null, null, null, null);
+        loadedView3.setMetadata(metadata2);
+        DatasetInfo loadedDataset = importer.updateView(loadedView3);
+        TestCase.assertEquals("FFFFF", loadedDataset.getMetadata().getCustom_fields().get("Dataset Summary").get("Organization"));
+
+        importer.deleteView(loadedDataset.getId());
     }
 
 }
