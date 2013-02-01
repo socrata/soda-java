@@ -98,11 +98,19 @@ public class SodaWorkflowTest  extends TestBase
         //
         //  Now work on replace
         final DatasetInfo unpublishedView2 = importer.createWorkingCopy(datasetInfo.getId());
+        TestCase.assertFalse(unpublishedView2.getId().equals(publishedResults.getId()));
+
         importer.replace(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
         final DatasetInfo publishedResults2 = importer.publish(unpublishedView2.getId());
+        TestCase.assertEquals(publishedResults.getId(), publishedResults2.getId());
+
 
         List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, new GenericType(Object.class) {});
         TestCase.assertEquals(2, results2.size());
+
+        //
+        //  Now delete
+        importer.deleteView(publishedResults2.getId());
 
     }
 
