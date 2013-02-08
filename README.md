@@ -1,14 +1,27 @@
 soda-java
 =========
 
-This is the Java API for SODA2.  SODA is broken in to the producer and consumer parts of the API.  The consumer
-interface is very SQL like.  This API provides the Soda2Consumer interface, along with a builder pattern for creating
-queries.  It also provides the Soda2Producer interface for updating data sets.
+This is the Java API for the Socrata Open Data API (SODA).  You can look at the devloper site (http://dev.socrata.com/) for
+a deeper discussion of the underlying protocol.
+
+The API is broken into several logical parts:
+
+* The **Producer** api provides functions to add/update/delete objects for datasets that are updated frequently, or for updates
+that are small.  The advantage of this api is that the changes do NOT requre a working copy or to use the publishing cycle
+at all, so there is no overhead of copying the dataset data around.
+* The **Consumer** api provides a rich, simple query language called SoQL.  SoQL is based off of SQL, and the Consumer
+api provides methods to build, execute and consume the results for these queries.
+* The **Workflow** api provides functions for creating and publishing working copies of datasets.  These are required for
+any changes in a dataset's schema or for the large, bulk changes using the import API
+* The **DDL** api provides functions for creating/updating/deleting datasets or columns on datasets.
+* The **Import** api provides functions for importing files into datasets.  This can be used for creating
+a dataset as well as replacing or appending to datasets.
+
 
 This library is built using two "Layers" or interaction.  The HttpLowLevel class takes care of much of the common
 HTTP and URL wrangling required by SODA, but does not deal with any unmarshalling of results.
 
-The Soda2Consumer and Soda2Producer classes are built on top of the HttpLowLevel class.  They build upon it to
+The Soda2Consumer, Soda2Producer, SodaDdl, SodaImporter and SodaWorkflow classes are built on top of the HttpLowLevel class.  They build upon it to
 use Jackson to do marshalling from the JSON to Java Objects.
 
 If you want to actually see any of these examples working.  You can take a look at the class `com.socrata.ExamplesTest`
@@ -96,4 +109,14 @@ The library also allows callers to upsert based on a CSV file or stream.
     InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
     UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
 
+
+**Easiest way to import a CSV file**
+
+The library makes it simple to upload a CSV file and create a new dataset.
+
+        final SodaImporter    importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+
+        //Create the dataset from the CSV and set the RowColumnIdentifier to "name"
+        final DatasetInfo     nominationsDataset = importer.createViewFromCsv(uniqueName, "This is a test dataset using samples with the nominations schema", NOMINATIONS_CSV, "Name");
+        importer.publish(nominationsDataset.getId());
 

@@ -6,15 +6,14 @@ import com.google.common.collect.Maps;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.SearchResults;
 import com.socrata.model.importer.*;
+import com.socrata.model.search.SearchClause;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * */
@@ -139,6 +138,40 @@ public class SodaDdlTest  extends TestBase
         TestCase.assertEquals("FFFFF", loadedDataset.getMetadata().getCustom_fields().get("Dataset Summary").get("Organization"));
 
         importer.deleteView(loadedDataset.getId());
+    }
+
+
+    @Test
+    public void testSearch() throws SodaError, InterruptedException, IOException
+    {
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+
+        final SearchClause    nameClause = new SearchClause.NameSearch("TestUpdate");
+        final SearchClause    tagClause = new SearchClause.TagSearch("test");
+        final SearchClause    metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata");
+
+        final SearchResults results1 =  importer.searchViews(nameClause);
+        TestCase.assertEquals(1, results1.getCount());
+        TestCase.assertEquals("TestUpdate", results1.getResults().get(0).getDataset().getName());
+
+        final SearchResults results2 =  importer.searchViews(tagClause);
+        TestCase.assertEquals(4, results2.getCount());
+
+        final SearchResults results2a =  importer.searchViews(tagClause, nameClause);
+        TestCase.assertEquals(1, results2a.getCount());
+        TestCase.assertEquals("TestUpdate", results2a.getResults().get(0).getDataset().getName());
+
+
+        final SearchResults results3 =  importer.searchViews(metadataClause);
+        TestCase.assertEquals(1, results3.getCount());
+        TestCase.assertEquals("TestUpdate", results3.getResults().get(0).getDataset().getName());
+
+        final SearchResults results4 =  importer.searchViews(nameClause, tagClause, metadataClause);
+        TestCase.assertEquals(1, results4.getCount());
+        TestCase.assertEquals("TestUpdate", results4.getResults().get(0).getDataset().getName());
+
     }
 
 }

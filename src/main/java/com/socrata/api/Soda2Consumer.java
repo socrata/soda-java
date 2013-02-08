@@ -2,11 +2,11 @@ package com.socrata.api;
 
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.soql.SoqlQuery;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class Soda2Consumer extends Soda2Base
 {
+    public static final GenericType<List<Object>> HASH_RETURN_TYPE = new GenericType(Object.class) {};
+
     /**
      * Creates a new Soda2Consumer that had no authentication associated with it.  All requests
      * will be done as an anonymous user.
@@ -68,11 +70,18 @@ public class Soda2Consumer extends Soda2Base
      */
     public <T> T getById(String resourceId, String id, Class<T> cls) throws SodaError, InterruptedException
     {
+
+        SodaRequest requester = new SodaRequest<String>(resourceId, id)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            { return getById(resourceId, HttpLowLevel.JSON_TYPE, payload); }
+        };
+
         try {
-            final ClientResponse    response = getById(resourceId, HttpLowLevel.JSON_TYPE, id);
+            final ClientResponse    response = requester.issueRequest();
             return response.getEntity(new GenericType<T>(cls));
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<T>(cls));
+            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<T>(cls), requester);
         }
     }
 
@@ -92,11 +101,17 @@ public class Soda2Consumer extends Soda2Base
     public <T> List<T> query(String resourceId, SoqlQuery query, GenericType<List<T>> genericType) throws SodaError, InterruptedException
     {
 
+        SodaRequest requester = new SodaRequest<SoqlQuery>(resourceId, query)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            { return query(resourceId, HttpLowLevel.JSON_TYPE, payload); }
+        };
+
         try {
             final ClientResponse    response = query(resourceId, HttpLowLevel.JSON_TYPE, query);
             return response.getEntity(genericType);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, genericType);
+            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, genericType, requester);
         }
 
 
@@ -116,11 +131,18 @@ public class Soda2Consumer extends Soda2Base
      */
     public <T> List<T>  query(String resourceId, String query, GenericType<List<T>> genericType) throws SodaError, InterruptedException
     {
+
+        SodaRequest requester = new SodaRequest<String>(resourceId, query)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            { return query(resourceId, HttpLowLevel.JSON_TYPE, payload); }
+        };
+
         try {
-            final ClientResponse    response = query(resourceId, HttpLowLevel.JSON_TYPE, query);
+            final ClientResponse    response = requester.issueRequest();
             return response.getEntity(genericType);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, genericType);
+            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, genericType, requester);
         }
     }
 

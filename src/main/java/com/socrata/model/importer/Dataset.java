@@ -1,5 +1,8 @@
 package com.socrata.model.importer;
 
+import com.google.common.collect.Collections2;
+import com.sun.jersey.api.client.GenericType;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Dataset extends DatasetInfo
 {
+    public static final GenericType<List<Dataset>> LIST_TYPE = new GenericType<List<Dataset>>() {};
+
     private Integer rowIdentifierColumnId;
     private List<String> flags = new ArrayList<String>();
     private List<Column> columns = new ArrayList<Column>();
@@ -54,6 +59,31 @@ public class Dataset extends DatasetInfo
     public void setFlags(List<String> flags)
     {
         this.flags = flags;
+    }
+
+
+    /**
+     * Looks up a column by it's name and uses that to setup the row identifier column.
+     *
+     * @param columnName name of the column
+     */
+    public void setupRowIdentifierColumnByName(final String columnName) {
+
+        if (columnName != null) {
+            for (Column column : getColumns()) {
+                if (columnName.equals(column.getName())) {
+                    setupRowIdentifierColumn(column);
+                    return;
+                }
+            }
+
+            final String columnNames = StringUtils.join(Collections2.transform(getColumns(), Column.TO_NAME), ",");
+            throw new IllegalArgumentException("No column named " + columnName + " exists for this dataset.  " +
+                                                       "Current column names are: " + columnNames);
+
+        } else {
+            setupRowIdentifierColumn(null);
+        }
     }
 
     /**

@@ -1,28 +1,20 @@
 package com.socrata.api;
 
-import com.google.common.collect.Collections2;
 import com.socrata.builders.BlueprintBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
-import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.*;
+import com.socrata.model.requests.SodaRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.Collections;
 
 /**
  * This class contains all the apis for using the full file import/update apis.
@@ -43,6 +35,21 @@ public class SodaImporter extends SodaDdl
 
     private final URI           importUri;
 
+
+    /**
+     * Create a new SodaImporter object, using the supplied credentials for authentication.
+     *
+     * @param url the base URL for the SODA2 domain to access.
+     * @param userName user name to log in as
+     * @param password password to log in with
+     * @param token the App Token to use for authorization and usage tracking.  If this is {@code null}, no value will be sent.
+     *
+     * @return fully configured SodaImporter
+     */
+    public static final SodaImporter newImporter(final String url, String userName, String password, String token)
+    {
+        return new SodaImporter(HttpLowLevel.instantiateBasic(url, userName, password, token));
+    }
 
     /**
      * Constructor.
@@ -68,13 +75,33 @@ public class SodaImporter extends SodaDdl
      * @param name name of the dataset to create
      * @param description description of the new dataset
      * @param file the file to upload
+     * @param rowIdentifierColumnName row identifie
      * @return return the view that was just created.
      *
      * @throws InterruptedException
      * @throws SodaError
      * @throws IOException
      */
-    public Dataset createViewFromCsv(final String name, final String description, final File file) throws InterruptedException, SodaError, IOException
+    public DatasetInfo createViewFromCsv(final String name, final String description, final File file, @Nullable final String rowIdentifierColumnName) throws InterruptedException, SodaError, IOException
+    {
+        return importScanResults(name, description, file, scan(file), rowIdentifierColumnName);
+    }
+
+
+    /**
+     * Creates a dataset from a CSV, using all the default column types.  This will also
+     * assume the CSV has a single header row at the top.
+     *
+     * @param name name of the dataset to create
+     * @param description description of the new dataset
+     * @param file the file to upload
+     * @return return the view that was just created.
+     *
+     * @throws InterruptedException
+     * @throws SodaError
+     * @throws IOException
+     */
+    public DatasetInfo createViewFromCsv(final String name, final String description, final File file) throws InterruptedException, SodaError, IOException
     {
         return importScanResults(name, description, file, scan(file));
     }
@@ -92,15 +119,24 @@ public class SodaImporter extends SodaDdl
      */
     public ScanResults scan(final File file) throws SodaError, InterruptedException
     {
-        try {
-            final URI scanUri = UriBuilder.fromUri(importUri)
-                                          .queryParam("method", "scan")
-                                          .build();
 
-            final ClientResponse response = httpLowLevel.postFileRaw(scanUri, HttpLowLevel.CSV_TYPE, file);
+        SodaRequest requester = new SodaRequest<File>(null, file)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI scanUri = UriBuilder.fromUri(importUri)
+                                              .queryParam("method", "scan")
+                                              .build();
+
+                return httpLowLevel.postFileRaw(scanUri, HttpLowLevel.CSV_TYPE, payload);
+            }
+        };
+
+        try {
+            final ClientResponse response = requester.issueRequest();
             return response.getEntity(ScanResults.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, ScanResults.class);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, ScanResults.class, requester);
         }
     }
 
@@ -117,7 +153,7 @@ public class SodaImporter extends SodaDdl
      * @param scanResults results of the scan
      * @return The default View object for the dataset that was just created.
      */
-    public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
+    public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
        return importScanResults(name, description, file, scanResults, null);
     }
@@ -133,7 +169,7 @@ public class SodaImporter extends SodaDdl
      * @param scanResults results of the scan
      * @return The default View object for the dataset that was just created.
      */
-    public Dataset importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName) throws SodaError, InterruptedException, IOException
+    public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName) throws SodaError, InterruptedException, IOException
     {
         final Blueprint blueprint = new BlueprintBuilder(scanResults)
                                         .setSkip(1)
@@ -141,27 +177,15 @@ public class SodaImporter extends SodaDdl
                                         .setDescription(description)
                                         .build();
 
-        Dataset createdDataset = importScanResults(blueprint, null, file, scanResults);
+        DatasetInfo createdDatasetInfo = importScanResults(blueprint, null, file, scanResults);
 
         if (rowIdentifierColumnName != null) {
-            Column  rowIdentifierColumn = null;
-            for (Column column : createdDataset.getColumns()) {
-                if (rowIdentifierColumnName.equals(column.getName())) {
-                    rowIdentifierColumn = column;
-                    break;
-                }
-            }
 
-            if (rowIdentifierColumn == null) {
-                final String columnNames = StringUtils.join(Collections2.transform(createdDataset.getColumns(), Column.TO_NAME), ",");
-                throw new IllegalArgumentException("No column named " + rowIdentifierColumnName + " exists for this dataset.  " +
-                                                           "Current column names are: " + columnNames);
-            }
-
-            createdDataset.setupRowIdentifierColumn(rowIdentifierColumn);
-            createdDataset = updateView(createdDataset);
+            final Dataset createdDataset = loadView(createdDatasetInfo.getId());
+            createdDataset.setupRowIdentifierColumnByName(rowIdentifierColumnName);
+            createdDatasetInfo = updateView(createdDataset);
         }
-        return createdDataset;
+        return createdDatasetInfo;
     }
 
 
@@ -175,7 +199,7 @@ public class SodaImporter extends SodaDdl
      * @param scanResults results of the scan
      * @return The default View object for the dataset that was just created.
      */
-    public Dataset importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
+    public DatasetInfo importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
         final String blueprintString = mapper.writeValueAsString(blueprint);
 
@@ -223,7 +247,7 @@ public class SodaImporter extends SodaDdl
         return updateFromScanResults(datasetId, "replace", skip, results.getFileId(), translation, file);
     }
 
-    protected Dataset updateFromScanResults(final String datasetId, final String method, final int skip, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    protected DatasetInfo updateFromScanResults(final String datasetId, final String method, final int skip, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
     {
 
 
@@ -237,31 +261,40 @@ public class SodaImporter extends SodaDdl
 
     }
 
-    protected Dataset sendScanResults(final String basePostBody, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    protected DatasetInfo sendScanResults(final String basePostBody, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
     {
+
+        final StringBuilder postbodyBuilder = new StringBuilder(basePostBody);
+
+        final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
+
+        postbodyBuilder.append("&fileId=").append(fileId)
+                       .append("&translation=").append(translationString)
+                       .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"));
+
+        SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                return httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, payload);
+            }
+        };
+
+
         try {
-            final StringBuilder postbodyBuilder = new StringBuilder(basePostBody);
 
-            final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
-
-            postbodyBuilder.append("&fileId=").append(fileId)
-                           .append("&translation=").append(translationString)
-                           .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"));
-
-            final String postData = postbodyBuilder.toString();
-
-            final ClientResponse response = httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, postData);
-            return response.getEntity(Dataset.class);
+            final ClientResponse response = requester.issueRequest();
+            return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
 
             if (e.location != null) {
-                return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, Dataset.class);
+                return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, DatasetInfo.class, requester);
             } else {
 
                 final URI ticketUri = UriBuilder.fromUri(importUri)
                                                 .queryParam("ticket", e.ticket)
                                                 .build();
-                return getHttpLowLevel().getAsyncResults(ticketUri, e.timeToRetry, Integer.MAX_VALUE, Dataset.class);
+                return getHttpLowLevel().getAsyncResults(ticketUri, e.timeToRetry, Integer.MAX_VALUE, Dataset.class, requester);
 
             }
         }

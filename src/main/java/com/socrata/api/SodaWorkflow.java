@@ -5,6 +5,7 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
+import com.socrata.model.requests.SodaRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -32,6 +33,23 @@ public class SodaWorkflow
     protected final HttpLowLevel  httpLowLevel;
     protected final ObjectMapper  mapper;
     protected final URI           viewUri;
+
+
+    /**
+     * Create a new SodaWorkflow object, using the supplied credentials for authentication.
+     *
+     * @param url the base URL for the SODA2 domain to access.
+     * @param userName user name to log in as
+     * @param password password to log in with
+     * @param token the App Token to use for authorization and usage tracking.  If this is {@code null}, no value will be sent.
+     *
+     * @return fully configured SodaWorkflow
+     */
+    public static final SodaWorkflow newWorkflow(final String url, String userName, String password, String token)
+    {
+        return new SodaWorkflow(HttpLowLevel.instantiateBasic(url, userName, password, token));
+    }
+
 
     /**
      * Constructor.
@@ -78,17 +96,29 @@ public class SodaWorkflow
      */
     public DatasetInfo publish(final String datasetId) throws SodaError, InterruptedException
     {
+
+
         waitForPendingGeocoding(datasetId);
-        final URI publicationUri = UriBuilder.fromUri(viewUri)
-                                             .path(datasetId)
-                                             .path("publication")
-                                             .build();
+
+        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI publicationUri = UriBuilder.fromUri(viewUri)
+                                                     .path(resourceId)
+                                                     .path("publication")
+                                                     .build();
+
+
+                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "viewId=" + resourceId);
+            }
+        };
 
         try {
-            ClientResponse response = httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "viewId=" + datasetId);
+            ClientResponse response = requester.issueRequest();
             return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class, requester);
         }
     }
 
@@ -105,18 +135,26 @@ public class SodaWorkflow
      */
     public DatasetInfo createWorkingCopy(final String datasetId) throws SodaError, InterruptedException{
 
-        final URI publicationUri = UriBuilder.fromUri(viewUri)
-                                             .path(datasetId)
-                                             .path("publication.json")
-                                             .queryParam("method", "copy")
-                                             .build();
+        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI publicationUri = UriBuilder.fromUri(viewUri)
+                                                     .path(resourceId)
+                                                     .path("publication.json")
+                                                     .queryParam("method", "copy")
+                                                     .build();
+
+                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=copy");
+            }
+        };
 
         try {
 
-            ClientResponse response = httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=copy");
+            ClientResponse response = requester.issueRequest();
             return response.getEntity(Dataset.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
         }
     }
 
@@ -132,7 +170,7 @@ public class SodaWorkflow
     public void waitForPendingGeocoding(final String datasetId) throws InterruptedException, SodaError
     {
         GeocodingResults geocodingResults = findPendingGeocodingResults(datasetId);
-        while (geocodingResults.getTotal() > 0)
+        while (geocodingResults.getView() > 0)
         {
             try { Thread.sleep(TICKET_CHECK); } catch (InterruptedException e) {}
             geocodingResults = findPendingGeocodingResults(datasetId);
@@ -150,16 +188,27 @@ public class SodaWorkflow
      */
     public GeocodingResults findPendingGeocodingResults(final String datasetId) throws SodaError, InterruptedException
     {
-        try {
-            final URI uri = UriBuilder.fromUri(geocodingUri)
-                                      .path(datasetId)
-                                      .queryParam("method", "pending")
-                                      .build();
+        SodaRequest requester = new SodaRequest<String>(datasetId, null)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI uri = UriBuilder.fromUri(geocodingUri)
+                                          .path(datasetId)
+                                          .queryParam("method", "pending")
+                                          .build();
 
-            final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
+                return httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
+            }
+        };
+
+
+        try {
+
+
+            final ClientResponse response = requester.issueRequest();
             return response.getEntity(GeocodingResults.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, GeocodingResults.class);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, GeocodingResults.class, requester);
         }
     }
 

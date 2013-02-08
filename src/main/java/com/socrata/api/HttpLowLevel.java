@@ -2,10 +2,8 @@ package com.socrata.api;
 
 
 import com.socrata.exceptions.*;
-import com.socrata.model.UpsertResult;
-import com.socrata.model.Meta;
 import com.socrata.model.SodaErrorResponse;
-import com.socrata.model.soql.SoqlQuery;
+import com.socrata.model.requests.SodaRequest;
 import com.socrata.utils.JacksonObjectMapperProvider;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -30,10 +28,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,7 +50,7 @@ public final class HttpLowLevel
             .withZone(DateTimeZone.UTC);
 
 
-    protected static final int DEFAULT_MAX_RETRIES = 20;
+    protected static final int DEFAULT_MAX_RETRIES = 200;
     public static final long   DEFAULT_RETRY_TIME = 1000;
 
     public static final String SODA_VERSION = "$$version";
@@ -154,7 +150,7 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse follow202(final URI uri, final MediaType mediaType, final long retryTime) throws InterruptedException, LongRunningQueryException, SodaError
+    public ClientResponse follow202(final URI uri, final MediaType mediaType, final long retryTime, final SodaRequest request2Rerun) throws InterruptedException, LongRunningQueryException, SodaError
     {
         if (retryTime > 0) {
             synchronized (this) {
@@ -162,7 +158,11 @@ public final class HttpLowLevel
             }
         }
 
-        return queryRaw(uri, mediaType);
+        if (uri != null) {
+            return queryRaw(uri, mediaType);
+        } else {
+            return request2Rerun.issueRequest();
+        }
     }
 
     /**
@@ -177,10 +177,10 @@ public final class HttpLowLevel
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public <T> T getAsyncResults(URI uri, long waitTime, long numRetries, Class<T> cls) throws SodaError, InterruptedException
+    final public <T> T getAsyncResults(URI uri, long waitTime, long numRetries, Class<T> cls, final SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
 
-        final ClientResponse response = getAsyncResults(uri, HttpLowLevel.JSON_TYPE, waitTime, numRetries);
+        final ClientResponse response = getAsyncResults(uri, HttpLowLevel.JSON_TYPE, waitTime, numRetries, request2Rerun);
         return response.getEntity(cls);
     }
 
@@ -196,9 +196,9 @@ public final class HttpLowLevel
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public <T> T getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, GenericType<T> cls) throws SodaError, InterruptedException
+    final public <T> T getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, GenericType<T> cls, SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
-        final ClientResponse response = getAsyncResults(uri, mediaType, waitTime, numRetries);
+        final ClientResponse response = getAsyncResults(uri, mediaType, waitTime, numRetries, request2Rerun);
         return response.getEntity(cls);
     }
 
@@ -208,18 +208,19 @@ public final class HttpLowLevel
      * @param uri the URI to go to for responses.
      * @param waitTime the time to wait until the first response
      * @param numRetries the total number of times to retry before failing.
+     * @param request2Rerun the object to use to re-run the request.
      * @return the ClientReponse for a successful response.
      *
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public ClientResponse getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries) throws SodaError, InterruptedException
+    final public ClientResponse getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
 
         for (int i=0; i<numRetries; i++) {
 
             try {
-                final ClientResponse response = follow202(uri, mediaType, waitTime);
+                final ClientResponse response = follow202(uri, mediaType, waitTime, request2Rerun);
                 return response;
             } catch (LongRunningQueryException e) {
 
@@ -258,16 +259,17 @@ public final class HttpLowLevel
      * and throw if there are any.
      *
      * @param uri URI to issue a request to.  Any id information should have already been added.
+     * @param acceptType the MIME Type accepted by this client
      * @return the raw ClientReponse to the request.  Any errors will have already been processed, and have thrown
      * and exception.
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse queryRaw(final URI uri, final MediaType mediaType) throws LongRunningQueryException, SodaError
+    public ClientResponse queryRaw(final URI uri, final MediaType acceptType) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                    .accept(mediaType);
+                                                    .accept(acceptType);
 
         final ClientResponse response = builder.get(ClientResponse.class);
         return processErrors(response);
@@ -392,7 +394,10 @@ public final class HttpLowLevel
                 try {
                     final ObjectMapper mapper = new ObjectMapper();
                     final Map<String, Object> bodyProperties = (Map<String, Object>)mapper.readValue(body, Object.class);
-                    ticket = bodyProperties.get("ticket").toString();
+                    if (bodyProperties.get("ticket") != null) {
+                        ticket = bodyProperties.get("ticket").toString();
+                    }
+
                 } catch (IOException ioe) {
                     throw new SodaError("Illegal body for 202 response.  No location or ticket.  Body = " + body);
                 }
@@ -439,6 +444,10 @@ public final class HttpLowLevel
      * NOT the number of milliseconds to wait.  To get milliseconds to wait, subtract current time.
      */
     private long parseRetryAfter(final String retryAfter) {
+        if (retryAfter == null) {
+            return DEFAULT_RETRY_TIME;
+        }
+
         if (StringUtils.isNumeric(retryAfter)) {
             return System.currentTimeMillis() + Integer.parseInt(retryAfter) * 1000L;
         } else {

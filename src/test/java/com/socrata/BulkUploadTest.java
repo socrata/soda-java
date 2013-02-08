@@ -7,7 +7,7 @@ import com.socrata.api.SodaImporter;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.UpsertResult;
-import com.socrata.model.importer.Dataset;
+import com.socrata.model.importer.DatasetInfo;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class BulkUploadTest extends TestBase
         final String description = name + "-Description";
 
 
-        final Dataset dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER);
+        final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER);
         TestCase.assertNotNull(dataset);
         TestCase.assertNotNull(dataset.getId());
 

@@ -67,7 +67,7 @@ public class Soda2Base
      *                    set in the metadata, or the unique ID given to the resource.
      * @param query The query string to be executed against the resource.  This should NOT be URL encoded.
      *
-     * @return a response containing the response stream, if the request is successful.
+     * @return The results from the operation
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
@@ -114,13 +114,13 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public void doTruncate(String resourceId) throws LongRunningQueryException, SodaError
+    public ClientResponse doTruncate(String resourceId) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
-        httpLowLevel.deleteRaw(builder.build());
+        return httpLowLevel.deleteRaw(builder.build());
     }
 
     /**
@@ -133,14 +133,14 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public void doDelete(String resourceId, String uniqueId) throws LongRunningQueryException, SodaError
+    public ClientResponse doDelete(String resourceId, String uniqueId) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId)
                                              .path(uniqueId);
-        httpLowLevel.deleteRaw(builder.build());
+        return httpLowLevel.deleteRaw(builder.build());
     }
 
 
@@ -152,47 +152,19 @@ public class Soda2Base
      * @param object The object that should be serialized to JSON and added to the dataset.  Jackson is used for serialization
      *               and deserialization.
      *
-     * @return the metadata for the object just added.  This will include the unique ID for the row, so it can be
-     * unambigously loaded through getById
+     * @return The results from the operation
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> Meta doAdd(String resourceId, T object) throws LongRunningQueryException, SodaError
+    public <T> ClientResponse doAdd(String resourceId, T object) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
-        return response.getEntity(Meta.class);
-    }
-
-    /**
-     * Adds a single row to a dataset.
-     *
-     * @param resourceId  The id of the resource to query.  This can either be the resource endpoint name
-     *                    set in the metadata, or the unique ID given to the resource.
-     * @param object The object that should be serialized to JSON and added to the dataset.  Jackson is used for serialization
-     *               and deserialization.
-     * @param retType type that should be returned from here.
-     *
-     * @return the metadata for the object just added.  This will include the unique ID for the row, so it can be
-     * unambigously loaded through getById
-     * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
-     * the caller likely wants to call follow202.
-     * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
-     */
-    public <T> T doAdd(String resourceId, T object, Class<T> retType) throws LongRunningQueryException, SodaError
-    {
-
-        final UriBuilder builder = httpLowLevel.uriBuilder()
-                                             .path(SODA_BASE_PATH)
-                                             .path(resourceId);
-
-        final ClientResponse response = httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
-        return response.getEntity(retType);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
     }
 
     /**
@@ -203,20 +175,19 @@ public class Soda2Base
      * @param objects The objects that should be serialized to JSON and added to the dataset.  Jackson is used for serialization
      *               and deserialization.
      *
-     * @return The upsert result describing succeful and unsucessful operations.
+     * @return The results from the operation
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> UpsertResult doAddObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
+    public <T> ClientResponse doAddObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, objects);
-        return response.getEntity(UpsertResult.class);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, objects);
     }
 
     /**
@@ -228,20 +199,20 @@ public class Soda2Base
      * @param mediaType The media type for the stream (normally JSON or CSV)
      * @param stream The objects to add, already serialized in a stream.
      *
-     * @return The upsert result describing succeful and unsucessful operations.
+     * @return The results from the operation
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public UpsertResult doAddStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
+    public ClientResponse doAddStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        final ClientResponse response = httpLowLevel.postRaw(builder.build(), mediaType, stream);
-        return response.getEntity(UpsertResult.class);
+        return httpLowLevel.postRaw(builder.build(), mediaType, stream);
+
     }
 
 
@@ -255,13 +226,12 @@ public class Soda2Base
      * @param object The object that should be serialized to JSON and added to the dataset.  Jackson is used for serialization
      *               and deserialization.
      *
-     * @return the metadata for the object just added.  This will include the unique ID for the row, so it can be
-     * unambigously loaded through getById
+     * @return The results from the operation
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public Meta doUpdate(String resourceId, Object uniqueId, Object object) throws LongRunningQueryException, SodaError
+    public ClientResponse doUpdate(String resourceId, Object uniqueId, Object object) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -269,8 +239,8 @@ public class Soda2Base
                                              .path(resourceId)
                                              .path(uniqueId.toString());
 
-        final ClientResponse response = httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
-        return response.getEntity(Meta.class);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
+
     }
 
 

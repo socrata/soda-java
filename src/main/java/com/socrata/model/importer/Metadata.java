@@ -56,7 +56,6 @@ public class Metadata
         }
 
         return retVal;
-
     }
 
     public Metadata()

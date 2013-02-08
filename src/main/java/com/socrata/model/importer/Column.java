@@ -15,6 +15,9 @@ public class Column
     public static final Function<Column, String>   TO_NAME = new Function<Column, String>()
     { @Override public String apply(@Nullable Column input) { return (input != null) ? input.getName() : null; } };
 
+    public static final Function<Column, Column>   COPY = new Function<Column, Column>()
+    { @Override public Column apply(@Nullable Column input) { return (input != null) ? new Column(input) : null; } };
+
     Integer id;
     String name;
     String fieldName;
@@ -36,6 +39,17 @@ public class Column
         this.dataTypeName = dataTypeName;
         this.position = position;
         this.width = width;
+    }
+
+    public Column(Column src)
+    {
+        this.id = src.id;
+        this.name = src.name;
+        this.fieldName = src.fieldName;
+        this.description = src.description;
+        this.dataTypeName = src.dataTypeName;
+        this.position = src.position;
+        this.width = src.width;
     }
 
     public Integer getId()

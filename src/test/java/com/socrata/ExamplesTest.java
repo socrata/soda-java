@@ -1,12 +1,11 @@
 package com.socrata;
 
-import com.socrata.api.HttpLowLevel;
-import com.socrata.api.Soda2Consumer;
-import com.socrata.api.Soda2Producer;
+import com.socrata.api.*;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.Meta;
 import com.socrata.model.UpsertResult;
+import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
@@ -16,17 +15,19 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Nomination;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  */
 public class ExamplesTest
 {
+
+    public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
+
 
     @Test
     public void readmeConsumerExamples() throws Exception {
@@ -112,4 +113,17 @@ public class ExamplesTest
 
     }
 
+    @Test
+    public void importExample() throws Exception {
+
+        //Create a name with a GUID on the end so we know we are not conflicting with someone else running this.
+        final String uniqueName = "Nominations-" + UUID.randomUUID().toString();
+
+        final SodaImporter    importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        final DatasetInfo     nominationsDataset = importer.createViewFromCsv(uniqueName, "This is a test dataset using samples with the nominations schema", NOMINATIONS_CSV, "Name");
+        importer.publish(nominationsDataset.getId());
+        //Now the dataset is ready to go!
+
+        importer.deleteView(nominationsDataset.getId());
+    }
 }

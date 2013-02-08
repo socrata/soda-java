@@ -150,7 +150,7 @@ public class LocationTests extends TestBase
 
 
         final String[] translation = new String[] {"col1", "col2", "'(' + col4 + ',' + col3 + ')'"};
-        Dataset dataset = importer.importScanResults(blueprint, translation, LOCATION_TEST_CSV, scanResults);
+        DatasetInfo dataset = importer.importScanResults(blueprint, translation, LOCATION_TEST_CSV, scanResults);
 
 
 

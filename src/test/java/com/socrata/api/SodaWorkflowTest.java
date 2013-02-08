@@ -2,7 +2,6 @@ package com.socrata.api;
 
 import com.google.common.collect.Lists;
 import com.socrata.TestBase;
-import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.importer.Column;
@@ -10,17 +9,13 @@ import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.importer.Metadata;
 import com.socrata.model.soql.SoqlQuery;
-import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
 import org.junit.Test;
-import test.model.Crime;
-import test.model.NominationWithJoda;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -89,23 +84,33 @@ public class SodaWorkflowTest  extends TestBase
         //Work on append
         final DatasetInfo unpublishedView = importer.createWorkingCopy(datasetInfo.getId());
         final DatasetInfo appendResults = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
+
+
+        //Uncomment to test 202s
+        //final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_CSV, 1, null);
         final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
+
         final DatasetInfo publishedResults = importer.publish(appendResults.getId());
 
-        List results = consumer.query(publishedResults.getId(), SoqlQuery.SELECT_ALL, new GenericType(Object.class) {});
-        TestCase.assertEquals(6, results.size());
+        List results = consumer.query(publishedResults.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        //TestCase.assertEquals(6, results.size());
 
         //
         //  Now work on replace
         final DatasetInfo unpublishedView2 = importer.createWorkingCopy(datasetInfo.getId());
         TestCase.assertFalse(unpublishedView2.getId().equals(publishedResults.getId()));
 
+        //Uncomment to test 202s
+        //final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_CSV, 1, null);
+        final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
+        TestCase.assertNotNull(appendResults3);
+
         importer.replace(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
         final DatasetInfo publishedResults2 = importer.publish(unpublishedView2.getId());
         TestCase.assertEquals(publishedResults.getId(), publishedResults2.getId());
 
 
-        List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, new GenericType(Object.class) {});
+        List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
         TestCase.assertEquals(2, results2.size());
 
         //

@@ -26,10 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  */
@@ -51,7 +48,7 @@ public class SodaImporterTest extends TestBase
 
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
-        final Dataset createdView = importer.createViewFromCsv(name, description, NOMINATIONS_CSV);
+        final DatasetInfo createdView = importer.createViewFromCsv(name, description, NOMINATIONS_CSV);
 
         try {
             TestCase.assertNotNull(createdView);
@@ -61,7 +58,6 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
             GeocodingResults results = importer.findPendingGeocodingResults(createdView.getId());
-            TestCase.assertEquals(0, results.getTotal());
             TestCase.assertEquals(0, results.getView());
 
             importer.waitForPendingGeocoding(createdView.getId());
@@ -107,7 +103,7 @@ public class SodaImporterTest extends TestBase
                 .addColumn(new BlueprintColumn("Holdover", "Holdover Description", "checkbox"))
                 .build();
 
-        final Dataset createdView = importer.importScanResults(blueprint, null, NOMINATIONS_CSV, scanResults);
+        final DatasetInfo createdView = importer.importScanResults(blueprint, null, NOMINATIONS_CSV, scanResults);
 
 
 
@@ -121,7 +117,6 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
             GeocodingResults results = importer.findPendingGeocodingResults(createdView.getId());
-            TestCase.assertEquals(0, results.getTotal());
             TestCase.assertEquals(0, results.getView());
 
             importer.waitForPendingGeocoding(createdView.getId());
@@ -316,6 +311,50 @@ public class SodaImporterTest extends TestBase
         final Metadata loadedMetadata = loadView2.getMetadata();
         TestCase.assertEquals(1, loadedMetadata.getAttachments().size());
         TestCase.assertEquals(response.getId(), loadedMetadata.getAttachments().get(0).getBlobId());
+
+
+    }
+
+    @Test
+    public void testImportWithPK() throws InterruptedException, SodaError, IOException
+    {
+        final String name = "Name" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
+        final Soda2Producer producer = new Soda2Producer(connection);
+        final DatasetInfo createdView = importer.createViewFromCsv(name, description, NOMINATIONS_CSV, "Name");
+
+        try {
+            importer.publish(createdView.getId());
+
+            SoqlQuery   sortByNameQuery = new SoqlQueryBuilder(SoqlQuery.SELECT_ALL)
+                    .addOrderByPhrase(new OrderByClause(SortOrder.Descending, "name"))
+                    .build();
+
+            //Validate
+            List retVal =  consumer.query(createdView.getId(), sortByNameQuery, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(2, retVal.size());
+            TestCase.assertEquals("Name, Test", ((Map)retVal.get(0)).get("name"));
+            TestCase.assertEquals("TEST (http://www.test.com)", ((Map)retVal.get(0)).get("agency_website"));
+
+            //Test an update that will fail because of a PK constraint
+            Nomination duplicatePk = new Nomination("Name, Test", "New Position", "This Agency", "http://foo.bar", new Date(), new Date(), false, false);
+
+            producer.addObject(createdView.getId(), duplicatePk);
+            //Verify the existing record was updated, rather than a new one being created
+            retVal =  consumer.query(createdView.getId(), sortByNameQuery, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(2, retVal.size());
+            TestCase.assertEquals("Name, Test", ((Map)retVal.get(0)).get("name"));
+            TestCase.assertEquals("http://foo.bar", ((Map)retVal.get(0)).get("agency_website"));
+
+
+
+        } finally {
+            importer.deleteView(createdView.getId());
+        }
 
 
     }
