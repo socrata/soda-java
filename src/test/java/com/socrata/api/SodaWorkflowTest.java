@@ -1,13 +1,11 @@
 package com.socrata.api;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
-import com.socrata.model.importer.Column;
-import com.socrata.model.importer.Dataset;
-import com.socrata.model.importer.DatasetInfo;
-import com.socrata.model.importer.Metadata;
+import com.socrata.model.importer.*;
 import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -117,6 +115,33 @@ public class SodaWorkflowTest  extends TestBase
         //  Now delete
         importer.deleteView(publishedResults2.getId());
 
+    }
+
+    @Test
+    public void testMakingPublic() throws IOException, SodaError, InterruptedException
+    {
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
+
+        final Dataset newDataset = createPrivateDataset(importer);
+
+        try {
+            final DatasetInfo publishedView = importer.publish(newDataset.getId());
+            TestCase.assertEquals(null, publishedView.getGrants());
+
+            importer.makePublic(publishedView.getId());
+            final Dataset publicDataset = importer.loadView(publishedView.getId());
+            TestCase.assertNotNull(publicDataset.getGrants());
+            TestCase.assertEquals(1, Collections2.filter(publicDataset.getGrants(), Grant.IS_PUBLIC).size());
+
+            importer.makePrivate(publishedView.getId());
+            final Dataset privateDataset = importer.loadView(publishedView.getId());
+            TestCase.assertEquals(null, privateDataset.getGrants());
+        } finally {
+            importer.deleteView(newDataset.getId());
+        }
     }
 
     Dataset createPrivateDataset(final SodaImporter importer) throws SodaError, InterruptedException, IOException

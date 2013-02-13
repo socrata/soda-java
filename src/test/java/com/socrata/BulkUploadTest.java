@@ -4,16 +4,20 @@ import com.socrata.TestBase;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Producer;
 import com.socrata.api.SodaImporter;
+import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.importer.DatasetInfo;
+import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -62,8 +66,51 @@ public class BulkUploadTest extends TestBase
         TestCase.assertNotNull(result);
         TestCase.assertEquals(4999, result.getRowsCreated());
         TestCase.assertEquals(0, result.getRowsUpdated());
+    }
+
+    @Test
+    public void testUpsertWithRowIdentifier() throws IOException, SodaError, InterruptedException {
+        final Soda2Producer producer = createProducer();
+        final SodaImporter importer = createImporter();
+
+        final String name = "RowIdUpsert" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+        final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER, "ID");
+        TestCase.assertNotNull(dataset);
+        TestCase.assertNotNull(dataset.getId());
+        importer.publish(dataset.getId());
+
+        try {
+            final SoqlQuery   lookupTestRow = new SoqlQueryBuilder()
+                        .setWhereClause("id='8880962'")
+                        .build();
+            final List queryResults = producer.query(dataset.getId(), lookupTestRow, Soda2Producer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1, queryResults.size());
+
+            final Map result = (Map) queryResults.get(0);
+            TestCase.assertEquals("8880962", result.get("id"));
+            TestCase.assertEquals("THEFT", result.get("primary_type"));
+
+            final InputStream  csvStream = getClass().getResourceAsStream("/testCrimesHeader2.csv");
+            final UpsertResult results = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, csvStream);
+            TestCase.assertEquals(1, results.getRowsCreated());
+            TestCase.assertEquals(0, results.getErrors());
+            TestCase.assertEquals(0, results.getRowsDeleted());
+            TestCase.assertEquals(2, results.getRowsUpdated());
 
 
+            final List queryResults2 = producer.query(dataset.getId(), lookupTestRow, Soda2Producer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1, queryResults.size());
+
+            final Map result2 = (Map) queryResults2.get(0);
+            TestCase.assertEquals("8880962", result2.get("id"));
+            TestCase.assertEquals("BATTERY", result2.get("primary_type"));
+
+
+        } finally {
+            importer.deleteView(dataset.getId());
+        }
 
     }
 

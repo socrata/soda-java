@@ -1,5 +1,6 @@
 package com.socrata.api;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -9,6 +10,7 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.SearchResults;
 import com.socrata.model.importer.*;
 import com.socrata.model.search.SearchClause;
+import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -172,6 +174,40 @@ public class SodaDdlTest  extends TestBase
         TestCase.assertEquals(1, results4.getCount());
         TestCase.assertEquals("TestUpdate", results4.getResults().get(0).getDataset().getName());
 
+    }
+
+    @Test
+    public void testSettingResourceName() throws IOException, SodaError, InterruptedException
+    {
+        final String name = "Name" + UUID.randomUUID();
+        final String resourceName = "resource_" + name.toLowerCase();
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Producer producer = new Soda2Producer(connection);
+
+        final Dataset view = new Dataset();
+        view.setName(name);
+        view.setDescription("Hello Kitty");
+        view.setTags(Lists.newArrayList("Red", "Blue"));
+        view.setColumns(Lists.newArrayList(
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+        ));
+        view.setResourceName(resourceName);
+        view.setFlags(new ArrayList<String>());
+
+        final Dataset createdView = importer.createView(view);
+
+        try {
+            importer.publish(createdView.getId());
+
+            producer.addObject(resourceName, ImmutableMap.of("col1", "hello", "col2", "kitty"));
+            List queryResults = producer.query(resourceName, SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1, queryResults.size());
+
+        } finally {
+            importer.deleteView(createdView.getId());
+        }
     }
 
 }

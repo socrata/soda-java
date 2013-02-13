@@ -182,8 +182,13 @@ public class SodaImporter extends SodaDdl
         if (rowIdentifierColumnName != null) {
 
             final Dataset createdDataset = loadView(createdDatasetInfo.getId());
-            createdDataset.setupRowIdentifierColumnByName(rowIdentifierColumnName);
-            createdDatasetInfo = updateView(createdDataset);
+            try {
+                createdDataset.setupRowIdentifierColumnByName(rowIdentifierColumnName);
+                createdDatasetInfo = updateView(createdDataset);
+            } catch (IllegalArgumentException e) {
+                deleteView(createdDataset.getId());
+                throw e;
+            }
         }
         return createdDatasetInfo;
     }

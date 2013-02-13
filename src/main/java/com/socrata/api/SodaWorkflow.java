@@ -159,6 +159,59 @@ public class SodaWorkflow
     }
 
 
+    public void makePublic(final String datasetId) throws SodaError, InterruptedException {
+        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        {
+
+            //accessType=WEBSITE&method=setPermission&value=public.read
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI publicationUri = UriBuilder.fromUri(viewUri)
+                                                     .path(resourceId)
+                                                     .queryParam("accessType", "WEBSITE")
+                                                     .queryParam("method", "setPermission")
+                                                     .queryParam("value", "public.read")
+                                                     .build();
+
+                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=setPermission");
+            }
+        };
+
+        try {
+
+            requester.issueRequest();
+        } catch (LongRunningQueryException e) {
+            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+        }
+    }
+
+
+    public void makePrivate(final String datasetId) throws SodaError, InterruptedException {
+        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        {
+
+            //accessType=WEBSITE&method=setPermission&value=public.read
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI publicationUri = UriBuilder.fromUri(viewUri)
+                                                     .path(resourceId)
+                                                     .queryParam("accessType", "WEBSITE")
+                                                     .queryParam("method", "setPermission")
+                                                     .queryParam("value", "private")
+                                                     .build();
+
+                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=setPermission");
+            }
+        };
+
+        try {
+
+            requester.issueRequest();
+        } catch (LongRunningQueryException e) {
+            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+        }
+    }
+
     /**
      * Waits for pending geocodes to be finished.  A publish won't work until all active geocoding requests are
      * handled.

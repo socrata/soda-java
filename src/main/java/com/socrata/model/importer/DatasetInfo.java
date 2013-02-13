@@ -1,5 +1,7 @@
 package com.socrata.model.importer;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.BeanUtils;
@@ -23,6 +25,7 @@ public class DatasetInfo
     public static final     String PUBLISHED = "published";
     public static final     String UNPUBLISHED = "unpublished";
 
+    private String              resourceName;
     private String              attribution;
     private String              attributionLink;
     private String              category;
@@ -38,7 +41,7 @@ public class DatasetInfo
     private Long                rowsUpdatedAt;
     private List<String>        rights = new ArrayList<String>();
     private List<String>        tags = new ArrayList<String>();
-
+    private List<Grant>         grants;
 
     /**
      * Does a deep copy of this DatasetInfo.
@@ -66,6 +69,10 @@ public class DatasetInfo
                 retVal.privateMetadata = Maps.newHashMap(retVal.privateMetadata);
             }
 
+            if (retVal.grants != null) {
+                retVal.grants = Lists.newArrayList(retVal.grants);
+            }
+
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -75,6 +82,38 @@ public class DatasetInfo
 
     public DatasetInfo()
     {
+    }
+
+    /**
+     * Gets the resource name for this dataset.  The Resource Name is
+     * a name that can be used on the URL to access the dataset.
+     *
+     * E.g.  if a dataset had a resource name of my_dataset, it would
+     * be accessible via:
+     *
+     *   https://mysite.socrata.com/id/my_dataset
+     *
+     * @return the resource name
+     */
+    public String getResourceName()
+    {
+        return resourceName;
+    }
+
+    /**
+     * Sets the resource name for this dataset.  The Resource Name is
+     * a name that can be used on the URL to access the dataset.
+     *
+     * E.g.  if a dataset had a resource name of my_dataset, it would
+     * be accessible via:
+     *
+     *   https://mysite.socrata.com/id/my_dataset
+     *
+     * @return the resource name
+     */
+    public void setResourceName(String resourceName)
+    {
+        this.resourceName = resourceName;
     }
 
     /**
@@ -416,5 +455,28 @@ public class DatasetInfo
     public void setTags(List<String> tags)
     {
         this.tags = tags;
+    }
+
+    /**
+     * Gets all the permission grants for this dataset.  This will include
+     * a grant to make the dataset public, or any explicit sharing with another user.
+     *
+     * May be null if there are no grants.  This state is teh same as a dataset being private.
+     *
+     * @return list of grants
+     */
+    public List<Grant> getGrants()
+    {
+        return grants;
+    }
+
+    /**
+     * Sets all the permission grants for this dataset.  This is an accessor on this
+     * class, but to actually make a dataset public or private, you should use the
+     *   {@code makePublic} and {@code makePrivate} methods in SodaWorkflow
+     */
+    public void setGrants(List<Grant> grants)
+    {
+        this.grants = grants;
     }
 }
