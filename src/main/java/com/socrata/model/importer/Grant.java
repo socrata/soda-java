@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
+ * Represents a permissions grant to a dataset.  Used whenever a dataset is made public
+ * or explicitly shared to a user.
  */
 public class Grant
 {

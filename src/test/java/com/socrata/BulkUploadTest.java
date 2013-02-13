@@ -76,12 +76,16 @@ public class BulkUploadTest extends TestBase
         final String name = "RowIdUpsert" + UUID.randomUUID();
         final String description = name + "-Description";
 
+        //Import a CSV and set the rowIdentifier to be ID
         final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER, "ID");
         TestCase.assertNotNull(dataset);
         TestCase.assertNotNull(dataset.getId());
         importer.publish(dataset.getId());
 
         try {
+
+            //
+            //Verify the row we expect is really there.
             final SoqlQuery   lookupTestRow = new SoqlQueryBuilder()
                         .setWhereClause("id='8880962'")
                         .build();
@@ -92,6 +96,9 @@ public class BulkUploadTest extends TestBase
             TestCase.assertEquals("8880962", result.get("id"));
             TestCase.assertEquals("THEFT", result.get("primary_type"));
 
+
+            //
+            //  Update the dataset by uploading a CSV stream
             final InputStream  csvStream = getClass().getResourceAsStream("/testCrimesHeader2.csv");
             final UpsertResult results = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, csvStream);
             TestCase.assertEquals(1, results.getRowsCreated());
@@ -100,6 +107,8 @@ public class BulkUploadTest extends TestBase
             TestCase.assertEquals(2, results.getRowsUpdated());
 
 
+            //
+            //   Verify an overwrite happened, and not just an append.
             final List queryResults2 = producer.query(dataset.getId(), lookupTestRow, Soda2Producer.HASH_RETURN_TYPE);
             TestCase.assertEquals(1, queryResults.size());
 

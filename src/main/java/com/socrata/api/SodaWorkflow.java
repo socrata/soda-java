@@ -158,7 +158,12 @@ public class SodaWorkflow
         }
     }
 
-
+    /**
+     * Makes a dataset public.  After calling this on a dataset, it will be visible to
+     * any user, meaning any use will have teh "viewer" role for this dataset.
+     *
+     * @param datasetId id of the dataset to make public.
+     */
     public void makePublic(final String datasetId) throws SodaError, InterruptedException {
         SodaRequest requester = new SodaRequest<String>(datasetId,null)
         {
@@ -186,6 +191,12 @@ public class SodaWorkflow
     }
 
 
+    /**
+     * Makes a dataset private, so it can only be viewed by users that it has been shared
+     * with, or people who are admins on the site.
+     *
+     * @param datasetId id of the dataset
+     */
     public void makePrivate(final String datasetId) throws SodaError, InterruptedException {
         SodaRequest requester = new SodaRequest<String>(datasetId,null)
         {
