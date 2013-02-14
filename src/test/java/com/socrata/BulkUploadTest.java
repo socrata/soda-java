@@ -41,7 +41,7 @@ public class BulkUploadTest extends TestBase
 
         final UpsertResult results = producer.upsertStream(UPDATE_DATA_SET, HttpLowLevel.CSV_TYPE, csvStream);
         TestCase.assertEquals(2, results.getRowsCreated());
-        TestCase.assertEquals(0, results.getErrors());
+        TestCase.assertEquals(0, results.errorCount());
         TestCase.assertEquals(0, results.getRowsDeleted());
         TestCase.assertEquals(0, results.getRowsUpdated());
 
