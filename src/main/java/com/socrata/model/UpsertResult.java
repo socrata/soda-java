@@ -4,6 +4,8 @@ import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.List;
+
 /**
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
@@ -13,7 +15,7 @@ public class UpsertResult
     public final long rowsCreated;
     public final long rowsUpdated;
     public final long rowsDeleted;
-    public final long errors;
+    public final List<UpsertError> errors;
     public final long bySid;
     public final long byRowIdentifier;
 
@@ -22,7 +24,7 @@ public class UpsertResult
     public UpsertResult(final @JsonProperty("rows_created") long rowsCreated,
                         final @JsonProperty("rows_updated") long rowsUpdated,
                         final @JsonProperty("rows_deleted") long rowsDeleted,
-                        final @JsonProperty("errors") long errors,
+                        final @JsonProperty("errors") List<UpsertError> errors,
                         final @JsonProperty("by_sid") long bySid,
                         final @JsonProperty("by_rowidentifier") long byRowIdentifier)
     {
@@ -50,10 +52,16 @@ public class UpsertResult
         return rowsDeleted;
     }
 
-    public long getErrors()
+    public List<UpsertError> getErrors()
     {
         return errors;
     }
+
+    public long errorCount()
+    {
+        return (errors != null) ? errors.size() : 0;
+    }
+
 
     public long getBySid()
     {

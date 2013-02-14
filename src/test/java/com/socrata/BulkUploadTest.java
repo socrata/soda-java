@@ -102,10 +102,9 @@ public class BulkUploadTest extends TestBase
             final InputStream  csvStream = getClass().getResourceAsStream("/testCrimesHeader2.csv");
             final UpsertResult results = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, csvStream);
             TestCase.assertEquals(1, results.getRowsCreated());
-            TestCase.assertEquals(0, results.getErrors());
+            TestCase.assertEquals(0, results.errorCount());
             TestCase.assertEquals(0, results.getRowsDeleted());
             TestCase.assertEquals(2, results.getRowsUpdated());
-
 
             //
             //   Verify an overwrite happened, and not just an append.
@@ -115,6 +114,18 @@ public class BulkUploadTest extends TestBase
             final Map result2 = (Map) queryResults2.get(0);
             TestCase.assertEquals("8880962", result2.get("id"));
             TestCase.assertEquals("BATTERY", result2.get("primary_type"));
+
+            //
+            //  Test adding a stream that has an invalid row in it
+            final InputStream  csvStreamInvalid = getClass().getResourceAsStream("/testCrimesWithInvalidCrime.csv");
+            final UpsertResult resultsInvalid = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, csvStreamInvalid);
+            TestCase.assertEquals(0, resultsInvalid.getRowsCreated());
+            TestCase.assertEquals(1, resultsInvalid.errorCount());
+            TestCase.assertEquals(0, resultsInvalid.getRowsDeleted());
+            TestCase.assertEquals(2, resultsInvalid.getRowsUpdated());
+
+            TestCase.assertEquals(1, resultsInvalid.getErrors().get(0).getIndex());
+            TestCase.assertEquals("", resultsInvalid.getErrors().get(0).getPrimaryKey());
 
 
         } finally {
