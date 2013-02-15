@@ -6,13 +6,16 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.importer.*;
 import com.socrata.model.requests.SodaRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.header.InBoundHeaders;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 
@@ -181,12 +184,12 @@ public class SodaImporter extends SodaDdl
 
         if (rowIdentifierColumnName != null) {
 
-            final Dataset createdDataset = loadView(createdDatasetInfo.getId());
+            final Dataset createdDataset = (Dataset) loadDatasetInfo(createdDatasetInfo.getId());
             try {
                 createdDataset.setupRowIdentifierColumnByName(rowIdentifierColumnName);
-                createdDatasetInfo = updateView(createdDataset);
+                createdDatasetInfo = updateDatasetInfo(createdDataset);
             } catch (IllegalArgumentException e) {
-                deleteView(createdDataset.getId());
+                deleteDataset(createdDataset.getId());
                 throw e;
             }
         }
@@ -306,6 +309,60 @@ public class SodaImporter extends SodaDdl
 
     }
 
+    /**
+     * Imports a file that is NOT going to be used to create a datset, but is instead available for
+     * downloading directly.
+     *
+     * @param name name of the file
+     * @param description description of the file
+     * @param file the file to upload
+     * @return The NonDataFileDataset object that was saved to Socrata
+     */
+    public NonDataFileDataset importNonDataFile(final String name, final String description, final File file) throws SodaError, InterruptedException
+    {
+
+        SodaRequest requester = new SodaRequest<File>(null, file)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI scanUri = UriBuilder.fromUri(importUri)
+                                              .queryParam("method", "blob")
+                                              .queryParam("fileUploaderfile", file.getName())
+                                              .build();
+
+                try {
+                    final InputStream   is = new FileInputStream(file);
+                    try {
+                        ClientResponse clientResponse = httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
+
+                        //Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                        //response needs to be processed as JSON.  So, wrap the return in a ClientResponse that acts
+                        //as if the content type is JSON. There is a bug on the core server side to fix this.
+                        InBoundHeaders  headers = new InBoundHeaders();
+                        headers.putSingle("Content-Type", MediaType.APPLICATION_JSON);
+                        return new ClientResponse(clientResponse.getStatus(), headers, clientResponse.getEntityInputStream(), clientResponse.getClient().getMessageBodyWorkers());
+
+                    } finally {
+                        is.close();
+                    }
+                } catch (IOException ioe) {
+                    throw new SodaError("Unable to load file: " + file.getAbsolutePath());
+                }
+            }
+        };
+
+        NonDataFileDataset nonDataFileDataset;
+        try {
+            final ClientResponse response = requester.issueRequest();
+            nonDataFileDataset = response.getEntity(NonDataFileDataset.class);
+        } catch (LongRunningQueryException e) {
+            nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, NonDataFileDataset.class, requester);
+        }
+
+        nonDataFileDataset.setDescription(description);
+        nonDataFileDataset.setName(name);
+        return (NonDataFileDataset) updateDatasetInfo(nonDataFileDataset);
+    }
 
 
     /**

@@ -1,21 +1,16 @@
 package com.socrata;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.socrata.api.*;
 import com.socrata.builders.BlueprintBuilder;
-import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.Location;
 import com.socrata.model.Meta;
 import com.socrata.model.importer.*;
-import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
-import com.socrata.utils.ColumnUtil;
 import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.LocationTestClass;
-import test.model.Nomination;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +50,7 @@ public class LocationTests extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final DatasetInfo createdView = importer.createDataset(view);
 
 
         LocationTestClass   obj1 = new LocationTestClass(2, new Location(83.121212, 84.121212, null), "Name 1");
@@ -72,7 +67,7 @@ public class LocationTests extends TestBase
         TestCase.assertEquals(2, result.getUniqueid());
         TestCase.assertEquals("Name 1", result.getName());
 
-        importer.deleteView(createdView.getId());
+        importer.deleteDataset(createdView.getId());
     }
 
     /**
@@ -99,7 +94,7 @@ public class LocationTests extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final DatasetInfo createdView = importer.createDataset(view);
 
         importer.addColumn(createdView.getId(), new Column(0, "location", "location", "A location", "Location", 0, 10));
 
@@ -119,7 +114,7 @@ public class LocationTests extends TestBase
         TestCase.assertEquals(2, result.getUniqueid());
         TestCase.assertEquals("Name 1", result.getName());
 
-        importer.deleteView(createdView.getId());
+        importer.deleteDataset(createdView.getId());
     }
 
     /**
@@ -164,6 +159,6 @@ public class LocationTests extends TestBase
         TestCase.assertEquals(2, result.getUniqueid());
         TestCase.assertEquals("Name 1", result.getName());
 
-        importer.deleteView(dataset.getId());
+        importer.deleteDataset(dataset.getId());
     }
 }

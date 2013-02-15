@@ -1,6 +1,7 @@
 package com.socrata.api;
 
 
+import com.google.common.collect.ImmutableMap;
 import com.socrata.exceptions.*;
 import com.socrata.model.SodaErrorResponse;
 import com.socrata.model.requests.SodaRequest;
@@ -58,8 +59,10 @@ public final class HttpLowLevel
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
     public static final String UNEXPECTED_ERROR = "uexpectedError";
 
+    public static final Map<String, String> UTF_PARAMS = ImmutableMap.of("charset", "UTF-8");
     public static final MediaType JSON_TYPE = MediaType.APPLICATION_JSON_TYPE;
     public static final MediaType CSV_TYPE = new MediaType("text", "csv");
+    public static final MediaType UTF8_TEXT_TYPE = new MediaType("text", "plain", UTF_PARAMS);
 
     public static final GenericType<List<Object>> MAP_OBJECT_TYPE = new GenericType<List<Object>>() {};
 

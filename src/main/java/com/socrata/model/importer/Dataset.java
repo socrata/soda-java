@@ -22,6 +22,12 @@ public class Dataset extends DatasetInfo
     private List<String> flags = new ArrayList<String>();
     private List<Column> columns = new ArrayList<Column>();
 
+
+    public Dataset()
+    {
+        setViewType(DATASET_TYPE);
+    }
+
     /**
      * Gets the list of columns in this dataset.
      * @return the list of columns in this dataset.

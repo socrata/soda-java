@@ -2,9 +2,10 @@ package com.socrata.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.socrata.TestBase;
 import com.socrata.builders.BlueprintBuilder;
+import com.socrata.builders.ExternalDatasetBuilder;
+import com.socrata.builders.NonDataFileDatasetBuilder;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -13,13 +14,11 @@ import com.socrata.model.importer.*;
 import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
-import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import test.model.Nomination;
-import test.model.NominationWithJoda;
 import test.model.NominationsWText;
 
 import java.io.File;
@@ -63,7 +62,7 @@ public class SodaImporterTest extends TestBase
             importer.waitForPendingGeocoding(createdView.getId());
             importer.publish(createdView.getId());
 
-            Dataset loadedView = importer.loadView(createdView.getId());
+            DatasetInfo loadedView = importer.loadDatasetInfo(createdView.getId());
             TestCase.assertNotNull(loadedView);
             TestCase.assertEquals("published", loadedView.getPublicationStage());
 
@@ -76,7 +75,7 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());
             TestCase.assertEquals("Name, Test", nominations.get(1).getName());
         } finally {
-            importer.deleteView(createdView.getId());
+            importer.deleteDataset(createdView.getId());
         }
     }
 
@@ -122,7 +121,7 @@ public class SodaImporterTest extends TestBase
             importer.waitForPendingGeocoding(createdView.getId());
             importer.publish(createdView.getId());
 
-            Dataset loadedView = importer.loadView(createdView.getId());
+            Dataset loadedView = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertNotNull(loadedView);
             TestCase.assertEquals("published", loadedView.getPublicationStage());
 
@@ -135,7 +134,7 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());
             TestCase.assertEquals("Name, Test", nominations.get(1).getName());
         } finally {
-            importer.deleteView(createdView.getId());
+            importer.deleteDataset(createdView.getId());
         }
     }
 
@@ -155,7 +154,7 @@ public class SodaImporterTest extends TestBase
         view.setColumns(new ArrayList<Column>());
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset) importer.createDataset(view);
         TestCase.assertNotNull(createdView);
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
@@ -163,7 +162,7 @@ public class SodaImporterTest extends TestBase
         importer.publish(createdView.getId());
 
         createdView.setDescription("New Description");
-        final Dataset updatedView = importer.updateView(createdView);
+        final Dataset updatedView = (Dataset) importer.updateDatasetInfo(createdView);
         TestCase.assertEquals("New Description", updatedView.getDescription());
         TestCase.assertEquals("published", updatedView.getPublicationStage());
 
@@ -172,11 +171,11 @@ public class SodaImporterTest extends TestBase
         producer.upsertStream(updatedView.getId(), HttpLowLevel.CSV_TYPE, fis);
         fis.close();
 
-        Dataset loadedView = importer.loadView(createdView.getId());
+        Dataset loadedView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         TestCase.assertNotNull(loadedView);
         TestCase.assertEquals("published", loadedView.getPublicationStage());
 
-        importer.deleteView(createdView.getId());
+        importer.deleteDataset(createdView.getId());
     }
 
 
@@ -199,13 +198,13 @@ public class SodaImporterTest extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset) importer.createDataset(view);
         TestCase.assertNotNull(createdView);
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
 
-        final Dataset loadView = importer.loadView(createdView.getId());
+        final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         TestCase.assertEquals(name, loadView.getName());
         TestCase.assertEquals(2, loadView.getColumns().size());
 
@@ -225,8 +224,8 @@ public class SodaImporterTest extends TestBase
         loadView.setExternalId("ExternalId_For_Me");
 
         //Update dataset
-        final Dataset updateView2 = importer.updateView(loadView);
-        final Dataset loadView2 = importer.loadView(createdView.getId());
+        final Dataset updateView2 = (Dataset) importer.updateDatasetInfo(loadView);
+        final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
 
         TestCase.assertEquals(loadView.getLicenseId(), loadView2.getLicenseId());
         TestCase.assertEquals(loadView.getLicense().getName(), loadView2.getLicense().getName());
@@ -244,8 +243,8 @@ public class SodaImporterTest extends TestBase
         TestCase.assertEquals(loadView.getAttribution(), loadView2.getAttribution());
         TestCase.assertEquals(loadView.getAttributionLink(), loadView2.getAttributionLink());
 
-        final Dataset updateView3 = importer.updateView(loadView2);
-        final Dataset loadView3 = importer.loadView(createdView.getId());
+        final Dataset updateView3 = (Dataset) importer.updateDatasetInfo(loadView2);
+        final Dataset loadView3 = (Dataset) importer.loadDatasetInfo(createdView.getId());
         TestCase.assertEquals(loadView.getLicenseId(), loadView3.getLicenseId());
         TestCase.assertEquals(loadView.getLicense().getName(), loadView3.getLicense().getName());
         TestCase.assertEquals(loadView.getLicense().getLogoUrl(), loadView3.getLicense().getLogoUrl());
@@ -259,7 +258,7 @@ public class SodaImporterTest extends TestBase
         TestCase.assertEquals(loadView.getAttribution(), loadView3.getAttribution());
         TestCase.assertEquals(loadView.getAttributionLink(), loadView3.getAttributionLink());
 
-        importer.deleteView(createdView.getId());
+        importer.deleteDataset(createdView.getId());
     }
 
     @Test
@@ -281,7 +280,7 @@ public class SodaImporterTest extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset) importer.createDataset(view);
         TestCase.assertNotNull(createdView);
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
@@ -303,11 +302,11 @@ public class SodaImporterTest extends TestBase
         //
         //  Test using assets for attachement
         final Metadata    metadata = new Metadata(null, null, null, null, Lists.newArrayList(new Attachment(response.getId(), response.getNameForOutput(), response.getNameForOutput())));
-        final Dataset loadView = importer.loadView(createdView.getId());
+        final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         loadView.setMetadata(metadata);
-        importer.updateView(loadView);
+        importer.updateDatasetInfo(loadView);
 
-        final Dataset loadView2 = importer.loadView(createdView.getId());
+        final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
         final Metadata loadedMetadata = loadView2.getMetadata();
         TestCase.assertEquals(1, loadedMetadata.getAttachments().size());
         TestCase.assertEquals(response.getId(), loadedMetadata.getAttachments().get(0).getBlobId());
@@ -338,7 +337,7 @@ public class SodaImporterTest extends TestBase
             List retVal =  consumer.query(createdView.getId(), sortByNameQuery, Soda2Consumer.HASH_RETURN_TYPE);
             TestCase.assertEquals(2, retVal.size());
             TestCase.assertEquals("Name, Test", ((Map)retVal.get(0)).get("name"));
-            TestCase.assertEquals("TEST (http://www.test.com)", ((Map)retVal.get(0)).get("agency_website"));
+            TestCase.assertEquals("TEST (http://www.test.com)", ((Map) retVal.get(0)).get("agency_website"));
 
             //Test an update that will fail because of a PK constraint
             Nomination duplicatePk = new Nomination("Name, Test", "New Position", "This Agency", "http://foo.bar", new Date(), new Date(), false, false);
@@ -353,10 +352,116 @@ public class SodaImporterTest extends TestBase
 
 
         } finally {
-            importer.deleteView(createdView.getId());
+            importer.deleteDataset(createdView.getId());
         }
 
 
     }
+
+    @Test
+    public void testCreatingFileDataset() throws IOException, SodaError, InterruptedException
+    {
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+        final String name = "Name" + UUID.randomUUID();
+        final String description = "Description" + name;
+
+
+        final NonDataFileDataset fileDataset = importer.importNonDataFile(name, description, NOMINATIONS_CSV);
+
+        try {
+            TestCase.assertNotNull(fileDataset);
+            TestCase.assertEquals(name, fileDataset.getName());
+            TestCase.assertEquals(description, fileDataset.getDescription());
+            TestCase.assertEquals("testNominations.csv", fileDataset.getBlobFilename());
+            TestCase.assertEquals(NOMINATIONS_CSV.length(), fileDataset.getBlobFileSize());
+            TestCase.assertEquals("published", fileDataset.getPublicationStage());
+
+            importer.makePublic(fileDataset.getId());
+            final NonDataFileDataset fileDatasetLoaded = (NonDataFileDataset) importer.loadDatasetInfo(fileDataset.getId());
+            TestCase.assertNotNull(fileDatasetLoaded);
+            TestCase.assertEquals(name, fileDatasetLoaded.getName());
+            TestCase.assertEquals(description, fileDatasetLoaded.getDescription());
+            TestCase.assertEquals("testNominations.csv", fileDatasetLoaded.getBlobFilename());
+            TestCase.assertEquals(NOMINATIONS_CSV.length(), fileDatasetLoaded.getBlobFileSize());
+            TestCase.assertEquals("published", fileDatasetLoaded.getPublicationStage());
+
+            final NonDataFileDatasetBuilder nonDataFileDatasetBuilder = new NonDataFileDatasetBuilder(fileDatasetLoaded)
+                    .addTag("TestFile")
+                    .setLicenseId("CC_30_BY_NC")
+                    .setLicense(new License("Creative Commons Attribution-Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
+                    .setAttribution("Socrata Test")
+                    .setAttributionLink("https://www.socrata.com");
+
+            final NonDataFileDataset fileDatasetLoaded2 = (NonDataFileDataset) importer.updateDatasetInfo(nonDataFileDatasetBuilder.build());
+            TestCase.assertEquals("CC_30_BY_NC", fileDatasetLoaded2.getLicenseId());
+            TestCase.assertEquals("Socrata Test", fileDatasetLoaded2.getAttribution());
+            TestCase.assertEquals("https://www.socrata.com", fileDatasetLoaded2.getAttributionLink());
+        } finally {
+            importer.deleteDataset(fileDataset.getId());
+        }
+
+    }
+
+
+    @Test
+    public void testCreatingExternalDataset() throws IOException, SodaError, InterruptedException
+    {
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+        final String name = "Name" + UUID.randomUUID();
+        final String description = "Description" + name;
+
+
+        final ExternalDataset    dataset1 = new ExternalDatasetBuilder()
+                .setMetadata(new Metadata())
+                .addAccessPoint("html", "http://www.google.com")
+                .setName(name)
+                .setDescription(description)
+                .build();
+
+        final ExternalDataset fileDataset = (ExternalDataset) importer.createDataset(dataset1);
+
+        try {
+            TestCase.assertNotNull(fileDataset);
+            TestCase.assertEquals(name, fileDataset.getName());
+            TestCase.assertEquals(description, fileDataset.getDescription());
+            TestCase.assertEquals("http://www.google.com", fileDataset.getMetadata().getAccessPoints().get("html"));
+            TestCase.assertEquals("unpublished", fileDataset.getPublicationStage());
+
+            importer.publish(fileDataset.getId());
+            importer.makePublic(fileDataset.getId());
+
+            final ExternalDataset fileDatasetLoaded = (ExternalDataset) importer.loadDatasetInfo(fileDataset.getId());
+            TestCase.assertNotNull(fileDatasetLoaded);
+            TestCase.assertEquals(name, fileDatasetLoaded.getName());
+            TestCase.assertEquals(description, fileDatasetLoaded.getDescription());
+            TestCase.assertEquals("http://www.google.com", fileDatasetLoaded.getMetadata().getAccessPoints().get("html"));
+            TestCase.assertEquals("published", fileDatasetLoaded.getPublicationStage());
+
+            final ExternalDatasetBuilder externalDatasetBuilder = new ExternalDatasetBuilder(fileDatasetLoaded)
+                    .addTag("TestFile")
+                    .setLicenseId("CC_30_BY_NC")
+                    .setLicense(new License("Creative Commons Attribution-Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
+                    .setAttribution("Socrata Test")
+                    .setAttributionLink("https://www.socrata.com");
+
+            final ExternalDataset fileDatasetLoaded2 = (ExternalDataset) importer.updateDatasetInfo(externalDatasetBuilder.build());
+            TestCase.assertEquals("CC_30_BY_NC", fileDatasetLoaded2.getLicenseId());
+            TestCase.assertEquals("Socrata Test", fileDatasetLoaded2.getAttribution());
+            TestCase.assertEquals("https://www.socrata.com", fileDatasetLoaded2.getAttributionLink());
+            TestCase.assertEquals(name, fileDatasetLoaded2.getName());
+            TestCase.assertEquals(description, fileDatasetLoaded2.getDescription());
+            TestCase.assertEquals("http://www.google.com", fileDatasetLoaded2.getMetadata().getAccessPoints().get("html"));
+            TestCase.assertEquals("published", fileDatasetLoaded2.getPublicationStage());
+
+        } finally {
+            importer.deleteDataset(fileDataset.getId());
+        }
+
+    }
+
 
 }

@@ -1,9 +1,7 @@
 package com.socrata.api;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -40,7 +38,7 @@ public class SodaDdlTest  extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset) importer.createDataset(view);
         TestCase.assertNotNull(createdView);
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
@@ -57,7 +55,7 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn1.getDescription(),  retVal1.getDescription());
             TestCase.assertEquals(newColumn1.getDataTypeName(), retVal1.getDataTypeName());
 
-            final Dataset loadedDataset = importer.loadView(createdView.getId());
+            final Dataset loadedDataset = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertEquals(3, loadedDataset.getColumns().size());
             TestCase.assertEquals(newColumn1.getName(), loadedDataset.getColumns().get(2).getName());
             TestCase.assertEquals(newColumn1.getFieldName(),    loadedDataset.getColumns().get(2).getFieldName());
@@ -82,7 +80,7 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn3.getDescription(),  retVal3.getDescription());
             TestCase.assertEquals(newColumn3.getDataTypeName(), retVal3.getDataTypeName());
 
-            final Dataset loadedDataset2 = importer.loadView(createdView.getId());
+            final Dataset loadedDataset2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertEquals(3, loadedDataset2.getColumns().size());
             TestCase.assertEquals(newColumn3.getName(),         loadedDataset2.getColumns().get(2).getName());
             TestCase.assertEquals(newColumn3.getFieldName(),    loadedDataset2.getColumns().get(2).getFieldName());
@@ -90,11 +88,11 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn3.getDataTypeName(), loadedDataset2.getColumns().get(2).getDataTypeName());
 
             importer.removeColumn(createdView.getId(), newColumn3.getId());
-            final Dataset loadedDataset3 = importer.loadView(createdView.getId());
+            final Dataset loadedDataset3 = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertEquals(2, loadedDataset3.getColumns().size());
 
         } finally {
-            importer.deleteView(createdView.getId());
+            importer.deleteDataset(createdView.getId());
         }
     }
 
@@ -117,17 +115,17 @@ public class SodaDdlTest  extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset) importer.createDataset(view);
         TestCase.assertNotNull(createdView);
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
         final Metadata metadata = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "DDDDDD")), null, null, null, null);
-        final Dataset loadedView = importer.loadView(createdView.getId());
+        final Dataset loadedView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         loadedView.setMetadata(metadata);
-        importer.updateView(loadedView);
+        importer.updateDatasetInfo(loadedView);
 
-        final Dataset loadedView2 = importer.loadView(createdView.getId());
+        final Dataset loadedView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
         TestCase.assertEquals(1, loadedView2.getMetadata().getCustom_fields().size());
 
         importer.publish(createdView.getId());
@@ -136,10 +134,10 @@ public class SodaDdlTest  extends TestBase
         loadedView3.setId(loadedView2.getId());
         final Metadata metadata2 = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "FFFFF")), null, null, null, null);
         loadedView3.setMetadata(metadata2);
-        DatasetInfo loadedDataset = importer.updateView(loadedView3);
+        DatasetInfo loadedDataset = importer.updateDatasetInfo(loadedView3);
         TestCase.assertEquals("FFFFF", loadedDataset.getMetadata().getCustom_fields().get("Dataset Summary").get("Organization"));
 
-        importer.deleteView(loadedDataset.getId());
+        importer.deleteDataset(loadedDataset.getId());
     }
 
 
@@ -196,7 +194,7 @@ public class SodaDdlTest  extends TestBase
         view.setResourceName(resourceName);
         view.setFlags(new ArrayList<String>());
 
-        final Dataset createdView = importer.createView(view);
+        final Dataset createdView = (Dataset)  importer.createDataset(view);
 
         try {
             importer.publish(createdView.getId());
@@ -206,7 +204,7 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(1, queryResults.size());
 
         } finally {
-            importer.deleteView(createdView.getId());
+            importer.deleteDataset(createdView.getId());
         }
     }
 

@@ -108,18 +108,18 @@ public class SodaDdl extends SodaWorkflow
 
 
     /**
-     * Creates an empty dataset, based on the view passed in.
+     * Creates an empty dataset, based on the dataset passed in.
      *
-     * The new view will be unpublished.
+     * The new dataset will be unpublished.
      *
-     * @param view view to create the new view on.  The ID should NOT be set.
-     * @return the created view, the ID will be set on this.
+     * @param dataset dataset to create the new dataset on.  The ID should NOT be set.
+     * @return the created dataset, the ID will be set on this.
      * @throws SodaError
      * @throws InterruptedException
      */
-    public Dataset createView(final Dataset view) throws SodaError, InterruptedException
+    public DatasetInfo createDataset(final DatasetInfo dataset) throws SodaError, InterruptedException
     {
-        SodaRequest requester = new SodaRequest<Dataset>(null, view)
+        SodaRequest requester = new SodaRequest<DatasetInfo>(null, dataset)
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             { return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, payload); }
@@ -127,9 +127,9 @@ public class SodaDdl extends SodaWorkflow
 
         try {
             final ClientResponse response = requester.issueRequest();
-            return response.getEntity(Dataset.class);
+            return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class, requester);
         }
     }
 
@@ -143,7 +143,7 @@ public class SodaDdl extends SodaWorkflow
      * @throws LongRunningQueryException
      * @throws SodaError
      */
-    public Dataset loadView(final String id) throws SodaError, InterruptedException
+    public DatasetInfo loadDatasetInfo(final String id) throws SodaError, InterruptedException
     {
 
         final URI uri = UriBuilder.fromUri(viewUri)
@@ -159,9 +159,9 @@ public class SodaDdl extends SodaWorkflow
         try {
 
             final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
-            return response.getEntity(Dataset.class);
+            return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class, requester);
         }
     }
 
@@ -177,7 +177,7 @@ public class SodaDdl extends SodaWorkflow
      * @throws SodaError
      * @throws InterruptedException
      */
-    public  Dataset updateView(final DatasetInfo datasetInfo) throws SodaError, InterruptedException
+    public  DatasetInfo updateDatasetInfo(final DatasetInfo datasetInfo) throws SodaError, InterruptedException
     {
 
 
@@ -194,9 +194,9 @@ public class SodaDdl extends SodaWorkflow
         try {
 
             final ClientResponse response = requester.issueRequest();
-            return response.getEntity(Dataset.class);
+            return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class, requester);
         }
     }
 
@@ -207,7 +207,7 @@ public class SodaDdl extends SodaWorkflow
      * @throws SodaError
      * @throws InterruptedException
      */
-    public void deleteView(final String id) throws SodaError, InterruptedException
+    public void deleteDataset(final String id) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaRequest<DatasetInfo>(id, null)

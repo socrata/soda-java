@@ -1,11 +1,11 @@
 package com.socrata.model.importer;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.ArrayList;
@@ -20,12 +20,21 @@ import java.util.Map;
 
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="viewType")
+@JsonSubTypes({@JsonSubTypes.Type(value = Dataset.class, name = "tabular"),
+               @JsonSubTypes.Type(value = NonDataFileDataset.class, name = "blobby"),
+               @JsonSubTypes.Type(value = ExternalDataset.class, name = "href")})
 public class DatasetInfo
 {
+    public static final String DATASET_TYPE = "tabular";
+    public static final String FILE_TYPE = "blobby";
+    public static final String EXTERNAL_TYPE = "href";
+
     public static final     String PUBLISHED = "published";
     public static final     String UNPUBLISHED = "unpublished";
 
     private String              resourceName;
+    private String              viewType;
     private String              attribution;
     private String              attributionLink;
     private String              category;
@@ -114,6 +123,31 @@ public class DatasetInfo
     public void setResourceName(String resourceName)
     {
         this.resourceName = resourceName;
+    }
+
+    /**
+     * describes what type of object this is.  The possible values are:
+     * <ul>
+     *     <li>tabular</li>
+     *     <li>blobby</li>
+     *     <li>href</li>
+     * </ul>
+     * @return the object type
+     */
+    public String getViewType()
+    {
+        return viewType;
+    }
+
+    /**
+     * Sets what type of object this is.  This should not be changed
+     * for existing objects.
+     *
+     * @param viewType the object type
+     */
+    public void setViewType(String viewType)
+    {
+        this.viewType = viewType;
     }
 
     /**

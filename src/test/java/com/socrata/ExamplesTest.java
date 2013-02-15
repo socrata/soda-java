@@ -2,7 +2,6 @@ package com.socrata;
 
 import com.socrata.api.*;
 import com.socrata.builders.SoqlQueryBuilder;
-import com.socrata.exceptions.SodaError;
 import com.socrata.model.Meta;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.importer.DatasetInfo;
@@ -10,13 +9,11 @@ import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Nomination;
 
 import java.io.*;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -124,6 +121,6 @@ public class ExamplesTest
         importer.publish(nominationsDataset.getId());
         //Now the dataset is ready to go!
 
-        importer.deleteView(nominationsDataset.getId());
+        importer.deleteDataset(nominationsDataset.getId());
     }
 }

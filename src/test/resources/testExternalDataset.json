@@ -1,0 +1,42 @@
+{
+    "name": "Jackson Docs",
+    "metadata": {
+        "renderTypeConfig": {
+            "visible": {
+                "href": true
+            }
+        },
+        "custom_fields": {
+            "FieldSet": {
+                "Field1": ""
+            },
+            "MyTestField": {
+                "aa": "",
+                "bb": "",
+                "cc": ""
+            },
+            "MyTestField2": {
+                "aa": "",
+                "baba": "",
+                "bbb": "",
+                "@@jj": ""
+            },
+            "MyTestField3": {
+                "aa": "",
+                "bbbb": "",
+                "cccc": ""
+            },
+            "API Foundry": {
+                "Type": ""
+            }
+        },
+        "accessPoints": {
+            "html": "http://jackson.codehaus.org/1.9.9/javadoc/org/codehaus/jackson/annotate/JsonTypeInfo.html"
+        },
+        "availableDisplayTypes": ["href"]
+    },
+    "displayType": "href",
+    "searchString": null,
+    "displayFormat": {}
+}
+

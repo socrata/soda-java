@@ -1,6 +1,5 @@
 package com.socrata;
 
-import com.socrata.TestBase;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Producer;
 import com.socrata.api.SodaImporter;
@@ -129,7 +128,7 @@ public class BulkUploadTest extends TestBase
 
 
         } finally {
-            importer.deleteView(dataset.getId());
+            importer.deleteDataset(dataset.getId());
         }
 
     }

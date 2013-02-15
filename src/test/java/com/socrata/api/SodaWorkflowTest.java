@@ -50,7 +50,7 @@ public class SodaWorkflowTest  extends TestBase
             }
 
             datasetInfo.getMetadata().addCustomField("Category", "TestTest", "ValVal");
-            importer.updateView(datasetInfo);
+            importer.updateDatasetInfo(datasetInfo);
 
 
             //
@@ -58,13 +58,13 @@ public class SodaWorkflowTest  extends TestBase
             final Dataset workingCopy = (Dataset) importer.createWorkingCopy(dataset.getId());
             final Column newColumn = new Column(null, "new_col", "new_col", "Description", "text", 3, null);
             importer.addColumn(workingCopy.getId(), newColumn);
-            importer.updateView(workingCopy);
+            importer.updateDatasetInfo(workingCopy);
             final DatasetInfo postPublish = importer.publish(workingCopy.getId());
-            final Dataset postPublish2 = importer.loadView(postPublish.getId());
+            final Dataset postPublish2 = (Dataset) importer.loadDatasetInfo(postPublish.getId());
 
             TestCase.assertEquals(3, postPublish2.getColumns().size());
         } finally {
-            importer.deleteView(dataset.getId());
+            importer.deleteDataset(dataset.getId());
         }
     }
 
@@ -113,7 +113,7 @@ public class SodaWorkflowTest  extends TestBase
 
         //
         //  Now delete
-        importer.deleteView(publishedResults2.getId());
+        importer.deleteDataset(publishedResults2.getId());
 
     }
 
@@ -132,15 +132,15 @@ public class SodaWorkflowTest  extends TestBase
             TestCase.assertEquals(null, publishedView.getGrants());
 
             importer.makePublic(publishedView.getId());
-            final Dataset publicDataset = importer.loadView(publishedView.getId());
+            final Dataset publicDataset = (Dataset) importer.loadDatasetInfo(publishedView.getId());
             TestCase.assertNotNull(publicDataset.getGrants());
             TestCase.assertEquals(1, Collections2.filter(publicDataset.getGrants(), Grant.IS_PUBLIC).size());
 
             importer.makePrivate(publishedView.getId());
-            final Dataset privateDataset = importer.loadView(publishedView.getId());
+            final Dataset privateDataset = (Dataset) importer.loadDatasetInfo(publishedView.getId());
             TestCase.assertEquals(null, privateDataset.getGrants());
         } finally {
-            importer.deleteView(newDataset.getId());
+            importer.deleteDataset(newDataset.getId());
         }
     }
 
@@ -159,6 +159,6 @@ public class SodaWorkflowTest  extends TestBase
         ));
         view.setFlags(new ArrayList<String>());
 
-        return importer.createView(view);
+        return (Dataset) importer.createDataset(view);
     }
 }
