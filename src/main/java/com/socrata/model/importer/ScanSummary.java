@@ -17,20 +17,20 @@ public class ScanSummary
     final public String summary;
     final public int headers;
     final public List<ScanColumn> columns;
-    final public List<Location> locations;
+    final public List<PossibleLocation> locations;
 
     /**
      *
      * @param summary Human readable summary of the scan
      * @param headers Number of rows that the scan believes contains the headers
      * @param columns Results of the scan for each column and their suggested types
-     * @param locations
+     * @param locations the columns that can possibly be part of a location
      */
     @JsonCreator
     public ScanSummary(final @JsonProperty("summary") String summary,
                        final @JsonProperty("headers") int headers,
                        final @JsonProperty("columns") List<ScanColumn> columns,
-                       final @JsonProperty("locations") List<Location> locations)
+                       final @JsonProperty("locations") List<PossibleLocation> locations)
     {
         this.summary = summary;
         this.headers = headers;
@@ -53,7 +53,7 @@ public class ScanSummary
         return columns;
     }
 
-    public List<Location> getLocations()
+    public List<PossibleLocation> getLocations()
     {
         return locations;
     }

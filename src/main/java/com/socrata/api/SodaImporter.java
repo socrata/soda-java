@@ -277,7 +277,7 @@ public class SodaImporter extends SodaDdl
         final String translationString =  (translation != null) ? "[" + StringUtils.join(translation, ",") + "]" : "";
 
         postbodyBuilder.append("&fileId=").append(fileId)
-                       .append("&translation=").append(translationString)
+                       .append("&translation=").append(URLEncoder.encode(translationString, "UTF-8"))
                        .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"));
 
         SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())

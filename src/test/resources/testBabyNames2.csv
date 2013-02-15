@@ -1,0 +1,5 @@
+first_name,county,sex,count,rollnumber,address, location
+Willamina,King,1,1000,1,"1959 NE Pacific StSeattle, WA 98195-6151","(44.254272,-121.162895)"
+William,King,0,1000,1,"1959 NE Pacific StSeattle, WA 98195-6151","(44.254272,-121.162895)"
+Larry,King,0,999,2,"1959 NE Pacific StSeattle, WA 98195-6151","(44.254272,-121.162895)"
+Lindsey,King,1,999,2,"1959 NE Pacific StSeattle, WA 98195-6151","(44.254272,-121.162895)"

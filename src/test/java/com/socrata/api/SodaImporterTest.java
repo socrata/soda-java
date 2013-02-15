@@ -9,7 +9,9 @@ import com.socrata.builders.NonDataFileDatasetBuilder;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.Address;
 import com.socrata.model.GeocodingResults;
+import com.socrata.model.Location;
 import com.socrata.model.importer.*;
 import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
@@ -17,6 +19,7 @@ import com.socrata.model.soql.SortOrder;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import test.model.Nomination;
 import test.model.NominationsWText;
@@ -35,6 +38,10 @@ public class SodaImporterTest extends TestBase
     public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
     public static final File  CRIMES_CSV = new File("src/test/resources/testCrimes.csv");
     public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
+    public static final File  BABY_NAMES_LOC = new File("src/test/resources/testBabyNames.csv");
+    public static final File  BABY_NAMES_LOC_2 = new File("src/test/resources/testBabyNames2.csv");
+    public static final File  BABY_NAMES_LOC_3 = new File("src/test/resources/testBabyNames3.csv");
+
 
     /**
      * Tests a number of ways to connect using dataset name
@@ -463,5 +470,167 @@ public class SodaImporterTest extends TestBase
 
     }
 
+    @Test
+    public void testWithLocations() throws IOException, InterruptedException, SodaError
+    {
+
+        final String name = "Testing Loc" ;
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer= new Soda2Consumer(connection);
+
+        ScanResults scanResults = importer.scan(BABY_NAMES_LOC);
+
+
+        final Blueprint blueprint = new BlueprintBuilder()
+                .setName(name)
+                .setDescription("Description")
+                .setSkip(1)
+                .addColumn(new BlueprintColumn("first_name","First Name",   "Text"))
+                .addColumn(new BlueprintColumn("county",    "County",       "Text"))
+                .addColumn(new BlueprintColumn("sex",       "Sex",          "Number"))
+                .addColumn(new BlueprintColumn("count",     "count",        "Number"))
+                .addColumn(new BlueprintColumn("rollnumber","RollNumber",   "Number"))
+                .addColumn(new BlueprintColumn("street",    "Street",       "Text"))
+                .addColumn(new BlueprintColumn("city",      "City",         "Text"))
+                .addColumn(new BlueprintColumn("state",     "State",        "Text"))
+                .addColumn(new BlueprintColumn("zipcode",   "Zip Code",     "Text"))
+                .addColumn(new BlueprintColumn("location",  "location",     "location"))
+                .build();
+
+
+        final String[] translation = new String[] {"col1", "col2","col3",
+                "col4","col5","col6","col7","col8","col9", "'(' + col6 + ',' + col7 + ',' + col8 + ',' + col9 + ')'"};
+        DatasetInfo dataset = importer.importScanResults(blueprint, translation, BABY_NAMES_LOC, scanResults);
+
+        dataset = importer.publish(dataset.getId());
+
+        //Verify the address got setup correctly
+        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        ObjectMapper mapper = new ObjectMapper();
+        TestCase.assertEquals(4, results.size());
+        for (Object curr : results) {
+            Map currRow = (Map)curr;
+            Map location = (Map) currRow.get("location");
+            Map human_address = (Map) location.get("human_address");
+
+            Address address = new Address((String)human_address.get("address"),
+                                          (String)human_address.get("city"),
+                                          (String)human_address.get("state"),
+                                          (String)human_address.get("zip"));
+
+            TestCase.assertNotNull(location.get("longitude"));
+            TestCase.assertNotNull(location.get("latitude"));
+            TestCase.assertEquals(currRow.get("street"), address.getStreetAddress());
+            TestCase.assertEquals(currRow.get("city"), address.getCity());
+            TestCase.assertEquals(currRow.get("state"), address.getState());
+            TestCase.assertEquals(currRow.get("zipcode"), address.getZip());
+        }
+
+
+        importer.deleteDataset(dataset.getId());
+    }
+
+    @Test
+    public void testWithLocations2() throws IOException, InterruptedException, SodaError
+    {
+
+        final String name = "Testing Loc" ;
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer= new Soda2Consumer(connection);
+        ScanResults scanResults = importer.scan(BABY_NAMES_LOC_2);
+
+
+        final Blueprint blueprint = new BlueprintBuilder()
+                .setName(name)
+                .setDescription("Description")
+                .setSkip(1)
+                .addColumn(new BlueprintColumn("first_name","First Name",   "Text"))
+                .addColumn(new BlueprintColumn("county",    "County",       "Text"))
+                .addColumn(new BlueprintColumn("sex",       "Sex",          "Number"))
+                .addColumn(new BlueprintColumn("count",     "count",        "Number"))
+                .addColumn(new BlueprintColumn("rollnumber","RollNumber",   "Number"))
+                .addColumn(new BlueprintColumn("address",    "Address",     "Location"))
+                .build();
+
+
+        DatasetInfo dataset = importer.importScanResults(blueprint, null, BABY_NAMES_LOC_2, scanResults);
+        importer.publish(dataset.getId());
+
+        //Verify the address got setup correctly
+        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        ObjectMapper mapper = new ObjectMapper();
+        TestCase.assertEquals(4, results.size());
+        for (Object curr : results) {
+            Map currRow = (Map)curr;
+            Map location = (Map) currRow.get("address");
+            Map human_address = (Map) location.get("human_address");
+
+            Address address = new Address((String)human_address.get("address"),
+                                          (String)human_address.get("city"),
+                                          (String)human_address.get("state"),
+                                          (String)human_address.get("zip"));
+
+            TestCase.assertNotNull(location.get("longitude"));
+            TestCase.assertNotNull(location.get("latitude"));
+            TestCase.assertNotNull(address.getStreetAddress());
+            TestCase.assertNotNull(address.getCity());
+            TestCase.assertNotNull(address.getState());
+            TestCase.assertNotNull(address.getZip());
+        }
+
+        importer.deleteDataset(dataset.getId());
+    }
+
+    @Test
+    public void testWithLocations3() throws IOException, InterruptedException, SodaError
+    {
+
+        final String name = "Testing Loc" ;
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer= new Soda2Consumer(connection);
+
+        ScanResults scanResults = importer.scan(BABY_NAMES_LOC_3);
+
+
+        final Blueprint blueprint = new BlueprintBuilder()
+                .setName(name)
+                .setDescription("Description")
+                .setSkip(1)
+                .addColumn(new BlueprintColumn("first_name", "First Name", "Text"))
+                .addColumn(new BlueprintColumn("county",    "County",       "Text"))
+                .addColumn(new BlueprintColumn("sex",       "Sex",          "Number"))
+                .addColumn(new BlueprintColumn("count",     "count",        "Number"))
+                .addColumn(new BlueprintColumn("rollnumber","RollNumber",   "Number"))
+                .addColumn(new BlueprintColumn("lat",       "Lat",          "Number"))
+                .addColumn(new BlueprintColumn("long",      "Long",         "Number"))
+                .addColumn(new BlueprintColumn("location",  "location",     "location"))
+                .build();
+
+
+        final String[] translation = new String[] {"col1", "col2","col3","col4","col5","col6", "col7","'(' + col6 + ',' + col7 + ')'"};
+        DatasetInfo dataset = importer.importScanResults(blueprint, translation, BABY_NAMES_LOC_3, scanResults);
+
+        importer.publish(dataset.getId());
+
+        //Verify the address got setup correctly
+        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(4, results.size());
+        for (Object curr : results) {
+            Map currRow = (Map)curr;
+            Map location = (Map) currRow.get("location");
+            TestCase.assertNotNull(currRow.get("lat"));
+            TestCase.assertNotNull(currRow.get("long"));
+            TestCase.assertNotNull(location.get("longitude"));
+            TestCase.assertNotNull(location.get("latitude"));
+        }
+
+        importer.deleteDataset(dataset.getId());
+    }
 
 }

@@ -267,8 +267,6 @@ public class SodaWorkflow
 
 
         try {
-
-
             final ClientResponse response = requester.issueRequest();
             return response.getEntity(GeocodingResults.class);
         } catch (LongRunningQueryException e) {

@@ -1,0 +1,5 @@
+first_name,county,sex,count,rollnumber,street,city,state,zip
+Willamina,King,1,1000,1,1959 Pacific St,Seattle,WA,98195-6151
+William,King,0,1000,1,1959 Pacific St,Seattle,WA,98195-6151
+Larry,King,0,999,2,1959 Pacific St,Seattle,WA,98195-6151
+Lindsey,King,1,999,2,1959 Pacific St,Seattle,WA,98195-6151
