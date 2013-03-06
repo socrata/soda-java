@@ -52,7 +52,7 @@ public final class HttpLowLevel
 
 
     protected static final int DEFAULT_MAX_RETRIES = 200;
-    public static final long   DEFAULT_RETRY_TIME = 1000;
+    public static final long   DEFAULT_RETRY_TIME = 4000;
 
     public static final String SODA_VERSION = "$$version";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
@@ -68,6 +68,9 @@ public final class HttpLowLevel
 
     private final Client client;
     private final String url;
+
+    private long retryTime = DEFAULT_RETRY_TIME;
+    private long maxRetries = DEFAULT_MAX_RETRIES;
 
     /**
      * Creates a client with the appropriate mappers and features turned on to
@@ -135,6 +138,41 @@ public final class HttpLowLevel
         return client;
     }
 
+    /**
+     * Gets the number of milliseconds to wait before following a 202
+     * @return number of milliseconds to wait before following a 202
+     */
+    public long getRetryTime()
+    {
+        return retryTime;
+    }
+
+    /**
+     * Sets the number of milliseconds to wait before following a 202
+     * @param retryTime number of milliseconds to wait before following a 202
+     */
+    public void setRetryTime(long retryTime)
+    {
+        this.retryTime = retryTime;
+    }
+
+    /**
+     * Gets the max number of times to follow a 202 before failing
+     * @return max number of times to follow a 202 before failing
+     */
+    public long getMaxRetries()
+    {
+        return maxRetries;
+    }
+
+    /**
+     * Sets the max number of times to follow a 202 before failing
+     * @param maxRetries max number of times to follow a 202 before failing
+     */
+    public void setMaxRetries(long maxRetries)
+    {
+        this.maxRetries = maxRetries;
+    }
 
     public UriBuilder uriBuilder() {
         return UriBuilder.fromUri(url);
@@ -448,7 +486,7 @@ public final class HttpLowLevel
      */
     private long parseRetryAfter(final String retryAfter) {
         if (retryAfter == null) {
-            return DEFAULT_RETRY_TIME;
+            return getRetryTime();
         }
 
         if (StringUtils.isNumeric(retryAfter)) {
@@ -457,11 +495,11 @@ public final class HttpLowLevel
             try {
                 final DateTime date = RFC1123_DATE_FORMAT.parseDateTime(retryAfter);
                 if (date == null) {
-                    return DEFAULT_RETRY_TIME;
+                    return getRetryTime();
                 }
                 return date.getMillis();
             } catch (Exception e) {
-                return DEFAULT_RETRY_TIME;
+                return getRetryTime();
             }
 
         }

@@ -118,7 +118,7 @@ public class SodaWorkflow
             ClientResponse response = requester.issueRequest();
             return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, DatasetInfo.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
         }
     }
 
@@ -154,7 +154,7 @@ public class SodaWorkflow
             ClientResponse response = requester.issueRequest();
             return response.getEntity(Dataset.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
     }
 
@@ -186,7 +186,7 @@ public class SodaWorkflow
 
             requester.issueRequest();
         } catch (LongRunningQueryException e) {
-            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
     }
 
@@ -219,7 +219,7 @@ public class SodaWorkflow
 
             requester.issueRequest();
         } catch (LongRunningQueryException e) {
-            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Dataset.class, requester);
+            getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
     }
 
@@ -270,7 +270,7 @@ public class SodaWorkflow
             final ClientResponse response = requester.issueRequest();
             return response.getEntity(GeocodingResults.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, GeocodingResults.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), GeocodingResults.class, requester);
         }
     }
 

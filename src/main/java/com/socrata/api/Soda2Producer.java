@@ -72,7 +72,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             requester.issueRequest();
         } catch (LongRunningQueryException e) {
-            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<String>(String.class), requester);
+            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<String>(String.class), requester);
         }
     }
 
@@ -97,7 +97,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             requester.issueRequest();
         } catch (LongRunningQueryException e) {
-            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<String>(String.class), requester);
+            getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<String>(String.class), requester);
         }
 
     }
@@ -124,7 +124,7 @@ public class Soda2Producer extends Soda2Consumer
             ClientResponse response = requester.issueRequest();
             return response.getEntity(Meta.class);
         } catch (LongRunningQueryException e) {
-            return (Meta) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, Meta.class, requester);
+            return (Meta) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Meta.class, requester);
         }
     }
 
@@ -152,7 +152,7 @@ public class Soda2Producer extends Soda2Consumer
             ClientResponse response = requester.issueRequest();
             return response.getEntity(retType);
         } catch (LongRunningQueryException e) {
-            return (T) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, retType, requester);
+            return (T) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), retType, requester);
         }
     }
 
@@ -188,7 +188,7 @@ public class Soda2Producer extends Soda2Consumer
             ClientResponse response = requester.issueRequest();
             return response.getEntity(UpsertResult.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, UpsertResult.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
         }
     }
 
@@ -226,7 +226,7 @@ public class Soda2Producer extends Soda2Consumer
             return response.getEntity(UpsertResult.class);
 
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class), requester);
+            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
         }
     }
 
@@ -264,7 +264,7 @@ public class Soda2Producer extends Soda2Consumer
                 ClientResponse response = requester.issueRequest();
                 return response.getEntity(UpsertResult.class);
             } catch (LongRunningQueryException e) {
-                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<UpsertResult>(InputStream.class), requester);
+                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
                 GeneralUtils.closeQuietly(is);
             }
@@ -299,7 +299,7 @@ public class Soda2Producer extends Soda2Consumer
             ClientResponse response = requester.issueRequest();
             return response.getEntity(Meta.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, new GenericType<Meta>(Meta.class), requester);
+            return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<Meta>(Meta.class), requester);
         }
 
     }

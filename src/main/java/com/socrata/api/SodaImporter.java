@@ -139,7 +139,7 @@ public class SodaImporter extends SodaDdl
             final ClientResponse response = requester.issueRequest();
             return response.getEntity(ScanResults.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, ScanResults.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), ScanResults.class, requester);
         }
     }
 
@@ -356,7 +356,7 @@ public class SodaImporter extends SodaDdl
             final ClientResponse response = requester.issueRequest();
             nonDataFileDataset = response.getEntity(NonDataFileDataset.class);
         } catch (LongRunningQueryException e) {
-            nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, HttpLowLevel.DEFAULT_MAX_RETRIES, NonDataFileDataset.class, requester);
+            nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), NonDataFileDataset.class, requester);
         }
 
         nonDataFileDataset.setDescription(description);

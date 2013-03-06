@@ -16,6 +16,7 @@ import java.util.Map;
 abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDatasetInfoBuilder, BUILDEE extends DatasetInfo>
 {
 
+    protected String              resourceName;
     protected String              viewType;
     protected String              attribution;
     protected String              attributionLink;
@@ -39,6 +40,7 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
     public AbstractDatasetInfoBuilder(DatasetInfo datasetInfo)
     {
 
+        setResourceName(datasetInfo.getResourceName());
         setAttribution(datasetInfo.getAttribution());
         setAttributionLink(datasetInfo.getAttributionLink());
         setCategory(datasetInfo.getCategory());
@@ -64,6 +66,13 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
         }
 
     }
+
+    public BUILDER setResourceName(String resourceName)
+    {
+        this.resourceName = resourceName;
+        return (BUILDER) this;
+    }
+
 
     public BUILDER setViewType(String viewType)
     {
