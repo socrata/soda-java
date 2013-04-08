@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socrata Java API</title>
+</head>
+<body>
+
+<h2>Overview</h2>
+The Java API provides methods for calling the commonly used APIs provided by the Socrata platform.  That being said, by far the
+most common usages are either updating data or querying data.  For querying data, there is only one good way of doing this, which is using the
+Soda2Consumer api and the SODA Query Language (SoQL) to create queries.  For updating data there are two ways to do this, and choosing which
+one depdends on your scenario.
+
+<h2>Updating Datasets</h2>
+
+Socrata offers two workflows for updating data:
+<ol>
+    <li>The <b>Upsert Flow</b> is a much simple process where you simply call an upsert operation that allows you to add/remove/update data
+    in a dataset in a bulk operation.  This is a more light weight way to update datasets and should be considered the default updating mechanism.  If
+    updating datasets more than once an hour, you should definitely use this flow.</li>
+
+    <li>The <b>Publishing Flow</b> is a process where you first create a working copy of the dataset.  This working copy is only seen
+    by your client until you do your appropriate updates and then publish it.  This method provides some safety in terms of allowing you to
+    do many updates through several API calls and not let your users see them mid way, however, it is <b>expensive</b>.  You should only
+    really use this if you are <strong>updating datasets less than once every two hours</strong> and <strong>you are updating a lot
+    of the dataset</strong>.</li>
+</ol>
+
+
+<h4>The Upsert Flow</h4>
+The upsert flow is the easiest way to update data and is often the recommended version.  This simply allows you to send up updates
+in a CSV file or a JSON object.  An example of the simplest way to call this is:
+
+<pre><code>
+    Soda2Producer producer = Soda2Producer.newProducer(url, userName, password, token);
+    UpsertResult results = producer.upsertStream(UPDATE_DATA_SET, HttpLowLevel.CSV_TYPE, csvStream);
+    if (results.errorCount()) {
+        //If there are data errors, throw so the data can be checked by a human to make sure it is correct
+        throw SomeError;
+    }
+</code></pre>
+
+<h4>The Publishing Flow</h4>
+The publishing flow is a bit more involved.  It entails copying a dataset, doing work on it, and then publishing it.  As mentioned
+above, the copy and publishing steps are potentially expensive, so this flow should only be done when you need it.  It is likely in
+the future, Socrata may restrict the number of working copies allowed on a dataset per hour to prevent abuse.
+
+<pre><code>
+    SodaImporter importer = SodaImporter.newImporter(url, userName, password, token);
+
+    DatasetInfo  unpublishedView  = importer.createWorkingCopy(UPDATE_DATA_SET);
+    DatasetInfo  appendResults    = importer.replace(unpublishedView.getId(), CSV_TO_REPLACE_WITH, 1, null)
+    DatasetInfo  publishedResults = importer.publish(appendResults.getId());
+
+</code></pre>
+
+
+</body>
+</html>
