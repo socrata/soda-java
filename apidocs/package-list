@@ -1,0 +1,9 @@
+com.socrata.api
+com.socrata.builders
+com.socrata.exceptions
+com.socrata.model
+com.socrata.model.importer
+com.socrata.model.requests
+com.socrata.model.search
+com.socrata.model.soql
+com.socrata.utils
