@@ -23,7 +23,12 @@
       <url>https://github.com/socrata/soda-java</url>
   </scm>
 
-  <licenses>
+   <properties>
+      <github.global.server>github.com</github.global.server>
+   </properties>
+
+
+    <licenses>
       <license>
           <name>The MIT License (MIT)</name>
           <url>http://opensource.org/licenses/mit-license.php</url>
@@ -71,6 +76,11 @@
     </profiles>
 
   <dependencies>
+      <dependency>
+          <groupId>net.sf.opencsv</groupId>
+          <artifactId>opencsv</artifactId>
+          <version>2.0</version>
+      </dependency>
       <dependency>
           <groupId>joda-time</groupId>
           <artifactId>joda-time</artifactId>
@@ -147,9 +157,9 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>src/main/build/assembly.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
             <plugin>
@@ -169,7 +179,7 @@
                         <group>
                             <title>Utility and Helper Packages</title>
                             <packages>com.socrata.utils:com.socrata.builders</packages>
-                        </group>s
+                        </group>
                     </groups>
                 </configuration>
             </plugin>
@@ -182,6 +192,22 @@
                     <override>true</override>
                     <includeAttached>true</includeAttached>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <configuration>
+                    <message>Creating site for ${project.version}</message>
+                    <merge>true</merge>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

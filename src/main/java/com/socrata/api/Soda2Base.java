@@ -244,6 +244,27 @@ public class Soda2Base
     }
 
 
+    public <T> ClientResponse doReplaceObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
+    {
+
+        final UriBuilder builder = httpLowLevel.uriBuilder()
+                                               .path(SODA_BASE_PATH)
+                                               .path(resourceId);
+
+        return httpLowLevel.putRaw(builder.build(), httpLowLevel.JSON_TYPE, objects);
+    }
+
+    public ClientResponse doReplaceStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
+    {
+
+        final UriBuilder builder = httpLowLevel.uriBuilder()
+                                               .path(SODA_BASE_PATH)
+                                               .path(resourceId);
+
+        return httpLowLevel.putRaw(builder.build(), mediaType, stream);
+
+    }
+
     /**
      * The HttpLowLevel used for communicating with the service.
      * @return HttpLowLevel used for communicating with the service.

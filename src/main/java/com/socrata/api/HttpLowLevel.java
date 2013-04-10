@@ -382,6 +382,23 @@ public final class HttpLowLevel
     }
 
 
+    public ClientResponse putFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
+        return putFileRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, file);
+    }
+
+    public ClientResponse putFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final File file) throws LongRunningQueryException, SodaError
+    {
+        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
+                                                  .accept(acceptType)
+                                                  .type(MediaType.MULTIPART_FORM_DATA_TYPE);
+
+        FormDataMultiPart form = new FormDataMultiPart();
+        form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
+
+        final ClientResponse response = builder.put(ClientResponse.class, form);
+        return processErrors(response);
+    }
+
 
     /**
      * Internal API to add any common parameters.  In this case, it sets the version parameter

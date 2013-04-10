@@ -10,7 +10,8 @@ public enum SearchClauseTypes
     query       ("q"),
     description ("desc"),
     category    ("category"),
-    metadata    ("metadata_tag");
+    metadata    ("metadata_tag"),
+    viewType    ("datasetView");
 
     public final String queryParam;
 

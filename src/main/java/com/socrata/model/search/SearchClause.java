@@ -84,4 +84,24 @@ public class SearchClause
             super(SearchClauseTypes.metadata, metadataCategory + "_" + metadataKey + ":" + metadataValue);
         }
     }
+
+    static public enum ViewType {
+        view ("VIEW") ,
+        dataset ("DATASET");
+
+        public final String value;
+
+        private ViewType(String value)
+        {
+            this.value = value;
+        }
+    }
+
+    static public class ViewTypeSearch extends SearchClause {
+
+        public ViewTypeSearch(ViewType viewType)
+        {
+            super(SearchClauseTypes.viewType, viewType.value);
+        }
+    }
 }

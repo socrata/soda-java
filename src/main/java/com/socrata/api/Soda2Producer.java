@@ -169,7 +169,7 @@ public class Soda2Producer extends Soda2Consumer
      *   an :id.
      *
      * @param resourceId unique id or resource name of the dataset
-     * @param objects  list of objects to upsert;
+     * @param objects  list of objects to upsert
      *
      * @return result of objects added, removed and modified.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
@@ -182,6 +182,34 @@ public class Soda2Producer extends Soda2Consumer
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             { return doAddObjects(resourceId, payload); }
+        };
+
+        try {
+            ClientResponse response = requester.issueRequest();
+            return response.getEntity(UpsertResult.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
+        }
+    }
+
+
+    /**
+     * Replaces a dataset with a list of objects.  This is the same as doing a truncate, followed by an upsert, except
+     * that it will happen atomically (so you cannot have a failure that puts the dataset in a half state)
+     *
+     * @param resourceId unique id or resource name of the dataset
+     * @param objects list of objects to replace the contents of the dataset with
+     * @return Upsert result describing number of objects added/removed as well as errors.
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public UpsertResult replace(String resourceId, List objects) throws SodaError, InterruptedException
+    {
+
+        SodaRequest requester = new SodaRequest<List>(resourceId, objects)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            { return doReplaceObjects(resourceId, payload); }
         };
 
         try {
@@ -232,6 +260,37 @@ public class Soda2Producer extends Soda2Consumer
 
 
     /**
+     * Replaces a dataset with a the objects serialized in an input stream.  This is the same as doing a truncate, followed by an upsert, except
+     * that it will happen atomically (so you cannot have a failure that puts the dataset in a half state)
+     *
+     * @param resourceId unique id or resource name of the dataset
+     * @param mediaType what the format of the stream is.  Normally, HttpLowLevel.JSON_TYPE or HttpLowLevel.CSV_TYPE
+     * @param stream  JSON stream of objects to replace the existing dataset with.
+     *
+     * @return Upsert result describing number of objects added/removed as well as errors.
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public UpsertResult replaceStream(String resourceId, MediaType mediaType, InputStream stream) throws SodaError, InterruptedException
+    {
+
+        SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            { return doReplaceStream(resourceId, mediaType, payload); }
+        };
+
+        try {
+
+            ClientResponse response = requester.issueRequest();
+            return response.getEntity(UpsertResult.class);
+
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+        }
+    }
+
+    /**
      * "Upserts" a list of objects.  What this means is that it will:
      * <ol>
      *     <li>Add the objects in the list.</li>
@@ -273,6 +332,41 @@ public class Soda2Producer extends Soda2Consumer
         }
     }
 
+
+    /**
+     * Replaces a dataset with the rows defined in the provided CSV.  This is logically the same thing
+     * as doing a truncate followed by an upsertCsv, with the advantage of being atomic (so failures can't
+     * cause a half-state)
+     *
+     * @param resourceId unique id or resource name of the dataset
+     * @param csvFile File that contains a CSV to replace the dataset with
+     * @return Upsert result describing number of objects added/removed as well as errors.
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public UpsertResult replaceCsv(String resourceId, File csvFile) throws SodaError, InterruptedException
+    {
+        try {
+            InputStream is = new FileInputStream(csvFile);
+
+            SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, is, HttpLowLevel.CSV_TYPE)
+            {
+                public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+                { return doReplaceStream(resourceId, mediaType, payload); }
+            };
+
+            try {
+                ClientResponse response = requester.issueRequest();
+                return response.getEntity(UpsertResult.class);
+            } catch (LongRunningQueryException e) {
+                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+            } finally {
+                GeneralUtils.closeQuietly(is);
+            }
+        } catch (IOException ioe) {
+            throw new SodaError("Cannot load CSV from the file " + GeneralUtils.bestFilePath(csvFile) + ".  Error message: " + ioe.getLocalizedMessage());
+        }
+    }
 
 
     /**

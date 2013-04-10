@@ -152,6 +152,7 @@ public class SodaDdlTest  extends TestBase
         final SearchClause    tagClause = new SearchClause.TagSearch("test");
         final SearchClause    metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata");
 
+
         final SearchResults results1 =  importer.searchViews(nameClause);
         TestCase.assertEquals(1, results1.getCount());
         TestCase.assertEquals("TestUpdate", results1.getResults().get(0).getDataset().getName());
@@ -171,6 +172,13 @@ public class SodaDdlTest  extends TestBase
         final SearchResults results4 =  importer.searchViews(nameClause, tagClause, metadataClause);
         TestCase.assertEquals(1, results4.getCount());
         TestCase.assertEquals("TestUpdate", results4.getResults().get(0).getDataset().getName());
+
+        final SearchResults results5 =  importer.searchViews(metadataClause, new SearchClause.ViewTypeSearch(SearchClause.ViewType.dataset));
+        TestCase.assertEquals(1, results5.getCount());
+        TestCase.assertEquals("TestUpdate", results5.getResults().get(0).getDataset().getName());
+
+        final SearchResults results6 =  importer.searchViews(metadataClause, new SearchClause.ViewTypeSearch(SearchClause.ViewType.view));
+        TestCase.assertEquals(0, results6.getCount());
 
     }
 

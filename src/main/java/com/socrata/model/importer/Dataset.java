@@ -134,6 +134,21 @@ public class Dataset extends DatasetInfo
     }
 
     /**
+     * returns the column for the row identifier column, based on the id.
+     * @return the column for the row identifier column, based on the id.
+     */
+    public Column lookupRowIdentifierColumn() {
+        if (getRowIdentifierColumnId() != null) {
+            for (Column curr : getColumns()) {
+                if (getRowIdentifierColumnId().equals(curr.getId())) {
+                    return curr;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sets the row identier column ID for the (like a primary key).  It is important to note
      * that when changing this to update the server, you will need to set the row identifier field in the
      * metadata field as well.  Or you can call setRowIdentifierColumn to do this for you.

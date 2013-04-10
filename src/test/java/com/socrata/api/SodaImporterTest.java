@@ -227,7 +227,7 @@ public class SodaImporterTest extends TestBase
                                                                           "col1", null, null, null));
         loadView.setRowIdentifierColumnId(loadView.getColumns().get(0).getId());
 
-        loadView.setCategory("Crime");
+        loadView.setCategory("Fun");
         loadView.setExternalId("ExternalId_For_Me");
 
         //Update dataset
