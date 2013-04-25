@@ -14,6 +14,8 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.client.urlconnection.HttpURLConnectionFactory;
+import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import org.apache.commons.lang3.StringUtils;
@@ -29,8 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -76,12 +77,43 @@ public final class HttpLowLevel
      * Creates a client with the appropriate mappers and features turned on to
      * most easily map from SODA2 data types to Java data types.
      *
+     * This call will honor {@code https.proxyHost} and {@code https.proxyPort} for setting a proxy.
+     *
      * @return the Client that was created.
      */
     private static Client createClient() {
+
+        String  proxyHost = System.getProperty("https.proxyHost");
+        Integer proxyPort = null;
+        if (StringUtils.isNotEmpty(proxyHost)) {
+            final String proxyPortString = System.getProperty("https.proxyPort");
+            if (StringUtils.isNotEmpty(proxyPortString)) {
+                proxyPort = Integer.decode(proxyPortString);
+            }
+        }
+
+        return createClient(proxyHost, proxyPort);
+    }
+
+    /**
+     * Creates a client with the appropriate mappers and features turned on to
+     * most easily map from SODA2 data types to Java data types.
+     *
+     * @param proxyHost the host to use a proxy.  If {@code null}, this will not use a proxy.
+     * @param proxyPort the port to use for the proxy host.  If {@code null}, this will use the default HTTP port.
+     *
+     * @return the Client that was created.
+     */
+    private static Client createClient(@Nullable final String proxyHost, @Nullable final Integer proxyPort) {
         final ClientConfig clientConfig = new DefaultClientConfig();
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
         clientConfig.getClasses().add(JacksonObjectMapperProvider.class);
+
+        if (StringUtils.isNotEmpty(proxyHost)) {
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort == null ? 443 : proxyPort));
+            return new Client(new URLConnectionClientHandler(new ProxyHandler(proxy)), clientConfig);
+        }
+
         return Client.create(clientConfig);
     }
 
@@ -521,6 +553,27 @@ public final class HttpLowLevel
 
         }
     }
+
+    /**
+     * An internal class we use for setting the proxy for an Http connection.
+     */
+    private static class ProxyHandler implements HttpURLConnectionFactory
+    {
+
+        final Proxy proxy;
+
+        public ProxyHandler(@Nonnull Proxy proxy)
+        {
+            this.proxy = proxy;
+        }
+
+        @Override
+        public HttpURLConnection getHttpURLConnection(URL url) throws IOException
+        {
+            return (HttpURLConnection)url.openConnection(proxy);
+        }
+    }
+
 
 
 }

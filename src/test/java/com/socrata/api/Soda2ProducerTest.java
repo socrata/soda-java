@@ -1,8 +1,10 @@
 package com.socrata.api;
 
+import com.google.common.collect.Lists;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.UpsertResult;
 import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.utils.GeneralUtils;
@@ -46,7 +48,7 @@ public class Soda2ProducerTest extends TestBase
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-            /*
+
             UpsertResult replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_HEADER_CSV);
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
@@ -54,7 +56,7 @@ public class Soda2ProducerTest extends TestBase
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
-            */
+
 
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
@@ -85,7 +87,6 @@ public class Soda2ProducerTest extends TestBase
             TestCase.assertEquals(3, results.size());
 
 
-            /*
             UpsertResult replaceResult = producer.replaceStream(datasetPublished.getId(), HttpLowLevel.CSV_TYPE, fisCrimes1);
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
@@ -93,7 +94,7 @@ public class Soda2ProducerTest extends TestBase
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
-            */
+
 
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());

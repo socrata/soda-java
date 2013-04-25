@@ -7,6 +7,7 @@ import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
@@ -43,6 +44,26 @@ public class ApiTest extends TestBase
     {
         final HttpLowLevel connection = connect();
         executeSimpleQuery(connection, "77tg-nbgd");
+    }
+
+    /**
+     * Tests that we fail if we try to go through a non-existent proxy
+     */
+    @Test
+    public void testProxy() throws IOException, LongRunningQueryException, InterruptedException, SodaError
+    {
+
+        System.setProperty("https.proxyHost", "webcache.mydomain.com");
+        System.setProperty("https.proxyPort", "8080");
+
+        final HttpLowLevel connection = connect();
+
+        try {
+            executeSimpleQuery(connection, "77tg-nbgd");
+            TestCase.fail("webcache.mydomain.com does not exist, so this call should have failed if it was using the set proxy.");
+        } catch (ClientHandlerException e) {
+            //Success
+        }
     }
 
     /**
