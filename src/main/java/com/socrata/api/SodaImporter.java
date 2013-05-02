@@ -223,11 +223,19 @@ public class SodaImporter extends SodaDdl
      *
      * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
      *
+     * In the case of errors, if the error is an MetadataUpdateError, then the data has all been committed, but there was a problem with
+     * the meta-data.  In the case of any other errors, the dataset is in an unknown state.  The only way to get it back into a clean
+     * state is to remove the working copy, and start again.  The Soda2Producer API has better error semantics where all rows will be
+     * either committed or rolledback.
+     *
+     *
      * @param datasetId  id of the dataset to append to
      * @param file file with the data in it
      * @param skip number of rows in the data to skip (normally for skipping headers)
      * @param translation an optional translation array for translating from values in the file and values in the dataset.
      * @return The info of the dataset after the append operation.
+     * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
+     * of a metadata inconsistency.  In this case, the data has already been committed.
      */
     public DatasetInfo append(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
     {
@@ -243,11 +251,18 @@ public class SodaImporter extends SodaDdl
      *
      * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
      *
+     * In the case of errors, if the error is an MetadataUpdateError, then the data has all been committed, but there was a problem with
+     * the meta-data.  In the case of any other errors, the dataset is in an unknown state.  The only way to get it back into a clean
+     * state is to remove the working copy, and start again.  The Soda2Producer API has better error semantics where all rows will be
+     * either committed or rolledback.
+     *
      * @param datasetId  id of the dataset to append to
      * @param file file with the data in it
      * @param skip number of rows in the data to skip (normally for skipping headers)
      * @param translation an optional translation array for translating from values in the file and values in the dataset.
      * @return The info of the dataset after the append operation.
+     * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
+     * of a metadata inconsistency.  In this case, the data has already been committed.
      */
     public DatasetInfo replace(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
     {
