@@ -1,63 +1,60 @@
 package com.socrata;
 
+import com.google.common.collect.Lists;
+import com.socrata.TestBase;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Consumer;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.UpsertResult;
+import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
+import com.socrata.utils.GeneralUtils;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
 import org.junit.Test;
-import test.model.DataType;
+import test.model.Crime;
 import test.model.ToxinData;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.UUID;
 
 /**
- * Not quite a unit test that tests the API against a sandbox domain.  This will depend on the TestData dataset, and
- * will test results against known results in that dataset
+ * Tests that the proxy settings work
  */
-public class ApiTest extends TestBase
+public class Soda2ProxyTest extends TestBase
 {
 
-
     /**
-     * Tests a number of ways to connect using 4x4s
-     *
-     * Will issue a simple query, and do spot validation.
+     * Tests that we fail if we try to go through a non-existent proxy
      */
     @Test
-    public void testSimpleQuery4x4() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    public void testProxy() throws IOException, LongRunningQueryException, InterruptedException, SodaError
     {
+
+        System.setProperty("https.proxyHost", "webcache.mydomain.com");
+        System.setProperty("https.proxyPort", "8080");
+
         final HttpLowLevel connection = connect();
-        executeSimpleQuery(connection, "77tg-nbgd");
+
+        try {
+            executeSimpleQuery(connection, "77tg-nbgd");
+            TestCase.fail("webcache.mydomain.com does not exist, so this call should have failed if it was using the set proxy.");
+        } catch (ClientHandlerException e) {
+            //Success
+        } finally {
+            System.clearProperty("https.proxyHost");
+            System.clearProperty("https.proxyPort");
+        }
     }
-
-
-
-    /**
-     * Tests a number of ways to connect using dataset name
-     */
-    @Test
-    public void testSimpleQueryName() throws LongRunningQueryException, SodaError, InterruptedException, IOException
-    {
-        final HttpLowLevel connection = connect();
-        executeSimpleQuery(connection, "TestData");
-    }
-
 
     private void executeSimpleQuery(final HttpLowLevel connection, final String dataset) throws LongRunningQueryException, SodaError, InterruptedException
     {
@@ -67,7 +64,7 @@ public class ApiTest extends TestBase
                 .setWhereClause(new ConditionalExpression("primary_naics=325510"))
                 .build();
 
-        final Soda2Consumer   soda2Consumer = new Soda2Consumer(connection);
+        final Soda2Consumer soda2Consumer = new Soda2Consumer(connection);
 
         //
         //   Issue query as a full query
@@ -98,5 +95,4 @@ public class ApiTest extends TestBase
             TestCase.assertEquals("325510", crimeMap.get("primary_naics"));
         }
     }
-
 }

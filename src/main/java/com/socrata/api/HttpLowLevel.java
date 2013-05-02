@@ -59,6 +59,7 @@ public final class HttpLowLevel
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
     public static final String UNEXPECTED_ERROR = "uexpectedError";
+    public static final String MALFORMED_RESPONSE = "malformedResponse";
 
     public static final Map<String, String> UTF_PARAMS = ImmutableMap.of("charset", "UTF-8");
     public static final MediaType JSON_TYPE = MediaType.APPLICATION_JSON_TYPE;
@@ -460,6 +461,10 @@ public final class HttpLowLevel
             return response;
         }
 
+        final ObjectMapper mapper = new ObjectMapper();
+        final String body = response.getEntity(String.class);
+
+
         if (response.getStatus() == 202) {
             final String location = response.getHeaders().getFirst("Location");
             final String retryAfter = response.getHeaders().getFirst("Retry-After");
@@ -476,13 +481,11 @@ public final class HttpLowLevel
             //
             if (StringUtils.isEmpty(location)) {
 
-                final String body = response.getEntity(String.class);
                 if (StringUtils.isEmpty(body)) {
                     throw new SodaError("Illegal body for 202 response.  No location and body is empty.");
                 }
 
                 try {
-                    final ObjectMapper mapper = new ObjectMapper();
                     final Map<String, Object> bodyProperties = (Map<String, Object>)mapper.readValue(body, Object.class);
                     if (bodyProperties.get("ticket") != null) {
                         ticket = bodyProperties.get("ticket").toString();
@@ -504,11 +507,22 @@ public final class HttpLowLevel
         }
 
         if (!response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, response.getEntity(String.class), null, null));
+            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null));
         }
 
-        final SodaErrorResponse sodaErrorResponse = response.getEntity(SodaErrorResponse.class);
+        SodaErrorResponse sodaErrorResponse;
+        try {
+            sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
+        } catch (Exception e) {
+            throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null));
+        }
+
+
         if (response.getStatus() == 400) {
+            if (sodaErrorResponse.message != null &&
+                    sodaErrorResponse.message.startsWith("Row data was saved.")) {
+                throw new MetadataUpdateError(sodaErrorResponse);
+            }
             throw new MalformedQueryError(sodaErrorResponse);
         } else if (response.getStatus() == 403) {
             if (AUTH_REQUIRED_CODE.equals(sodaErrorResponse.code)) {
