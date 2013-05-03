@@ -37,14 +37,13 @@ public class InconsistentMetadataTest  extends TestBase
             sodaImporter.removeColumn(datasetCreated.getId(), columnId);
 
 
-            /*
             try {
                 sodaImporter.append(datasetCreated.getId(), TEST_NOMINATIONA_CSV, 1, null);
                 TestCase.fail("Expected failure after updating a non-existing column as a rowidentifier");
             } catch (MetadataUpdateError mue) {
                  //Success error expected
             }
-            */
+
         } finally {
             sodaImporter.deleteDataset(datasetCreated.getId());
         }
