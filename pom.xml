@@ -16,8 +16,8 @@
   <description>A library for accessing SODA 2 endpoints.</description>
   <url>http://www.socrata.com/</url>
   <scm>
-      <connection>scm:git:https://github.com/socrata/soda-java.git</connection>
-      <developerConnection>scm:git:https://github.com/socrata/soda-java.git</developerConnection>
+      <connection>scm:git:git@github.com:socrata/soda-java.git</connection>
+      <developerConnection>scm:git:git@github.com:socrata/soda-java.git</developerConnection>
       <url>https://github.com/socrata/soda-java</url>
   </scm>
 
