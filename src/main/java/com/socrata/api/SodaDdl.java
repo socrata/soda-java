@@ -1,12 +1,10 @@
 package com.socrata.api;
 
+import com.google.common.base.Preconditions;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.SearchResults;
-import com.socrata.model.importer.AssetResponse;
-import com.socrata.model.importer.Column;
-import com.socrata.model.importer.Dataset;
-import com.socrata.model.importer.DatasetInfo;
+import com.socrata.model.importer.*;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.search.SearchClause;
 import com.sun.jersey.api.client.ClientResponse;
@@ -29,8 +27,10 @@ public class SodaDdl extends SodaWorkflow
 {
     protected static final String COLUMNS_PATH         = "columns";
     protected static final String ASSET_BASE_PATH      = "assets";
+    protected static final String FILE_RESOURCE_PATH   = "file_data";
     protected static final String SEARCH_BASE_PATH     = "search";
     private final URI assetUri;
+    private final URI fileResourceUri;
     private final URI searchUri;
 
     /**
@@ -68,6 +68,11 @@ public class SodaDdl extends SodaWorkflow
                                 .path(SEARCH_BASE_PATH)
                                 .path(VIEWS_BASE_PATH)
                                 .build();
+
+        fileResourceUri = httpLowLevel.uriBuilder()
+                               .path(API_BASE_PATH)
+                               .path(FILE_RESOURCE_PATH)
+                               .build();
 
 
 
@@ -360,6 +365,35 @@ public class SodaDdl extends SodaWorkflow
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(assetUri)
+                                          .path(resourceId)
+                                          .build();
+
+                return httpLowLevel.queryRaw(uri, MediaType.WILDCARD_TYPE);
+            }
+        };
+
+        try {
+            final ClientResponse response = requester.issueRequest();
+            return response.getEntity(InputStream.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), InputStream.class, requester);
+        }
+    }
+
+    /**
+     * Downloads a file blob, based on the NonDataFileDataset it's part of.
+     * @return
+     */
+    public InputStream getFileBlob(final NonDataFileDataset dataset) throws SodaError, InterruptedException
+    {
+        Preconditions.checkArgument(dataset.getBlobId()!=null, "Dataset MUST be imported already before calling this.  Otherwise, the file doesn't have a Blob ID yet.");
+
+
+        SodaRequest requester = new SodaRequest<File>(dataset.getBlobId(), null)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI uri = UriBuilder.fromUri(fileResourceUri)
                                           .path(resourceId)
                                           .build();
 

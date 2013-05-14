@@ -381,6 +381,60 @@ public class SodaImporter extends SodaDdl
 
 
     /**
+     * Replaces the file blob for a Imports a NonDataFileDataset.  For changing other properties,
+     * use SodaDdl.updateDatasetInfo
+     *
+     * @param id name of the file
+     * @param file the file to upload
+     * @return The NonDataFileDataset object that was saved to Socrata
+     */
+    public NonDataFileDataset replaceNonDataFile(final String id, final File file) throws SodaError, InterruptedException
+    {
+
+        SodaRequest requester = new SodaRequest<File>(null, file)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI scanUri = UriBuilder.fromUri(viewUri)
+                                              .path(id + ".txt")
+                                              .queryParam("method", "replaceBlob")
+                                              .queryParam("fileUploaderfile", file.getName())
+                                              .build();
+
+                try {
+                    final InputStream   is = new FileInputStream(file);
+                    try {
+                        ClientResponse clientResponse = httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
+
+                        //Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                        //response needs to be processed as JSON.  So, wrap the return in a ClientResponse that acts
+                        //as if the content type is JSON. There is a bug on the core server side to fix this.
+                        InBoundHeaders  headers = new InBoundHeaders();
+                        headers.putSingle("Content-Type", MediaType.APPLICATION_JSON);
+                        return new ClientResponse(clientResponse.getStatus(), headers, clientResponse.getEntityInputStream(), clientResponse.getClient().getMessageBodyWorkers());
+
+                    } finally {
+                        is.close();
+                    }
+                } catch (IOException ioe) {
+                    throw new SodaError("Unable to load file: " + file.getAbsolutePath());
+                }
+            }
+        };
+
+        NonDataFileDataset nonDataFileDataset;
+        try {
+            final ClientResponse response = requester.issueRequest();
+            nonDataFileDataset = response.getEntity(NonDataFileDataset.class);
+        } catch (LongRunningQueryException e) {
+            nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), NonDataFileDataset.class, requester);
+        }
+
+        return (NonDataFileDataset) loadDatasetInfo(id);
+    }
+
+
+    /**
      * Creates a straight translation with no transforms for a  given bluprint.
      *
      * @param blueprint blueprint to build the translation from
