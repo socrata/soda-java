@@ -10,7 +10,7 @@
   <groupId>com.socrata</groupId>
   <artifactId>soda-api-java</artifactId>
   <packaging>jar</packaging>
-  <version>0.9.3-SNAPSHOT</version>
+  <version>0.9.3</version>
 
   <name>Soda2 API Client</name>
   <description>A library for accessing SODA 2 endpoints.</description>
