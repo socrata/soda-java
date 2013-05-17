@@ -185,6 +185,7 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
      * @param retVal The value to populate with properties.
      */
     public void populate(DatasetInfo retVal) {
+        retVal.setResourceName(resourceName);
         retVal.setAttribution(attribution);
         retVal.setAttributionLink(attributionLink);
         retVal.setCategory(category);

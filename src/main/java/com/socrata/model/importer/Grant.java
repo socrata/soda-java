@@ -18,7 +18,7 @@ public class Grant
     /**
      * A singleton that can be used to represent a public grant
      */
-    public static final Grant PUBLIC_GRANT = new Grant(false, "viewer", null, ImmutableList.of("public"));
+    public static final Grant PUBLIC_GRANT = new Grant(false, "viewer", null, null, ImmutableList.of("public"));
 
     /**
      * A predicate that can be used for determining if a grant is to make a dataset public.
@@ -39,6 +39,7 @@ public class Grant
     final boolean inherited;
     final String type;
     final String userId;
+    final String userEmail;
     final List<String> flags;
 
 
@@ -47,11 +48,13 @@ public class Grant
     public Grant(@JsonProperty(value="inherited") boolean inherited,
                  @JsonProperty(value="type") String type,
                  @JsonProperty(value="userId") String userId,
+                 @JsonProperty(value="userEmail") String userEmail,
                  @JsonProperty(value="flags") List<String> flags)
     {
         this.inherited = inherited;
         this.type = type;
         this.userId = userId;
+        this.userEmail = userEmail;
         this.flags = flags;
     }
 
@@ -85,6 +88,16 @@ public class Grant
     public String getUserId()
     {
         return userId;
+    }
+
+    /**
+     * Returns the user email this grant is for.  This may be null.
+     *
+     * @return
+     */
+    public String getUserEmail()
+    {
+        return userEmail;
     }
 
     /**
