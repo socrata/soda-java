@@ -87,6 +87,50 @@ public class SodaImporterTest extends TestBase
     }
 
     @Test
+    public void testImportWithSetResourceName() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    {
+        final String name = "Name" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+        DatasetInfo createdView = importer.createViewFromCsv(name, description, NOMINATIONS_CSV);
+
+        try {
+            //
+            //  Make sure data is added
+            Soda2Consumer consumer = new Soda2Consumer(connection);
+            SoqlQuery   sortQuery = new SoqlQueryBuilder()
+                    .addOrderByPhrase(new OrderByClause(SortOrder.Ascending, "name"))
+                    .build();
+            List<NominationsWText> nominations = consumer.query(createdView.getId(), sortQuery, NominationsWText.LIST_TYPE);
+            TestCase.assertEquals(2, nominations.size());
+            TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());
+            TestCase.assertEquals("Name, Test", nominations.get(1).getName());
+
+
+
+            createdView.setResourceName(name);
+            createdView = importer.updateDatasetInfo(createdView);
+
+            consumer = new Soda2Consumer(connection);
+            sortQuery = new SoqlQueryBuilder()
+                    .addOrderByPhrase(new OrderByClause(SortOrder.Ascending, "name"))
+                    .build();
+            nominations = consumer.query(createdView.getId(), sortQuery, NominationsWText.LIST_TYPE);
+            TestCase.assertEquals(2, nominations.size());
+            TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());
+            TestCase.assertEquals("Name, Test", nominations.get(1).getName());
+
+        } finally {
+            importer.deleteDataset(createdView.getId());
+        }
+    }
+
+
+
+    @Test
     public void testWithTypes() throws IOException, InterruptedException, SodaError, LongRunningQueryException
     {
         final String name = "Name" + UUID.randomUUID();

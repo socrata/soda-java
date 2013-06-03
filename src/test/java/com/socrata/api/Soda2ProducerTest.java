@@ -25,6 +25,7 @@ public class Soda2ProducerTest extends TestBase
 
     public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
     public static final File  CRIMES_HEADER2_CSV = new File("src/test/resources/testCrimesHeader2.csv");
+    public static final File  DELETE_CRIMES_CSV = new File("src/test/resources/testDeletingCrimes.csv");
 
 
     /**
@@ -137,6 +138,44 @@ public class Soda2ProducerTest extends TestBase
             TestCase.assertEquals(1, results.size());
 
             datasetPublished = sodaImporter.publish(datasetWorkingCopy.getId());
+        } finally {
+            sodaImporter.deleteDataset(datasetPublished.getId());
+        }
+
+    }
+
+    /**
+     * Tests a number of ways to connect using dataset name
+     */
+    @Test
+    public void testDelete() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    {
+        final String name = "Name" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+        final HttpLowLevel  connection = connect();
+        final Soda2Producer producer = new Soda2Producer(connection);
+        final SodaImporter  sodaImporter = new SodaImporter(connection);
+
+        DatasetInfo datasetCreated = sodaImporter.createViewFromCsv(name, description, CRIMES_HEADER2_CSV, "ID");
+        DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
+
+        try {
+
+            List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(3, results.size());
+
+
+            //Delete two crimes using upsert
+            UpsertResult replaceResult = producer.upsertCsv(datasetPublished.getId(), DELETE_CRIMES_CSV);
+            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(1, results.size());
+
+            producer.delete(datasetPublished.getId(), results.get(0).getId().toString());
+            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(0, results.size());
+
+
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
         }

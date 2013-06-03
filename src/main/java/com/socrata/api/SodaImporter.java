@@ -193,7 +193,7 @@ public class SodaImporter extends SodaDdl
                 throw e;
             }
         }
-        return createdDatasetInfo;
+        return loadDatasetInfo(createdDatasetInfo.getId());
     }
 
 
