@@ -303,25 +303,16 @@ public class SodaImporter extends SodaDdl
             }
         };
 
-
         try {
-
             final ClientResponse response = requester.issueRequest();
             return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-
-            if (e.location != null) {
-                return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, DatasetInfo.class, requester);
-            } else {
-
-                final URI ticketUri = UriBuilder.fromUri(importUri)
-                                                .queryParam("ticket", e.ticket)
-                                                .build();
-                return getHttpLowLevel().getAsyncResults(ticketUri, e.timeToRetry, Integer.MAX_VALUE, Dataset.class, requester);
-
-            }
+            LongRunningQueryException lrqe = e.location != null ? e :
+                new LongRunningQueryException(UriBuilder.fromUri(importUri).queryParam("ticket", e.ticket).build(), e.timeToRetry, e.ticket);
+            LongRunningRequest<String, DatasetInfo> lrr = new LongRunningRequest(lrqe, DatasetInfo.class, requester);
+            setLastLongRunningRequest(lrr);
+            return checkLongRunningRequestStatus();
         }
-
     }
 
     /**

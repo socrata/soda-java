@@ -34,6 +34,12 @@ public class SodaWorkflow
     protected final ObjectMapper  mapper;
     protected final URI           viewUri;
 
+    /**
+     * If long running request is set, a request has already been submitted to the server.
+     * Network errors between now and completion do not stop the request from being processed by the server.
+     * You may call checkLongRunningRequestStatus to get the result of the long running request.
+     */
+    protected LongRunningRequest lastLongRunningRequest;
 
     /**
      * Create a new SodaWorkflow object, using the supplied credentials for authentication.
@@ -118,7 +124,8 @@ public class SodaWorkflow
             ClientResponse response = requester.issueRequest();
             return response.getEntity(DatasetInfo.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
+            setLastLongRunningRequest(new LongRunningRequest(e, DatasetInfo.class, requester));
+            return checkLongRunningRequestStatus();
         }
     }
 
@@ -150,11 +157,11 @@ public class SodaWorkflow
         };
 
         try {
-
             ClientResponse response = requester.issueRequest();
             return response.getEntity(Dataset.class);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
+            setLastLongRunningRequest(new LongRunningRequest(e, DatasetInfo.class, requester));
+            return checkLongRunningRequestStatus();
         }
     }
 
@@ -274,5 +281,38 @@ public class SodaWorkflow
         }
     }
 
+    /**
+     * Check status of a long running request.
+     * @param <T>
+     * @param <R>
+     * @return Final result from the long running request
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public <T, R> R checkLongRunningRequestStatus() throws SodaError, InterruptedException {
+        LongRunningRequest<T, R> lrr = getLastLongRunningRequest();
+        assert(lrr != null);
+        R result = lrr.checkStatus(httpLowLevel);
+        setLastLongRunningRequest(null); // Clear long running request.
+        return result;
+    }
 
+    /**
+     * Get the last long running request.
+     * Once we successfully get the final result, long running request should be cleared.
+     * @return
+     */
+    public LongRunningRequest getLastLongRunningRequest()
+    {
+        return lastLongRunningRequest;
+    }
+
+    /**
+     * Save long running request from server or clear it.
+     * @param lastLongRunningRequest - long running request from server or null.
+     */
+    protected void setLastLongRunningRequest(LongRunningRequest lastLongRunningRequest)
+    {
+        this.lastLongRunningRequest = lastLongRunningRequest;
+    }
 }
