@@ -517,26 +517,28 @@ public final class HttpLowLevel
             throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null));
         }
 
-
-        if (response.getStatus() == 400) {
-            if (sodaErrorResponse.message != null &&
-                    sodaErrorResponse.message.startsWith("Row data was saved.")) {
-                throw new MetadataUpdateError(sodaErrorResponse);
-            }
-            throw new MalformedQueryError(sodaErrorResponse);
-        } else if (response.getStatus() == 403) {
-            if (AUTH_REQUIRED_CODE.equals(sodaErrorResponse.code)) {
-                throw new MustBeLoggedInException(sodaErrorResponse);
-            } else {
-                throw new QueryTooComplexException(sodaErrorResponse);
-            }
-        } else if (response.getStatus() == 404){
-            throw new DoesNotExistException(sodaErrorResponse);
-        } else if (response.getStatus() == 408) {
-            throw new QueryTimeoutException(sodaErrorResponse);
+        switch (response.getStatus()) {
+            case 400:
+                if (sodaErrorResponse.message != null &&
+                        sodaErrorResponse.message.startsWith("Row data was saved.")) {
+                    throw new MetadataUpdateError(sodaErrorResponse);
+                }
+                throw new MalformedQueryError(sodaErrorResponse);
+            case 403:
+                if (AUTH_REQUIRED_CODE.equals(sodaErrorResponse.code)) {
+                    throw new MustBeLoggedInException(sodaErrorResponse);
+                } else {
+                    throw new QueryTooComplexException(sodaErrorResponse);
+                }
+            case 404:
+                throw new DoesNotExistException(sodaErrorResponse);
+            case 408:
+                throw new QueryTimeoutException(sodaErrorResponse);
+            case 409:
+                throw new ConflictOperationException(sodaErrorResponse);
+            default:
+                throw new SodaError(sodaErrorResponse);
         }
-
-        else throw new SodaError(sodaErrorResponse);
     }
 
 
