@@ -55,6 +55,9 @@ public final class HttpLowLevel
     protected static final int DEFAULT_MAX_RETRIES = 200;
     public static final long   DEFAULT_RETRY_TIME = 4000;
 
+    protected static final int DEFAULT_STATUS_CHECK_ERROR_RETRIES = 5;
+    protected static final long DEFAULT_STATUS_CHECK_ERROR_TIME = 4000;
+
     public static final String SODA_VERSION = "$$version";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
@@ -73,6 +76,9 @@ public final class HttpLowLevel
 
     private long retryTime = DEFAULT_RETRY_TIME;
     private long maxRetries = DEFAULT_MAX_RETRIES;
+
+    private int statusCheckErrorRetries = DEFAULT_STATUS_CHECK_ERROR_RETRIES;
+    private long statusCheckErrorTime = DEFAULT_STATUS_CHECK_ERROR_TIME;
 
     /**
      * Creates a client with the appropriate mappers and features turned on to
@@ -207,10 +213,45 @@ public final class HttpLowLevel
         this.maxRetries = maxRetries;
     }
 
+    /**
+     * Get the number of status check retries on non-soda errors between long running request submission and completion
+     * @return the number of status check retries on non-soda errors between long running request submission and completion
+     */
+    public int getStatusCheckErrorRetries()
+    {
+        return statusCheckErrorRetries;
+    }
+
+    /**
+     * Set the number of status check retries on non-soda errors between long running request submission and completion
+     * @param statusCheckErrorRetries number of status check retries on non-soda errors between long running request submission and completion
+     */
+    public void setStatusCheckErrorRetries(int statusCheckErrorRetries)
+    {
+        this.statusCheckErrorRetries = statusCheckErrorRetries;
+    }
+
+    /**
+     * Get the status check interval time in ms on non-soda errors between long running request submission and completion
+     * @return the status check interval time in ms on non-soda errors between long running request submission and completion
+     */
+    public long getStatusCheckErrorTime()
+    {
+        return statusCheckErrorTime;
+    }
+
+    /**
+     * Set the status check interval time in ms on non-soda errors between long running request submission and completion
+     * @param statusCheckErrorTime status check interval time in ms on non-soda errors between long running request submission and completion
+     */
+    public void setStatusCheckErrorTime(int statusCheckErrorTime)
+    {
+        this.statusCheckErrorTime = statusCheckErrorTime;
+    }
+
     public UriBuilder uriBuilder() {
         return UriBuilder.fromUri(url);
     }
-
 
     /**
      * Follows a 202 response that comes back for long running queries.

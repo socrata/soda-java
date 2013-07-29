@@ -20,4 +20,10 @@ public class SodaError extends Exception
         super(error);
         this.sodaErrorResponse = new SodaErrorResponse("", error, "", null);
     }
+
+    public SodaError(Throwable throwable)
+    {
+        super(throwable);
+        this.sodaErrorResponse = new SodaErrorResponse("", "", "", null);
+    }
 }

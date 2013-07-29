@@ -309,9 +309,9 @@ public class SodaImporter extends SodaDdl
         } catch (LongRunningQueryException e) {
             LongRunningQueryException lrqe = e.location != null ? e :
                 new LongRunningQueryException(UriBuilder.fromUri(importUri).queryParam("ticket", e.ticket).build(), e.timeToRetry, e.ticket);
-            LongRunningRequest<String, DatasetInfo> lrr = new LongRunningRequest(lrqe, DatasetInfo.class, requester);
-            setLastLongRunningRequest(lrr);
-            return checkLongRunningRequestStatus();
+            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest(lrqe, DatasetInfo.class, requester);
+            HttpLowLevel http = getHttpLowLevel();
+            return longRunningRequest.checkStatus(http, http.getStatusCheckErrorRetries(), http.getStatusCheckErrorTime());
         }
     }
 
