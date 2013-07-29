@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  */
@@ -23,6 +24,7 @@ public class Column
     String fieldName;
     String description;
     String dataTypeName;
+    List<Object> flags;
     int position;
     Integer width;
 
@@ -122,4 +124,13 @@ public class Column
         this.width = width;
     }
 
+    public List<Object> getFlags()
+    {
+        return flags;
+    }
+
+    public void setFlags(List<Object> flags)
+    {
+        this.flags = flags;
+    }
 }
