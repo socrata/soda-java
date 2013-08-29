@@ -25,6 +25,8 @@ public class Soda2ProducerTest extends TestBase
 
     public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
     public static final File  CRIMES_HEADER2_CSV = new File("src/test/resources/testCrimesHeader2.csv");
+    public static final File  CRIMES_APPEND_CSV = new File("src/test/resources/testCrimesAppend.csv");
+
     public static final File  DELETE_CRIMES_CSV = new File("src/test/resources/testDeletingCrimes.csv");
 
 
@@ -58,6 +60,13 @@ public class Soda2ProducerTest extends TestBase
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
+
+            //Try it with a larger file
+            /*
+            replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_APPEND_CSV);
+            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(1000, results.size());
+            */
 
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
@@ -132,6 +141,15 @@ public class Soda2ProducerTest extends TestBase
             producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_HEADER2_CSV);
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
+
+            /*
+            replaceResult = producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_APPEND_CSV);
+            TestCase.assertEquals(3, replaceResult.getRowsUpdated());
+            TestCase.assertEquals(997, replaceResult.getRowsCreated());
+
+            results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(1000, results.size());
+            */
 
             replaceResult = producer.replace(datasetWorkingCopy.getId(), Lists.newArrayList(results.get(0)));
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);

@@ -63,6 +63,7 @@ public class BulkUploadTest extends TestBase
 
         UpsertResult result = producer.upsertCsv(dataset.getId(), CRIMES_CSV_UPSERT);
         TestCase.assertNotNull(result);
+        TestCase.assertEquals(0, result.errorCount());
         TestCase.assertEquals(4999, result.getRowsCreated());
         TestCase.assertEquals(0, result.getRowsUpdated());
     }

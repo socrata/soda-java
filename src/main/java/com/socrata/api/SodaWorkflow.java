@@ -2,6 +2,7 @@ package com.socrata.api;
 
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.Comment;
 import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
@@ -24,10 +25,11 @@ import java.net.URI;
  */
 public class SodaWorkflow
 {
-    protected static final String API_BASE_PATH     = "api";
-    protected static final String GEO_BASE_PATH     = "geocoding";
-    protected static final long   TICKET_CHECK      = 10000L;
-    protected static final String VIEWS_BASE_PATH   = "views";
+    protected static final String API_BASE_PATH         = "api";
+    protected static final String GEO_BASE_PATH         = "geocoding";
+    protected static final long   TICKET_CHECK          = 10000L;
+    protected static final String VIEWS_BASE_PATH       = "views";
+    protected static final String COMMENTS_METHOD_PATH  = "comments";
 
     protected final URI           geocodingUri;
     protected final HttpLowLevel  httpLowLevel;
@@ -274,4 +276,30 @@ public class SodaWorkflow
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), GeocodingResults.class, requester);
         }
     }
+
+    public Comment addComment(final String datasetId, final Comment comment) throws SodaError, InterruptedException
+    {
+
+        SodaRequest requester = new SodaRequest<String>(datasetId, null)
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                final URI uri = UriBuilder.fromUri(viewUri)
+                                          .path(datasetId)
+                                          .path(COMMENTS_METHOD_PATH)
+                                          .build();
+
+                return httpLowLevel.postRaw(uri, HttpLowLevel.JSON_TYPE, comment);
+            }
+        };
+
+
+        try {
+            final ClientResponse response = requester.issueRequest();
+            return response.getEntity(Comment.class);
+        } catch (LongRunningQueryException e) {
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Comment.class, requester);
+        }
+    }
+
 }

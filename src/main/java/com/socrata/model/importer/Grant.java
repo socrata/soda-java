@@ -3,6 +3,7 @@ package com.socrata.model.importer;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.annotation.Nullable;
@@ -12,6 +13,7 @@ import java.util.List;
  * Represents a permissions grant to a dataset.  Used whenever a dataset is made public
  * or explicitly shared to a user.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Grant
 {
 

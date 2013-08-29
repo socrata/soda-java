@@ -109,6 +109,36 @@ public class SodaImporter extends SodaDdl
         return importScanResults(name, description, file, scan(file));
     }
 
+    /**
+     * Creates a new view based on a shapefile, these can be KML, KMZ or the ESRI format.
+     *
+     * This method will use default names and import all the layers.  To customize the import, call
+     * scanShapeFile and importShapeScanResults separately.
+     *
+     * @param file the file to upload
+     * @return the
+     * @throws SodaError
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public DatasetInfo createViewFromShapefile(final File file) throws SodaError, InterruptedException, IOException
+    {
+        final ShapeScanResults  shapeScanResults = scanShapeFile(file);
+        return importShapeScanResults(ShapeBlueprint.fromScanResults(shapeScanResults), file, shapeScanResults);
+    }
+
+    /**
+     * Replaces a view with a new shapefile, these can be KML, KMZ or the ESRI format.
+     *
+     * @param viewId the id of the view to update
+     * @param file the file to upload
+     * @return
+     */
+    public DatasetInfo replaceViewFromShapefile(final String viewId, final File file) throws SodaError, InterruptedException, IOException
+    {
+        final ShapeScanResults  shapeScanResults = scanShapeFile(file);
+        return replaceShapeScanResults(viewId, ShapeBlueprint.fromScanResults(shapeScanResults), file, shapeScanResults);
+    }
 
     /**
      * Scans a file, then sends it up to the Socrata service to be analyzed and have things
@@ -122,27 +152,49 @@ public class SodaImporter extends SodaDdl
      */
     public ScanResults scan(final File file) throws SodaError, InterruptedException
     {
+        return scanFile("scan", HttpLowLevel.CSV_TYPE, file, ScanResults.class);
+    }
+
+
+    /**
+     * Scans a file, then sends it up to the Socrata service to be analyzed and have things
+     * like column types guessed.
+     *
+     * @param file File to upload
+     * @return the results of the scan.
+     *
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public ShapeScanResults scanShapeFile(final File file) throws SodaError, InterruptedException
+    {
+        return scanFile("scanShape", MediaType.APPLICATION_OCTET_STREAM_TYPE, file, ShapeScanResults.class);
+    }
+
+
+
+    protected <T> T scanFile(final String method, final MediaType mediaType, final File file, Class<T> retType) throws SodaError, InterruptedException
+    {
 
         SodaRequest requester = new SodaRequest<File>(null, file)
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI scanUri = UriBuilder.fromUri(importUri)
-                                              .queryParam("method", "scan")
+                                              .queryParam("method", method)
                                               .build();
 
-                return httpLowLevel.postFileRaw(scanUri, HttpLowLevel.CSV_TYPE, payload);
+                return httpLowLevel.postFileRaw(scanUri, mediaType, payload);
             }
         };
 
         try {
             final ClientResponse response = requester.issueRequest();
-            return response.getEntity(ScanResults.class);
+            return response.getEntity(retType);
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), ScanResults.class, requester);
+            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), retType, requester);
         }
     }
-
 
 
 
@@ -213,6 +265,34 @@ public class SodaImporter extends SodaDdl
 
         final String blueprintBody = "blueprint="+URLEncoder.encode(blueprintString, "UTF-8");
         return sendScanResults(blueprintBody, scanResults.getFileId(), translation, file);
+    }
+
+    /**
+     * Imports the results of scanning a file.  This method does not assume anything about the Shape file, but instead has
+     * the caller provide the blueprint for any layer modifications.
+     *
+     * @param blueprint
+     * @param file file that was scanned
+     * @param scanResults results of the scan
+     * @return The default View object for the dataset that was just created.
+     */
+    public DatasetInfo importShapeScanResults(final ShapeBlueprint blueprint, final File file, final ShapeScanResults scanResults) throws SodaError, InterruptedException, IOException
+    {
+        return sendShapeScanResults(scanResults.getFileId(), "shapefile", blueprint, file, null);
+    }
+
+    /**
+     * Replaces the a view with the results of scanning in a shape file.
+     *
+     * @param viewId  id of the view to overwrite
+     * @param blueprint blueprint object with the name of the layers, etc.
+     * @param file file that was scanned
+     * @param scanResults results of the scan
+     * @return  The default object for the dataset that was just updated.
+     */
+    public DatasetInfo replaceShapeScanResults(final String viewId, final ShapeBlueprint blueprint, final File file, final ShapeScanResults scanResults) throws SodaError, InterruptedException, IOException
+    {
+        return sendShapeScanResults(scanResults.getFileId(), "replaceShapefile", blueprint, file, viewId);
     }
 
 
@@ -314,6 +394,54 @@ public class SodaImporter extends SodaDdl
             return longRunningRequest.checkStatus(http, http.getStatusCheckErrorRetries(), http.getStatusCheckErrorTime());
         }
     }
+
+    protected DatasetInfo sendShapeScanResults(final String fileId, final String method, final ShapeBlueprint shapeBlueprint, final File file, final String viewId) throws SodaError, InterruptedException, IOException
+    {
+
+        final StringBuilder postbodyBuilder = new StringBuilder();
+        final String blueprintString = mapper.writeValueAsString(shapeBlueprint);
+        final URI    shapeImportUri = UriBuilder.fromUri(importUri)
+                                                .queryParam("method", method)
+                                                .build();
+
+
+        postbodyBuilder.append("&fileId=").append(fileId)
+                       .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"))
+                       .append("&blueprint=").append(URLEncoder.encode(blueprintString, "UTF-8"));
+
+        if (StringUtils.isNotEmpty(viewId)) {
+            postbodyBuilder.append("&viewUid=").append(viewId);
+        }
+
+        SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())
+        {
+            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            {
+                return httpLowLevel.postRaw(shapeImportUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, payload);
+            }
+        };
+
+
+        try {
+
+            final ClientResponse response = requester.issueRequest();
+            return response.getEntity(DatasetInfo.class);
+        } catch (LongRunningQueryException e) {
+
+            if (e.location != null) {
+                return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, Integer.MAX_VALUE, DatasetInfo.class, requester);
+            } else {
+
+                final URI ticketUri = UriBuilder.fromUri(shapeImportUri)
+                                                .queryParam("ticket", e.ticket)
+                                                .build();
+                return getHttpLowLevel().getAsyncResults(ticketUri, e.timeToRetry, Integer.MAX_VALUE, DatasetInfo.class, requester);
+
+            }
+        }
+
+    }
+
 
     /**
      * Imports a file that is NOT going to be used to create a datset, but is instead available for
@@ -423,6 +551,7 @@ public class SodaImporter extends SodaDdl
 
         return (NonDataFileDataset) loadDatasetInfo(id);
     }
+
 
 
     /**

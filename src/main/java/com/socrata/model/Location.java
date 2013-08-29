@@ -3,8 +3,10 @@ package com.socrata.model;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class Location
 {
     public final Double longitude;
@@ -21,13 +23,13 @@ public class Location
     }
 
     @JsonProperty("longitude")
-    public double getLongitude()
+    public Double getLongitude()
     {
         return longitude;
     }
 
     @JsonProperty("latitude")
-    public double getLatitude()
+    public Double getLatitude()
     {
         return latitude;
     }

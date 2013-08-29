@@ -1,0 +1,2082 @@
+{
+    "id" : "9ubz-5r4b",
+    "name" : "Water Right Applications",
+    "attribution" : "Washington Department of Ecology",
+    "attributionLink" : "http://ecy.wa.gov",
+    "averageRating" : 0,
+    "category" : "Natural Resources & Environment",
+    "createdAt" : 1349998344,
+    "description" : "Pending Water Right Applications in Washington State. Includes both applications for new water rights and to change existing water rights.  Live data available at: https://fortress.wa.gov/ecy/waterresources/map/QuantityReport.aspx and https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx.",
+    "displayType" : "table",
+    "downloadCount" : 11,
+    "iconUrl" : "4D015F07-DE7D-44B3-8362-D901A9D1AD3C",
+    "licenseId" : "PUBLIC_DOMAIN",
+    "numberOfComments" : 0,
+    "oid" : 4847279,
+    "publicationAppendEnabled" : false,
+    "publicationDate" : 1376092509,
+    "publicationGroup" : 448933,
+    "publicationStage" : "published",
+    "rowIdentifierColumnId" : 88519855,
+    "rowsUpdatedAt" : 1376322741,
+    "rowsUpdatedBy" : "b99d-iz37",
+    "signed" : false,
+    "state" : "normal",
+    "tableId" : 1032283,
+    "totalTimesRated" : 0,
+    "viewCount" : 386,
+    "viewLastModified" : 1376092783,
+    "viewType" : "tabular",
+    "columns" : [ {
+        "id" : 88519855,
+        "name" : "WR_DOC_ID",
+        "dataTypeName" : "number",
+        "fieldName" : "wr_doc_id",
+        "position" : 1,
+        "renderTypeName" : "number",
+        "tableColumnId" : 12126791,
+        "width" : 100,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "2032326",
+            "sum" : "18303816452",
+            "null" : 0,
+            "average" : "2938483.938352866",
+            "largest" : "5844773",
+            "top" : [ {
+                "count" : 20,
+                "item" : "2085334"
+            }, {
+                "count" : 19,
+                "item" : "2283772"
+            }, {
+                "count" : 18,
+                "item" : "2283630"
+            }, {
+                "count" : 17,
+                "item" : "2283629"
+            }, {
+                "count" : 16,
+                "item" : "2085333"
+            }, {
+                "count" : 15,
+                "item" : "2283628"
+            }, {
+                "count" : 14,
+                "item" : "2283639"
+            }, {
+                "count" : 13,
+                "item" : "2283410"
+            }, {
+                "count" : 12,
+                "item" : "2283405"
+            }, {
+                "count" : 11,
+                "item" : "2283411"
+            }, {
+                "count" : 10,
+                "item" : "2283409"
+            }, {
+                "count" : 9,
+                "item" : "2283406"
+            }, {
+                "count" : 8,
+                "item" : "2283407"
+            }, {
+                "count" : 7,
+                "item" : "2283412"
+            }, {
+                "count" : 6,
+                "item" : "2283408"
+            }, {
+                "count" : 5,
+                "item" : "2283404"
+            }, {
+                "count" : 4,
+                "item" : "2283413"
+            }, {
+                "count" : 3,
+                "item" : "2283414"
+            }, {
+                "count" : 2,
+                "item" : "2228791"
+            }, {
+                "count" : 1,
+                "item" : "2283392"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "noCommas" : "true",
+            "align" : "right"
+        }
+    }, {
+        "id" : 88519856,
+        "name" : "DOCUMENT_NUMBER",
+        "dataTypeName" : "text",
+        "fieldName" : "document_number",
+        "position" : 2,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486913,
+        "width" : 280,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "CG1-*00212C@4",
+            "null" : 0,
+            "largest" : "S4-35599",
+            "top" : [ {
+                "count" : 20,
+                "item" : "G4-25062"
+            }, {
+                "count" : 19,
+                "item" : "G4-24862"
+            }, {
+                "count" : 18,
+                "item" : "G4-24728"
+            }, {
+                "count" : 17,
+                "item" : "G4-24565"
+            }, {
+                "count" : 16,
+                "item" : "G4-24542"
+            }, {
+                "count" : 15,
+                "item" : "G4-24516"
+            }, {
+                "count" : 14,
+                "item" : "G4-23998"
+            }, {
+                "count" : 13,
+                "item" : "G4-23286"
+            }, {
+                "count" : 12,
+                "item" : "G4-23274"
+            }, {
+                "count" : 11,
+                "item" : "G4-23288"
+            }, {
+                "count" : 10,
+                "item" : "G4-23285"
+            }, {
+                "count" : 9,
+                "item" : "G4-23280"
+            }, {
+                "count" : 8,
+                "item" : "G4-23283"
+            }, {
+                "count" : 7,
+                "item" : "G4-23291"
+            }, {
+                "count" : 6,
+                "item" : "G4-23284"
+            }, {
+                "count" : 5,
+                "item" : "G4-23050"
+            }, {
+                "count" : 4,
+                "item" : "G4-23373"
+            }, {
+                "count" : 3,
+                "item" : "G4-23461"
+            }, {
+                "count" : 2,
+                "item" : "G1-21568AWRIS"
+            }, {
+                "count" : 1,
+                "item" : "G4-22888"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519857,
+        "name" : "DOCUMENT_TYPE",
+        "dataTypeName" : "text",
+        "fieldName" : "document_type",
+        "position" : 3,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486914,
+        "width" : 256,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "Change Application",
+            "null" : 0,
+            "largest" : "NewApp",
+            "top" : [ {
+                "count" : 20,
+                "item" : "NewApp"
+            }, {
+                "count" : 19,
+                "item" : "Change Application"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519858,
+        "name" : "PURPOSE_CODE LIST",
+        "dataTypeName" : "text",
+        "description" : "Purpose Codes available at: http://www.ecy.wa.gov/programs/wr/rights/tracking-apps.html",
+        "fieldName" : "purpose_list",
+        "position" : 4,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486915,
+        "width" : 244,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "CI ",
+            "null" : 0,
+            "largest" : "WL ",
+            "top" : [ {
+                "count" : 20,
+                "item" : "MU "
+            }, {
+                "count" : 19,
+                "item" : "DS "
+            }, {
+                "count" : 18,
+                "item" : "DM IR "
+            }, {
+                "count" : 17,
+                "item" : "IF "
+            }, {
+                "count" : 16,
+                "item" : "DS IR "
+            }, {
+                "count" : 15,
+                "item" : "IR "
+            }, {
+                "count" : 14,
+                "item" : "FS "
+            }, {
+                "count" : 13,
+                "item" : "DS IR ST "
+            }, {
+                "count" : 12,
+                "item" : "IR ST "
+            }, {
+                "count" : 11,
+                "item" : "FP IR "
+            }, {
+                "count" : 10,
+                "item" : "DM "
+            }, {
+                "count" : 9,
+                "item" : "CI "
+            }, {
+                "count" : 8,
+                "item" : "PO "
+            }, {
+                "count" : 7,
+                "item" : "DM IR ST "
+            }, {
+                "count" : 6,
+                "item" : "NULL"
+            }, {
+                "count" : 5,
+                "item" : "ST "
+            }, {
+                "count" : 4,
+                "item" : "FP HP IR "
+            }, {
+                "count" : 3,
+                "item" : "DS ST "
+            }, {
+                "count" : 2,
+                "item" : "DM ST "
+            }, {
+                "count" : 1,
+                "item" : "CI DM "
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519859,
+        "name" : "PERSON_LAST_OR_ORGANIZATION_NAME",
+        "dataTypeName" : "text",
+        "fieldName" : "person_last_or_organization_name",
+        "position" : 5,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486916,
+        "width" : 484,
+        "cachedContents" : {
+            "non_null" : 6227,
+            "smallest" : "(Davison) Hibbard",
+            "null" : 2,
+            "largest" : "ZYLSTRA",
+            "top" : [ {
+                "count" : 20,
+                "item" : "WA DFW Olympia"
+            }, {
+                "count" : 19,
+                "item" : "Ellensburg Water Company"
+            }, {
+                "count" : 18,
+                "item" : "Seattle City Water Dept"
+            }, {
+                "count" : 17,
+                "item" : "Thalheimer Brothers Inc"
+            }, {
+                "count" : 16,
+                "item" : "USFS Wenatchee"
+            }, {
+                "count" : 15,
+                "item" : "Plum Creek Timberlands LP"
+            }, {
+                "count" : 14,
+                "item" : "Dodge"
+            }, {
+                "count" : 13,
+                "item" : "McBride Hereford Ranches Inc"
+            }, {
+                "count" : 12,
+                "item" : "Hefflinger Ranches Inc"
+            }, {
+                "count" : 11,
+                "item" : "Joebgen"
+            }, {
+                "count" : 10,
+                "item" : "Johnson"
+            }, {
+                "count" : 9,
+                "item" : "Wilson"
+            }, {
+                "count" : 8,
+                "item" : "Miller"
+            }, {
+                "count" : 7,
+                "item" : "Andrews"
+            }, {
+                "count" : 6,
+                "item" : "Carnevali"
+            }, {
+                "count" : 5,
+                "item" : "Groth"
+            }, {
+                "count" : 4,
+                "item" : "Toppenish City"
+            }, {
+                "count" : 3,
+                "item" : "Yakima Fruit & Cold Storage Co"
+            }, {
+                "count" : 2,
+                "item" : "Mountain View Enterprises"
+            }, {
+                "count" : 1,
+                "item" : "Valley Roz Orchards Inc"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519860,
+        "name" : "PRIORITY_DATE",
+        "dataTypeName" : "calendar_date",
+        "description" : "Date of application",
+        "fieldName" : "priority_date",
+        "position" : 6,
+        "renderTypeName" : "calendar_date",
+        "tableColumnId" : 4486917,
+        "width" : 256,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "1936-07-14T00:00:00",
+            "null" : 0,
+            "largest" : "2013-07-23T00:00:00",
+            "top" : [ {
+                "count" : 20,
+                "item" : "1986-07-11T00:00:00"
+            }, {
+                "count" : 19,
+                "item" : "1981-08-28T00:00:00"
+            }, {
+                "count" : 18,
+                "item" : "1980-11-27T00:00:00"
+            }, {
+                "count" : 17,
+                "item" : "1980-07-11T00:00:00"
+            }, {
+                "count" : 16,
+                "item" : "1978-01-06T00:00:00"
+            }, {
+                "count" : 15,
+                "item" : "1977-04-19T00:00:00"
+            }, {
+                "count" : 14,
+                "item" : "1977-02-09T00:00:00"
+            }, {
+                "count" : 13,
+                "item" : "1974-06-25T00:00:00"
+            }, {
+                "count" : 12,
+                "item" : "1974-06-18T00:00:00"
+            }, {
+                "count" : 11,
+                "item" : "1974-04-10T00:00:00"
+            }, {
+                "count" : 10,
+                "item" : "1974-04-08T00:00:00"
+            }, {
+                "count" : 9,
+                "item" : "1972-05-12T00:00:00"
+            }, {
+                "count" : 8,
+                "item" : "1971-08-05T00:00:00"
+            }, {
+                "count" : 7,
+                "item" : "1951-12-29T00:00:00"
+            }, {
+                "count" : 6,
+                "item" : "1936-07-14T00:00:00"
+            } ]
+        },
+        "format" : {
+            "align" : "left",
+            "view" : "date"
+        }
+    }, {
+        "id" : 88519861,
+        "name" : "YEAR_APPLIED",
+        "dataTypeName" : "number",
+        "description" : "Year of Application",
+        "fieldName" : "yearapplied",
+        "position" : 7,
+        "renderTypeName" : "number",
+        "tableColumnId" : 7669062,
+        "width" : 100,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "1936",
+            "sum" : "12447220",
+            "null" : 0,
+            "average" : "1998.269385134050",
+            "largest" : "2013",
+            "top" : [ {
+                "count" : 20,
+                "item" : "2013"
+            }, {
+                "count" : 19,
+                "item" : "2012"
+            }, {
+                "count" : 18,
+                "item" : "2011"
+            }, {
+                "count" : 17,
+                "item" : "2010"
+            }, {
+                "count" : 16,
+                "item" : "2009"
+            }, {
+                "count" : 15,
+                "item" : "2008"
+            }, {
+                "count" : 14,
+                "item" : "2007"
+            }, {
+                "count" : 13,
+                "item" : "2006"
+            }, {
+                "count" : 12,
+                "item" : "2005"
+            }, {
+                "count" : 11,
+                "item" : "2004"
+            }, {
+                "count" : 10,
+                "item" : "2003"
+            }, {
+                "count" : 9,
+                "item" : "2002"
+            }, {
+                "count" : 8,
+                "item" : "2001"
+            }, {
+                "count" : 7,
+                "item" : "2000"
+            }, {
+                "count" : 6,
+                "item" : "1999"
+            }, {
+                "count" : 5,
+                "item" : "1998"
+            }, {
+                "count" : 4,
+                "item" : "1997"
+            }, {
+                "count" : 3,
+                "item" : "1996"
+            }, {
+                "count" : 2,
+                "item" : "1995"
+            }, {
+                "count" : 1,
+                "item" : "1994"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "align" : "left",
+            "noCommas" : "true"
+        }
+    }, {
+        "id" : 88519862,
+        "name" : "CFS",
+        "dataTypeName" : "number",
+        "description" : "Cubic feet per second",
+        "fieldName" : "cfs",
+        "position" : 8,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486918,
+        "width" : 136,
+        "cachedContents" : {
+            "non_null" : 2036,
+            "smallest" : "0",
+            "sum" : "43886.7573",
+            "null" : 4193,
+            "average" : "21.55538177799607",
+            "largest" : "6500",
+            "top" : [ {
+                "count" : 20,
+                "item" : "0.02"
+            }, {
+                "count" : 19,
+                "item" : "0.2"
+            }, {
+                "count" : 18,
+                "item" : "0"
+            }, {
+                "count" : 17,
+                "item" : "0.01"
+            }, {
+                "count" : 16,
+                "item" : "0.04"
+            }, {
+                "count" : 15,
+                "item" : "0.03"
+            }, {
+                "count" : 14,
+                "item" : "0.11"
+            }, {
+                "count" : 13,
+                "item" : "1"
+            }, {
+                "count" : 12,
+                "item" : "0.06"
+            }, {
+                "count" : 11,
+                "item" : "0.07"
+            }, {
+                "count" : 10,
+                "item" : "0.002"
+            }, {
+                "count" : 9,
+                "item" : "0.25"
+            }, {
+                "count" : 8,
+                "item" : "0.022"
+            }, {
+                "count" : 7,
+                "item" : "0.08"
+            }, {
+                "count" : 6,
+                "item" : "136"
+            }, {
+                "count" : 5,
+                "item" : "0.005"
+            }, {
+                "count" : 4,
+                "item" : "0.013"
+            }, {
+                "count" : 3,
+                "item" : "0.078"
+            }, {
+                "count" : 2,
+                "item" : "0.004"
+            }, {
+                "count" : 1,
+                "item" : "5"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "noCommas" : "false",
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519863,
+        "name" : "GPM",
+        "dataTypeName" : "number",
+        "description" : "Gallons Per Minute",
+        "fieldName" : "gpm",
+        "position" : 9,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486919,
+        "width" : 136,
+        "cachedContents" : {
+            "non_null" : 3919,
+            "smallest" : "0",
+            "sum" : "2695778.8638",
+            "null" : 2310,
+            "average" : "687.8741678489411",
+            "largest" : "100000",
+            "top" : [ {
+                "count" : 20,
+                "item" : "100"
+            }, {
+                "count" : 19,
+                "item" : "200"
+            }, {
+                "count" : 18,
+                "item" : "300"
+            }, {
+                "count" : 17,
+                "item" : "50"
+            }, {
+                "count" : 16,
+                "item" : "20"
+            }, {
+                "count" : 15,
+                "item" : "500"
+            }, {
+                "count" : 14,
+                "item" : "1000"
+            }, {
+                "count" : 13,
+                "item" : "40"
+            }, {
+                "count" : 12,
+                "item" : "30"
+            }, {
+                "count" : 11,
+                "item" : "25"
+            }, {
+                "count" : 10,
+                "item" : "60"
+            }, {
+                "count" : 9,
+                "item" : "250"
+            }, {
+                "count" : 8,
+                "item" : "150"
+            }, {
+                "count" : 7,
+                "item" : "10"
+            }, {
+                "count" : 6,
+                "item" : "1500"
+            }, {
+                "count" : 5,
+                "item" : "400"
+            }, {
+                "count" : 4,
+                "item" : "600"
+            }, {
+                "count" : 3,
+                "item" : "80"
+            }, {
+                "count" : 2,
+                "item" : "35"
+            }, {
+                "count" : 1,
+                "item" : "2700"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "noCommas" : "false",
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519864,
+        "name" : "DOMESTIC_UNITS",
+        "dataTypeName" : "number",
+        "description" : "Number of residential connections",
+        "fieldName" : "domestic_units",
+        "position" : 10,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486920,
+        "width" : 265,
+        "cachedContents" : {
+            "non_null" : 1243,
+            "smallest" : "0",
+            "sum" : "148349",
+            "null" : 4986,
+            "average" : "119.3475462590507",
+            "largest" : "20000",
+            "top" : [ {
+                "count" : 20,
+                "item" : "1"
+            }, {
+                "count" : 19,
+                "item" : "3"
+            }, {
+                "count" : 18,
+                "item" : "7"
+            }, {
+                "count" : 17,
+                "item" : "2"
+            }, {
+                "count" : 16,
+                "item" : "15"
+            }, {
+                "count" : 15,
+                "item" : "5"
+            }, {
+                "count" : 14,
+                "item" : "4"
+            }, {
+                "count" : 13,
+                "item" : "14"
+            }, {
+                "count" : 12,
+                "item" : "6"
+            }, {
+                "count" : 11,
+                "item" : "9"
+            }, {
+                "count" : 10,
+                "item" : "8"
+            }, {
+                "count" : 9,
+                "item" : "30"
+            }, {
+                "count" : 8,
+                "item" : "10"
+            }, {
+                "count" : 7,
+                "item" : "12"
+            }, {
+                "count" : 6,
+                "item" : "40"
+            }, {
+                "count" : 5,
+                "item" : "50"
+            }, {
+                "count" : 4,
+                "item" : "18"
+            }, {
+                "count" : 3,
+                "item" : "25"
+            }, {
+                "count" : 2,
+                "item" : "20"
+            }, {
+                "count" : 1,
+                "item" : "1000"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "noCommas" : "false",
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519865,
+        "name" : "ACRE FEET",
+        "dataTypeName" : "number",
+        "fieldName" : "acre_feet",
+        "position" : 11,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486921,
+        "width" : 208,
+        "cachedContents" : {
+            "non_null" : 1680,
+            "smallest" : "0",
+            "sum" : "2955166.307",
+            "null" : 4549,
+            "average" : "1759.027563690476",
+            "largest" : "931281",
+            "top" : [ {
+                "count" : 20,
+                "item" : "0.5"
+            }, {
+                "count" : 19,
+                "item" : "1"
+            }, {
+                "count" : 18,
+                "item" : "10"
+            }, {
+                "count" : 17,
+                "item" : "900"
+            }, {
+                "count" : 16,
+                "item" : "360"
+            }, {
+                "count" : 15,
+                "item" : "1580"
+            }, {
+                "count" : 14,
+                "item" : "76"
+            }, {
+                "count" : 13,
+                "item" : "2"
+            }, {
+                "count" : 12,
+                "item" : "540"
+            }, {
+                "count" : 11,
+                "item" : "5"
+            }, {
+                "count" : 10,
+                "item" : "366000"
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519866,
+        "name" : "ACRE IRR",
+        "dataTypeName" : "number",
+        "fieldName" : "acre_irr",
+        "position" : 12,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486922,
+        "width" : 196,
+        "cachedContents" : {
+            "non_null" : 3289,
+            "smallest" : "0",
+            "sum" : "492286.98",
+            "null" : 2940,
+            "average" : "149.6767953785345",
+            "largest" : "70000",
+            "top" : [ {
+                "count" : 20,
+                "item" : "40"
+            }, {
+                "count" : 19,
+                "item" : "10"
+            }, {
+                "count" : 18,
+                "item" : "20"
+            }, {
+                "count" : 17,
+                "item" : "5"
+            }, {
+                "count" : 16,
+                "item" : "3"
+            }, {
+                "count" : 15,
+                "item" : "1"
+            }, {
+                "count" : 14,
+                "item" : "2"
+            }, {
+                "count" : 13,
+                "item" : "80"
+            }, {
+                "count" : 12,
+                "item" : "0.5"
+            }, {
+                "count" : 11,
+                "item" : "100"
+            }, {
+                "count" : 10,
+                "item" : "15"
+            }, {
+                "count" : 9,
+                "item" : "25"
+            }, {
+                "count" : 8,
+                "item" : "150"
+            }, {
+                "count" : 7,
+                "item" : "140"
+            }, {
+                "count" : 6,
+                "item" : "160"
+            }, {
+                "count" : 5,
+                "item" : "30"
+            }, {
+                "count" : 4,
+                "item" : "250"
+            }, {
+                "count" : 3,
+                "item" : "1.5"
+            }, {
+                "count" : 2,
+                "item" : "430"
+            }, {
+                "count" : 1,
+                "item" : "308.5"
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519867,
+        "name" : "COUNTY_NAME",
+        "dataTypeName" : "text",
+        "fieldName" : "county_name",
+        "position" : 13,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486923,
+        "width" : 232,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "ADAMS",
+            "null" : 0,
+            "largest" : "YAKIMA",
+            "top" : [ {
+                "count" : 20,
+                "item" : "PIERCE"
+            }, {
+                "count" : 19,
+                "item" : "THURSTON"
+            }, {
+                "count" : 18,
+                "item" : "KITTITAS"
+            }, {
+                "count" : 17,
+                "item" : "BENTON"
+            }, {
+                "count" : 16,
+                "item" : "CHELAN"
+            }, {
+                "count" : 15,
+                "item" : "ADAMS"
+            }, {
+                "count" : 14,
+                "item" : "GRANT"
+            }, {
+                "count" : 13,
+                "item" : "SKAGIT"
+            }, {
+                "count" : 12,
+                "item" : "KING"
+            }, {
+                "count" : 11,
+                "item" : "WHATCOM"
+            }, {
+                "count" : 10,
+                "item" : "OKANOGAN"
+            }, {
+                "count" : 9,
+                "item" : "WALLA WALLA"
+            }, {
+                "count" : 8,
+                "item" : "SPOKANE"
+            }, {
+                "count" : 7,
+                "item" : "FRANKLIN"
+            }, {
+                "count" : 6,
+                "item" : "GRAYS HARBOR"
+            }, {
+                "count" : 5,
+                "item" : "LINCOLN"
+            }, {
+                "count" : 4,
+                "item" : "DOUGLAS"
+            }, {
+                "count" : 3,
+                "item" : "SNOHOMISH"
+            }, {
+                "count" : 2,
+                "item" : "LEWIS"
+            }, {
+                "count" : 1,
+                "item" : "KLICKITAT"
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519868,
+        "name" : "WRIA_NUMBER",
+        "dataTypeName" : "number",
+        "description" : "ID Number for Water Resources Inventory Area, or Watershed",
+        "fieldName" : "wria",
+        "position" : 14,
+        "renderTypeName" : "number",
+        "tableColumnId" : 4486924,
+        "width" : 148,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "1",
+            "sum" : "186796",
+            "null" : 0,
+            "average" : "29.98812008348049",
+            "largest" : "62",
+            "top" : [ {
+                "count" : 20,
+                "item" : "39"
+            }, {
+                "count" : 19,
+                "item" : "37"
+            }, {
+                "count" : 18,
+                "item" : "41"
+            }, {
+                "count" : 17,
+                "item" : "1"
+            }, {
+                "count" : 16,
+                "item" : "48"
+            }, {
+                "count" : 15,
+                "item" : "32"
+            }, {
+                "count" : 14,
+                "item" : "49"
+            }, {
+                "count" : 13,
+                "item" : "45"
+            }, {
+                "count" : 12,
+                "item" : "15"
+            }, {
+                "count" : 11,
+                "item" : "7"
+            }, {
+                "count" : 10,
+                "item" : "29"
+            }, {
+                "count" : 9,
+                "item" : "26"
+            }, {
+                "count" : 8,
+                "item" : "28"
+            }, {
+                "count" : 7,
+                "item" : "38"
+            }, {
+                "count" : 6,
+                "item" : "31"
+            }, {
+                "count" : 5,
+                "item" : "3"
+            }, {
+                "count" : 4,
+                "item" : "47"
+            }, {
+                "count" : 3,
+                "item" : "36"
+            }, {
+                "count" : 2,
+                "item" : "30"
+            }, {
+                "count" : 1,
+                "item" : "23"
+            } ]
+        },
+        "format" : {
+            "align" : "right"
+        }
+    }, {
+        "id" : 88519869,
+        "name" : "WATERSHED",
+        "dataTypeName" : "text",
+        "description" : "Name of Watershed (or WRIA)",
+        "fieldName" : "wria_nm",
+        "position" : 15,
+        "renderTypeName" : "text",
+        "tableColumnId" : 7689042,
+        "width" : 100,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "Alkali-Squilchuck",
+            "null" : 0,
+            "largest" : "Wind-White Salmon",
+            "top" : [ {
+                "count" : 20,
+                "item" : "Upper Yakima"
+            }, {
+                "count" : 19,
+                "item" : "Lower Yakima"
+            }, {
+                "count" : 18,
+                "item" : "Lower Crab"
+            }, {
+                "count" : 17,
+                "item" : "Nooksack"
+            }, {
+                "count" : 16,
+                "item" : "Methow"
+            }, {
+                "count" : 15,
+                "item" : "Walla Walla"
+            }, {
+                "count" : 14,
+                "item" : "Okanogan"
+            }, {
+                "count" : 13,
+                "item" : "Wenatchee"
+            }, {
+                "count" : 12,
+                "item" : "Kitsap"
+            }, {
+                "count" : 11,
+                "item" : "Snohomish"
+            }, {
+                "count" : 10,
+                "item" : "Wind-White Salmon"
+            }, {
+                "count" : 9,
+                "item" : "Cowlitz"
+            }, {
+                "count" : 8,
+                "item" : "Salmon-Washougal"
+            }, {
+                "count" : 7,
+                "item" : "Naches"
+            }, {
+                "count" : 6,
+                "item" : "Rock-Glade"
+            }, {
+                "count" : 5,
+                "item" : "Lower Skagit-Samish"
+            }, {
+                "count" : 4,
+                "item" : "Chelan"
+            }, {
+                "count" : 3,
+                "item" : "Esquatzel Coulee"
+            }, {
+                "count" : 2,
+                "item" : "Klickitat"
+            }, {
+                "count" : 1,
+                "item" : "Upper Chehalis"
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519870,
+        "name" : "CERT_NUM",
+        "dataTypeName" : "text",
+        "fieldName" : "cert_num",
+        "position" : 16,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486925,
+        "width" : 196,
+        "cachedContents" : {
+            "non_null" : 272,
+            "smallest" : " ",
+            "null" : 5957,
+            "largest" : "998-D",
+            "top" : [ {
+                "count" : 20,
+                "item" : "239"
+            }, {
+                "count" : 19,
+                "item" : "945"
+            }, {
+                "count" : 18,
+                "item" : "1022"
+            }, {
+                "count" : 17,
+                "item" : "1023"
+            }, {
+                "count" : 16,
+                "item" : "6471"
+            }, {
+                "count" : 15,
+                "item" : "2519"
+            }, {
+                "count" : 14,
+                "item" : "34"
+            }, {
+                "count" : 13,
+                "item" : "6802"
+            }, {
+                "count" : 12,
+                "item" : "3944"
+            }, {
+                "count" : 11,
+                "item" : "10416(D)"
+            }, {
+                "count" : 10,
+                "item" : "10416(A)"
+            }, {
+                "count" : 9,
+                "item" : "672"
+            }, {
+                "count" : 8,
+                "item" : "5598"
+            }, {
+                "count" : 7,
+                "item" : "6341"
+            }, {
+                "count" : 6,
+                "item" : "3877"
+            }, {
+                "count" : 5,
+                "item" : "8542"
+            }, {
+                "count" : 4,
+                "item" : "940-D"
+            }, {
+                "count" : 3,
+                "item" : "5318"
+            }, {
+                "count" : 2,
+                "item" : "4646"
+            }, {
+                "count" : 1,
+                "item" : "3105"
+            } ]
+        },
+        "format" : {
+            "precisionStyle" : "standard",
+            "noCommas" : "false",
+            "align" : "left"
+        }
+    }, {
+        "id" : 88519871,
+        "name" : "TRS",
+        "dataTypeName" : "text",
+        "fieldName" : "trs",
+        "position" : 17,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486926,
+        "width" : 136,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : "T01N/R02E-01",
+            "null" : 0,
+            "largest" : "T41N/R05E-33",
+            "top" : [ {
+                "count" : 20,
+                "item" : "T16N/R12E-12"
+            }, {
+                "count" : 19,
+                "item" : "T17N/R14E-30"
+            }, {
+                "count" : 18,
+                "item" : "T05N/R23E-29"
+            }, {
+                "count" : 17,
+                "item" : "T10N/R20E-11"
+            }, {
+                "count" : 16,
+                "item" : "T11N/R19E-10"
+            }, {
+                "count" : 15,
+                "item" : "T10N/R20E-09"
+            }, {
+                "count" : 14,
+                "item" : "T12N/R18E-27"
+            }, {
+                "count" : 13,
+                "item" : "T11N/R16E-28"
+            }, {
+                "count" : 12,
+                "item" : "T11N/R19E-31"
+            }, {
+                "count" : 11,
+                "item" : "T28N/R05E-23"
+            }, {
+                "count" : 10,
+                "item" : "T11N/R17E-02"
+            }, {
+                "count" : 9,
+                "item" : "T10N/R18E-31"
+            }, {
+                "count" : 8,
+                "item" : "T11N/R18E-13"
+            }, {
+                "count" : 7,
+                "item" : "T11N/R17E-16"
+            }, {
+                "count" : 6,
+                "item" : "T11N/R17E-03"
+            }, {
+                "count" : 5,
+                "item" : "T11N/R17E-17"
+            }, {
+                "count" : 4,
+                "item" : "T30N/R04E-36"
+            }, {
+                "count" : 3,
+                "item" : "T19N/R14E-01"
+            }, {
+                "count" : 2,
+                "item" : "T30N/R04E-21"
+            }, {
+                "count" : 1,
+                "item" : "T10N/R20E-04"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519872,
+        "name" : "QUAD_DESIGNATION",
+        "dataTypeName" : "text",
+        "fieldName" : "quad_designation",
+        "position" : 18,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486927,
+        "width" : 292,
+        "cachedContents" : {
+            "non_null" : 2117,
+            "smallest" : "E2/E2",
+            "null" : 4112,
+            "largest" : "W2/W2",
+            "top" : [ {
+                "count" : 20,
+                "item" : "N2/NW"
+            }, {
+                "count" : 19,
+                "item" : "N2/NE"
+            }, {
+                "count" : 18,
+                "item" : "SE/NW"
+            }, {
+                "count" : 17,
+                "item" : "SE/SW"
+            }, {
+                "count" : 16,
+                "item" : "NW/NW"
+            }, {
+                "count" : 15,
+                "item" : "NE/SE"
+            }, {
+                "count" : 14,
+                "item" : "SE/SE"
+            }, {
+                "count" : 13,
+                "item" : "NW/NE"
+            }, {
+                "count" : 12,
+                "item" : "SW/NE"
+            }, {
+                "count" : 11,
+                "item" : "SW/NW"
+            }, {
+                "count" : 10,
+                "item" : "NE/SW"
+            }, {
+                "count" : 9,
+                "item" : "SW/SW"
+            }, {
+                "count" : 8,
+                "item" : "NW/SW"
+            }, {
+                "count" : 7,
+                "item" : "SE/NE"
+            }, {
+                "count" : 6,
+                "item" : "NE/NE"
+            }, {
+                "count" : 5,
+                "item" : "SW/SE"
+            }, {
+                "count" : 4,
+                "item" : "NW/SE"
+            }, {
+                "count" : 3,
+                "item" : "S2/SE"
+            }, {
+                "count" : 2,
+                "item" : "NE/NW"
+            }, {
+                "count" : 1,
+                "item" : "S2/NW"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519873,
+        "name" : "SOURCE_NAME",
+        "dataTypeName" : "text",
+        "fieldName" : "source_name",
+        "position" : 19,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486928,
+        "width" : 232,
+        "cachedContents" : {
+            "non_null" : 5344,
+            "smallest" : "***6 wells",
+            "null" : 885,
+            "largest" : "YOUNGS CREEK",
+            "top" : [ {
+                "count" : 20,
+                "item" : "WELL"
+            }, {
+                "count" : 19,
+                "item" : "Well"
+            }, {
+                "count" : 18,
+                "item" : "Well 1"
+            }, {
+                "count" : 17,
+                "item" : "UNNAMED SPRING"
+            }, {
+                "count" : 16,
+                "item" : "YAKIMA RIVER"
+            }, {
+                "count" : 15,
+                "item" : "UNNAMED STREAM"
+            }, {
+                "count" : 14,
+                "item" : "COLUMBIA RIVER"
+            }, {
+                "count" : 13,
+                "item" : "well"
+            }, {
+                "count" : 12,
+                "item" : "LAKE CHELAN"
+            }, {
+                "count" : 11,
+                "item" : "LAKE WHATCOM"
+            }, {
+                "count" : 10,
+                "item" : "UNNAMED POND"
+            }, {
+                "count" : 9,
+                "item" : "UNNAMED SOURCE"
+            }, {
+                "count" : 8,
+                "item" : "OKANOGAN RIVER"
+            }, {
+                "count" : 7,
+                "item" : "INFILTRATION TRENCH"
+            }, {
+                "count" : 6,
+                "item" : "BERTRAND CREEK"
+            }, {
+                "count" : 5,
+                "item" : "CAIN LAKE"
+            }, {
+                "count" : 4,
+                "item" : "STEMILT CREEK"
+            }, {
+                "count" : 3,
+                "item" : "TWISP RIVER"
+            }, {
+                "count" : 2,
+                "item" : "WEBB SPRING"
+            }, {
+                "count" : 1,
+                "item" : "NACHES RIVER"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519874,
+        "name" : "TRIBUTARY_NAME",
+        "dataTypeName" : "text",
+        "fieldName" : "tributary_name",
+        "position" : 20,
+        "renderTypeName" : "text",
+        "tableColumnId" : 4486929,
+        "width" : 268,
+        "cachedContents" : {
+            "non_null" : 933,
+            "smallest" : "AHTANUM CREEK",
+            "null" : 5296,
+            "largest" : "YOUNGS CREEK",
+            "top" : [ {
+                "count" : 20,
+                "item" : "COLUMBIA RIVER"
+            }, {
+                "count" : 19,
+                "item" : "PACIFIC OCEAN"
+            }, {
+                "count" : 18,
+                "item" : "WALLA WALLA RIVER"
+            }, {
+                "count" : 17,
+                "item" : "YAKIMA RIVER"
+            }, {
+                "count" : 16,
+                "item" : "METHOW RIVER"
+            }, {
+                "count" : 15,
+                "item" : "FRIDAY CREEK"
+            }, {
+                "count" : 14,
+                "item" : "WHATCOM CREEK"
+            }, {
+                "count" : 13,
+                "item" : "WENATCHEE RIVER"
+            }, {
+                "count" : 12,
+                "item" : "CHELAN RIVER"
+            }, {
+                "count" : 11,
+                "item" : "NACHES RIVER"
+            }, {
+                "count" : 10,
+                "item" : "NOOKSACK RIVER"
+            }, {
+                "count" : 9,
+                "item" : "ELWHA RIVER"
+            }, {
+                "count" : 8,
+                "item" : "SILVER CREEK"
+            }, {
+                "count" : 7,
+                "item" : "BUMPING RIVER"
+            }, {
+                "count" : 6,
+                "item" : "COW CREEK"
+            }, {
+                "count" : 5,
+                "item" : "NORTH FORK NOOKSACK RIVER"
+            }, {
+                "count" : 4,
+                "item" : "AMERICAN RIVER"
+            }, {
+                "count" : 3,
+                "item" : "REECER CREEK"
+            }, {
+                "count" : 2,
+                "item" : "MANASTASH CREEK"
+            }, {
+                "count" : 1,
+                "item" : "CEDAR CREEK"
+            } ]
+        },
+        "format" : {
+        }
+    }, {
+        "id" : 88519875,
+        "name" : "IMAGE_URL",
+        "dataTypeName" : "url",
+        "fieldName" : "image_url",
+        "position" : 21,
+        "renderTypeName" : "url",
+        "tableColumnId" : 4486930,
+        "width" : 208,
+        "cachedContents" : {
+            "non_null" : 6228,
+            "smallest" : {
+                "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2032326&wr_doc_file_nr=CS4-WRC120462"
+            },
+            "null" : 1,
+            "largest" : {
+                "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=5844773&wr_doc_file_nr=G3-QB1660"
+            },
+            "top" : [ {
+                "count" : 20,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283772&wr_doc_file_nr=G4-24862"
+                }
+            }, {
+                "count" : 19,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283630&wr_doc_file_nr=G4-24728"
+                }
+            }, {
+                "count" : 18,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283629&wr_doc_file_nr=G4-24565"
+                }
+            }, {
+                "count" : 17,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2085333&wr_doc_file_nr=G4-24542"
+                }
+            }, {
+                "count" : 16,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283628&wr_doc_file_nr=G4-24516"
+                }
+            }, {
+                "count" : 15,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283639&wr_doc_file_nr=G4-23998"
+                }
+            }, {
+                "count" : 14,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283410&wr_doc_file_nr=G4-23286"
+                }
+            }, {
+                "count" : 13,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283405&wr_doc_file_nr=G4-23274"
+                }
+            }, {
+                "count" : 12,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283411&wr_doc_file_nr=G4-23288"
+                }
+            }, {
+                "count" : 11,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283409&wr_doc_file_nr=G4-23285"
+                }
+            }, {
+                "count" : 10,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283406&wr_doc_file_nr=G4-23280"
+                }
+            }, {
+                "count" : 9,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283407&wr_doc_file_nr=G4-23283"
+                }
+            }, {
+                "count" : 8,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283412&wr_doc_file_nr=G4-23291"
+                }
+            }, {
+                "count" : 7,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283408&wr_doc_file_nr=G4-23284"
+                }
+            }, {
+                "count" : 6,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283404&wr_doc_file_nr=G4-23050"
+                }
+            }, {
+                "count" : 5,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283413&wr_doc_file_nr=G4-23373"
+                }
+            }, {
+                "count" : 4,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283414&wr_doc_file_nr=G4-23461"
+                }
+            }, {
+                "count" : 3,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2228791&wr_doc_file_nr=G1-21568AWRIS"
+                }
+            }, {
+                "count" : 2,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283392&wr_doc_file_nr=G4-22888"
+                }
+            }, {
+                "count" : 1,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/wrx/wrx/columbia/imageviewer.aspx?wr_doc_id=2283402&wr_doc_file_nr=G4-22887"
+                }
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        },
+        "subColumnTypes" : [ "url", "description" ]
+    }, {
+        "id" : 88519876,
+        "name" : "MAP_URL",
+        "dataTypeName" : "url",
+        "fieldName" : "map_url",
+        "position" : 22,
+        "renderTypeName" : "url",
+        "tableColumnId" : 4486931,
+        "width" : 184,
+        "cachedContents" : {
+            "non_null" : 6229,
+            "smallest" : {
+                "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2032326"
+            },
+            "null" : 0,
+            "largest" : {
+                "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=5844773"
+            },
+            "top" : [ {
+                "count" : 20,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2085334"
+                }
+            }, {
+                "count" : 19,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283772"
+                }
+            }, {
+                "count" : 18,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283630"
+                }
+            }, {
+                "count" : 17,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283629"
+                }
+            }, {
+                "count" : 16,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2085333"
+                }
+            }, {
+                "count" : 15,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283628"
+                }
+            }, {
+                "count" : 14,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283639"
+                }
+            }, {
+                "count" : 13,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283410"
+                }
+            }, {
+                "count" : 12,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283405"
+                }
+            }, {
+                "count" : 11,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283411"
+                }
+            }, {
+                "count" : 10,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283409"
+                }
+            }, {
+                "count" : 9,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283406"
+                }
+            }, {
+                "count" : 8,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283407"
+                }
+            }, {
+                "count" : 7,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283412"
+                }
+            }, {
+                "count" : 6,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283408"
+                }
+            }, {
+                "count" : 5,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283404"
+                }
+            }, {
+                "count" : 4,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283413"
+                }
+            }, {
+                "count" : 3,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283414"
+                }
+            }, {
+                "count" : 2,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2228791"
+                }
+            }, {
+                "count" : 1,
+                "item" : {
+                    "url" : "https://fortress.wa.gov/ecy/waterresources/map/WaterResourcesExplorer.aspx?wr_doc_id=2283392"
+                }
+            } ]
+        },
+        "format" : {
+            "align" : "left"
+        },
+        "subColumnTypes" : [ "url", "description" ]
+    }, {
+        "id" : 88519877,
+        "name" : "Location 1",
+        "dataTypeName" : "location",
+        "fieldName" : "location_1",
+        "position" : 23,
+        "renderTypeName" : "location",
+        "tableColumnId" : 4486932,
+        "width" : 220,
+        "cachedContents" : {
+            "non_null" : 6227,
+            "smallest" : {
+                "longitude" : "-122.45329",
+                "latitude" : "47.1047"
+            },
+            "null" : 2,
+            "largest" : {
+                "longitude" : "-121.78897",
+                "latitude" : "47.72344"
+            },
+            "top" : [ {
+                "count" : 20,
+                "item" : {
+                    "longitude" : "-120.51291",
+                    "latitude" : "46.49931"
+                }
+            }, {
+                "count" : 19,
+                "item" : {
+                    "longitude" : "-120.04429",
+                    "latitude" : "45.88786"
+                }
+            }, {
+                "count" : 18,
+                "item" : {
+                    "longitude" : "-119.96095",
+                    "latitude" : "45.88752"
+                }
+            }, {
+                "count" : 17,
+                "item" : {
+                    "longitude" : "-120.28337",
+                    "latitude" : "46.36756"
+                }
+            }, {
+                "count" : 16,
+                "item" : {
+                    "longitude" : "-120.42773",
+                    "latitude" : "46.45512"
+                }
+            }, {
+                "count" : 15,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 14,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 13,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 12,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 11,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 10,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 9,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 8,
+                "item" : {
+                    "longitude" : "-120.32535",
+                    "latitude" : "46.36775"
+                }
+            }, {
+                "count" : 7,
+                "item" : {
+                    "longitude" : "-120.55513",
+                    "latitude" : "46.4992"
+                }
+            }, {
+                "count" : 6,
+                "item" : {
+                    "longitude" : "-120.82801",
+                    "latitude" : "46.41159"
+                }
+            }, {
+                "count" : 5,
+                "item" : {
+                    "longitude" : "-120.49121",
+                    "latitude" : "46.39742"
+                }
+            }, {
+                "count" : 4,
+                "item" : {
+                    "longitude" : "-122.1309",
+                    "latitude" : "47.89911"
+                }
+            }, {
+                "count" : 3,
+                "item" : {
+                    "longitude" : "-120.65995",
+                    "latitude" : "46.47006"
+                }
+            }, {
+                "count" : 2,
+                "item" : {
+                    "longitude" : "-120.61724",
+                    "latitude" : "46.30987"
+                }
+            }, {
+                "count" : 1,
+                "item" : {
+                    "longitude" : "-120.51266",
+                    "latitude" : "46.44121"
+                }
+            } ]
+        },
+        "format" : {
+        },
+        "subColumnTypes" : [ "human_address", "latitude", "longitude", "machine_address", "needs_recoding" ]
+    } ],
+    "grants" : [ {
+        "inherited" : false,
+        "type" : "viewer",
+        "flags" : [ "public" ]
+    } ],
+    "license" : {
+        "name" : "Public Domain"
+    },
+    "metadata" : {
+        "custom_fields" : {
+            "Notes" : {
+                "3. " : "",
+                "6. " : "",
+                "4. " : "",
+                "5. " : "",
+                "1. " : "Purpose Codes available at: http://www.ecy.wa.gov/programs/wr/rights/tracking-apps.html",
+                "2. " : ""
+            }
+        },
+        "renderTypeConfig" : {
+            "visible" : {
+                "page" : true,
+                "table" : true
+            },
+            "active" : {
+                "page" : {
+                    "id" : "1046"
+                }
+            }
+        },
+        "availableDisplayTypes" : [ "table", "fatrow", "page" ],
+        "rdfSubject" : "0",
+        "filterCondition" : {
+            "value" : "AND",
+            "children" : [ {
+                "value" : "OR",
+                "children" : [ {
+                    "value" : "EQUALS",
+                    "children" : [ {
+                        "type" : "column",
+                        "columnFieldName" : "document_type"
+                    }, {
+                        "value" : "NewApp",
+                        "type" : "literal"
+                    } ],
+                    "type" : "operator",
+                    "metadata" : {
+                        "freeform" : false
+                    }
+                }, {
+                    "value" : "EQUALS",
+                    "children" : [ {
+                        "type" : "column",
+                        "columnFieldName" : "document_type"
+                    }, {
+                        "value" : "Change Application",
+                        "type" : "literal"
+                    } ],
+                    "type" : "operator",
+                    "metadata" : {
+                        "freeform" : false
+                    }
+                } ],
+                "type" : "operator",
+                "metadata" : {
+                    "includeAuto" : 5,
+                    "tableColumnId" : {
+                        "448933" : 4486914
+                    },
+                    "operator" : "EQUALS"
+                }
+            }, {
+                "value" : "OR",
+                "type" : "operator",
+                "metadata" : {
+                    "tableColumnId" : {
+                        "448933" : 4486915
+                    },
+                    "operator" : "CONTAINS"
+                }
+            }, {
+                "value" : "OR",
+                "type" : "operator",
+                "metadata" : {
+                    "tableColumnId" : {
+                        "448933" : 7669062
+                    },
+                    "operator" : "BETWEEN"
+                }
+            } ],
+            "type" : "operator",
+            "metadata" : {
+                "unifiedVersion" : 2
+            }
+        },
+        "attachments" : [ {
+            "blobId" : "77DFE921-E60E-4023-86D3-2A86FDCFE718",
+            "name" : "Water_Right_Purpose_Codes.htm",
+            "filename" : "Water_Right_Purpose_Codes.htm"
+        } ],
+        "rowIdentifier" : 88519855
+    },
+    "owner" : {
+        "id" : "1234-5678",
+        "displayName" : "Test Owner",
+        "emailUnsubscribed" : false,
+        "privacyControl" : "login",
+        "profileImageUrlLarge" : "/images/profile/XXXXXXX/EcoLogo_large.png",
+        "profileImageUrlMedium" : "/images/profile/XXXXXXX/EcoLogo_thumb.png",
+        "profileImageUrlSmall" : "/images/profile/XXXXXXXX/EcoLogo_tiny.png",
+        "profileLastModified" : 1348682213,
+        "roleName" : "publisher",
+        "screenName" : "Test Owner Screen Name",
+        "rights" : [ "create_datasets", "edit_others_datasets", "edit_nominations", "approve_nominations", "moderate_comments", "manage_stories", "feature_items", "change_configurations", "view_domain", "view_others_datasets", "create_pages" ]
+    },
+    "query" : {
+        "orderBys" : [ {
+            "ascending" : false,
+            "expression" : {
+                "columnId" : 88519860,
+                "type" : "column"
+            }
+        } ]
+    },
+    "rights" : [ "read" ],
+    "sortBys" : [ {
+        "id" : 0,
+        "viewColumnId" : 88519860
+    } ],
+    "tableAuthor" : {
+        "id" : "8910-1234",
+        "displayName" : "Table Author",
+        "emailUnsubscribed" : false,
+        "privacyControl" : "login",
+        "profileImageUrlLarge" : "/images/profile/XXXXXXXXXX/EcoLogo_large.png",
+        "profileImageUrlMedium" : "/images/profile/XXXXXXXXXX/EcoLogo_thumb.png",
+        "profileImageUrlSmall" : "/images/profile/XXXXXXXXXX/EcoLogo_tiny.png",
+        "profileLastModified" : 1348682213,
+        "roleName" : "publisher",
+        "screenName" : "Table Author Screen Name",
+        "rights" : [ "create_datasets", "edit_others_datasets", "edit_nominations", "approve_nominations", "moderate_comments", "manage_stories", "feature_items", "change_configurations", "view_domain", "view_others_datasets", "create_pages" ]
+    },
+    "tags" : [ "ecology", "water rights" ],
+    "flags" : [ "default" ]
+}

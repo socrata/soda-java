@@ -11,7 +11,6 @@ import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.Address;
 import com.socrata.model.GeocodingResults;
-import com.socrata.model.Location;
 import com.socrata.model.importer.*;
 import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
@@ -41,6 +40,7 @@ public class SodaImporterTest extends TestBase
     public static final File  BABY_NAMES_LOC = new File("src/test/resources/testBabyNames.csv");
     public static final File  BABY_NAMES_LOC_2 = new File("src/test/resources/testBabyNames2.csv");
     public static final File  BABY_NAMES_LOC_3 = new File("src/test/resources/testBabyNames3.csv");
+    public static final File  BRONX_ADMIN_BOUNDARY = new File("src/test/resources/BronxAdminBoundaryLayers.zip");
 
 
     /**
@@ -694,6 +694,36 @@ public class SodaImporterTest extends TestBase
         }
 
         importer.deleteDataset(dataset.getId());
+    }
+
+
+    @Test
+    public void testWithShapefile() throws IOException, InterruptedException, SodaError
+    {
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+        final GeoDataset dataset = (GeoDataset) importer.createViewFromShapefile(BRONX_ADMIN_BOUNDARY);
+        TestCase.assertNotNull(dataset);
+
+        try {
+            GeoInfo  geoInfo = dataset.getMetadata().getGeo();
+            TestCase.assertNotNull(geoInfo);
+            TestCase.assertNotNull(geoInfo.namespace);
+            TestCase.assertEquals(7, geoInfo.decodeLayers().length);
+            TestCase.assertNotNull(geoInfo.owsUrl);
+            TestCase.assertEquals(4, geoInfo.decodeBbox().length);
+
+
+            final GeoDataset replacedDataset = (GeoDataset) importer.replaceViewFromShapefile(dataset.getId(), BRONX_ADMIN_BOUNDARY);
+            TestCase.assertNotNull(replacedDataset);
+            TestCase.assertTrue(dataset.getCreatedAt().equals(replacedDataset.getCreatedAt()));
+            TestCase.assertFalse(dataset.getViewLastModified().equals(replacedDataset.getViewLastModified()));
+
+        } finally {
+            importer.deleteDataset(dataset.getId());
+        }
     }
 
 }

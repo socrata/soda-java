@@ -57,10 +57,21 @@ public class TestBase
      */
     protected HttpLowLevel connect() throws IOException
     {
+        return connect(null);
+    }
+
+    /**
+     * Creates an HttpLowLevel connection based on the properties in TestConfig.properties.
+     *
+     * @return  connection to use
+     * @throws IOException
+     */
+    protected HttpLowLevel connect(final String url) throws IOException
+    {
         final Properties testProperties = new Properties();
         testProperties.load(ClassLoader.getSystemResourceAsStream("TestConfig.properties"));
 
-        final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(testProperties.getProperty(URL_PROP),
+        final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(url == null ? testProperties.getProperty(URL_PROP) : url,
                                                                         testProperties.getProperty(USER_NAME_PROP),
                                                                         testProperties.getProperty(PASSWORD_PROP),
                                                                         testProperties.getProperty(API_KEY_PROP));

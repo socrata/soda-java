@@ -2,9 +2,12 @@ package com.socrata;
 
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.Soda2Consumer;
+import com.socrata.api.SodaDdl;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.SearchResults;
+import com.socrata.model.search.SearchClause;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -42,8 +45,12 @@ public class ApiTest extends TestBase
     @Test
     public void testSimpleQuery4x4() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final HttpLowLevel connection = connect();
-        executeSimpleQuery(connection, "77tg-nbgd");
+        final HttpLowLevel  connection = connect();
+        final SodaDdl       sodaDdl= new SodaDdl(connection);
+
+        final SearchResults results =  sodaDdl.searchViews(new SearchClause.NameSearch("Test Data"));
+        final String id = results.getResults().get(0).getDataset().getId();
+        executeSimpleQuery(connection, id);
     }
 
 

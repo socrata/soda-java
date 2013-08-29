@@ -2,6 +2,7 @@ package com.socrata.model.importer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.socrata.model.UserInfo;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonSubTypes;
@@ -23,12 +24,14 @@ import java.util.Map;
 @JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="viewType")
 @JsonSubTypes({@JsonSubTypes.Type(value = Dataset.class, name = "tabular"),
                @JsonSubTypes.Type(value = NonDataFileDataset.class, name = "blobby"),
-               @JsonSubTypes.Type(value = ExternalDataset.class, name = "href")})
+               @JsonSubTypes.Type(value = ExternalDataset.class, name = "href"),
+               @JsonSubTypes.Type(value = GeoDataset.class, name = "geo")})
 public class DatasetInfo
 {
     public static final String DATASET_TYPE = "tabular";
-    public static final String FILE_TYPE = "blobby";
     public static final String EXTERNAL_TYPE = "href";
+    public static final String FILE_TYPE = "blobby";
+    public static final String GEODATASET_TYPE = "geo";
 
     public static final     String PUBLISHED = "published";
     public static final     String UNPUBLISHED = "unpublished";
@@ -48,9 +51,14 @@ public class DatasetInfo
     private Map<String, Object> privateMetadata;
     private String              publicationStage;
     private Long                rowsUpdatedAt;
+    private Long                viewLastModified;
+    private Long                createdAt;
     private List<String>        rights = new ArrayList<String>();
     private List<String>        tags = new ArrayList<String>();
     private List<Grant>         grants;
+    private UserInfo owner;
+    private UserInfo tableAuthor;
+
 
     /**
      * Does a deep copy of this DatasetInfo.
@@ -471,6 +479,26 @@ public class DatasetInfo
         this.rowsUpdatedAt = rowsUpdatedAt;
     }
 
+    public Long getViewLastModified()
+    {
+        return viewLastModified;
+    }
+
+    public void setViewLastModified(Long viewLastModified)
+    {
+        this.viewLastModified = viewLastModified;
+    }
+
+    public Long getCreatedAt()
+    {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt)
+    {
+        this.createdAt = createdAt;
+    }
+
     /**
      * Gets the list of freeform tags describing this dataset.
      *
@@ -512,5 +540,25 @@ public class DatasetInfo
     public void setGrants(List<Grant> grants)
     {
         this.grants = grants;
+    }
+
+    public UserInfo getOwner()
+    {
+        return owner;
+    }
+
+    public void setOwner(UserInfo owner)
+    {
+        this.owner = owner;
+    }
+
+    public UserInfo getTableAuthor()
+    {
+        return tableAuthor;
+    }
+
+    public void setTableAuthor(UserInfo tableAuthor)
+    {
+        this.tableAuthor = tableAuthor;
     }
 }

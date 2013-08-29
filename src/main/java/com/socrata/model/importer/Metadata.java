@@ -27,6 +27,7 @@ public class Metadata
     String                              rdfClass;
     List<Attachment>                    attachments;
     Map<String, String>                 accessPoints;
+    GeoInfo                             geo;
 
     public static Metadata copy(Metadata src) {
 
@@ -101,6 +102,7 @@ public class Metadata
         this.custom_fields = custom_metadata;
     }
 
+
     public String getRowIdentifier()
     {
         return rowIdentifier;
@@ -171,5 +173,28 @@ public class Metadata
     public void setAccessPoints(Map<String, String> accessPoints)
     {
         this.accessPoints = accessPoints;
+    }
+
+    /**
+     * If this metadata represents a dataset that was created by uploading a shape file,
+     * this will contain a lot of the geo information.
+     *
+     * @return the GeoInfo with the geo information in it
+     */
+    public GeoInfo getGeo()
+    {
+        return geo;
+    }
+
+
+    /**
+     * Sets the GeoInfo for the dataset.  This should NOT be explicitly set unless you REALLY
+     * know what you are doing.
+     *
+     * @param geo
+     */
+    public void setGeo(GeoInfo geo)
+    {
+        this.geo = geo;
     }
 }

@@ -35,6 +35,7 @@ import java.net.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class to handle all the low level HTTP operations. This class provides the core data access methods
@@ -76,6 +77,7 @@ public final class HttpLowLevel
 
     private long retryTime = DEFAULT_RETRY_TIME;
     private long maxRetries = DEFAULT_MAX_RETRIES;
+    private final ConcurrentHashMap<String, String> additionalParams = new ConcurrentHashMap<String, String>();
 
     private int statusCheckErrorRetries = DEFAULT_STATUS_CHECK_ERROR_RETRIES;
     private long statusCheckErrorTime = DEFAULT_STATUS_CHECK_ERROR_TIME;
@@ -247,6 +249,16 @@ public final class HttpLowLevel
     public void setStatusCheckErrorTime(int statusCheckErrorTime)
     {
         this.statusCheckErrorTime = statusCheckErrorTime;
+    }
+
+    /**
+     * Get the map of additional parameters for this HttpLowLevel.  These parameters
+     * will be added to every request.  The map returned will be thread safe for modifications.
+     *
+     * @return map of additional parameters
+     */
+    public Map<String, String> getAdditionalParameters() {
+        return this.additionalParams;
     }
 
     public UriBuilder uriBuilder() {
@@ -482,7 +494,14 @@ public final class HttpLowLevel
      * @return a new URI with the version parameter added.
      */
     private URI soda2ifyUri(final URI uri) {
-        return UriBuilder.fromUri(uri).queryParam(SODA_VERSION, "2.0").build();
+
+        final UriBuilder    builder = UriBuilder.fromUri(uri).queryParam(SODA_VERSION, "2.0");
+
+        for (String key : additionalParams.keySet()) {
+            builder.queryParam(key, additionalParams.get(key));
+        }
+
+        return builder.build();
     }
 
     /**
