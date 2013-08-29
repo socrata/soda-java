@@ -2,6 +2,7 @@ package com.socrata.api;
 
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.UpsertError;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.Meta;
 import com.socrata.model.requests.SodaModRequest;
@@ -13,6 +14,9 @@ import com.sun.jersey.api.client.GenericType;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.MediaType;
@@ -20,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -424,11 +429,55 @@ public class Soda2Producer extends Soda2Consumer
 
 
         if (parser.nextToken() == JsonToken.START_ARRAY) {
-            //UNDONE(willpugh) Fix this to count up results
-            return new UpsertResult(0, 0, 0, null, 0, 0);
+
+            int     count = 0;
+            long    inserts = 0;
+            long    updates = 0;
+            long    deletes = 0;
+            List<UpsertError> errors = new LinkedList<UpsertError>();
+
+            if (parser.nextToken() == JsonToken.START_ARRAY) {
+
+                while (parser.nextToken() != JsonToken.END_ARRAY) {
+                    NewUpsertRow row = parser.readValueAs(NewUpsertRow.class);
+                    if ("insert".equals(row.typ)) {
+                        inserts++;
+                    } else if ("update".equals(row.typ)) {
+                        updates++;
+                    } else if ("delete".equals(row.typ)) {
+                        deletes++;
+                    } else if ("error".equals(row.typ)) {
+                        errors.add(new UpsertError(row.err, count, row.id));
+                    }
+
+                    count++;
+                }
+            }
+
+            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null);
         }
 
         return parser.readValueAs(UpsertResult.class);
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown=true)
+    static public class NewUpsertRow {
+        public final String typ;
+        public final String id;
+        public final String ver;
+        public final String err;
+
+        @JsonCreator
+        public NewUpsertRow(final @JsonProperty("typ") String typ,
+                            final @JsonProperty("id") String id,
+                            final @JsonProperty("ver") String ver,
+                            final @JsonProperty("err") String err)
+        {
+            this.typ = typ;
+            this.id = id;
+            this.ver = ver;
+            this.err = err;
+        }
     }
 
 }
