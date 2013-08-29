@@ -10,6 +10,10 @@ import com.socrata.model.requests.SodaTypedRequest;
 import com.socrata.utils.GeneralUtils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -186,9 +190,11 @@ public class Soda2Producer extends Soda2Consumer
 
         try {
             ClientResponse response = requester.issueRequest();
-            return response.getEntity(UpsertResult.class);
+            return deserializeUpsertResult(response);
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
+        } catch (IOException ioe) {
+            throw new SodaError("Error upserting a dataset from this list of objects.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
@@ -214,9 +220,11 @@ public class Soda2Producer extends Soda2Consumer
 
         try {
             ClientResponse response = requester.issueRequest();
-            return response.getEntity(UpsertResult.class);
+            return deserializeUpsertResult(response);
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
+        } catch (IOException ioe) {
+            throw new SodaError("Error replacing dataset from this list of objects.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
@@ -251,10 +259,12 @@ public class Soda2Producer extends Soda2Consumer
         try {
 
             ClientResponse response = requester.issueRequest();
-            return response.getEntity(UpsertResult.class);
+            return deserializeUpsertResult(response);
 
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+        } catch (IOException ioe) {
+            throw new SodaError("Error upserting a dataset from this stream.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
@@ -283,10 +293,12 @@ public class Soda2Producer extends Soda2Consumer
         try {
 
             ClientResponse response = requester.issueRequest();
-            return response.getEntity(UpsertResult.class);
+            return deserializeUpsertResult(response);
 
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+        } catch (IOException ioe) {
+            throw new SodaError("Error replacing a dataset from this stream.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
@@ -321,7 +333,7 @@ public class Soda2Producer extends Soda2Consumer
 
             try {
                 ClientResponse response = requester.issueRequest();
-                return response.getEntity(UpsertResult.class);
+                return deserializeUpsertResult(response);
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -357,7 +369,7 @@ public class Soda2Producer extends Soda2Consumer
 
             try {
                 ClientResponse response = requester.issueRequest();
-                return response.getEntity(UpsertResult.class);
+                return deserializeUpsertResult(response);
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -396,6 +408,27 @@ public class Soda2Producer extends Soda2Consumer
             return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<Meta>(Meta.class), requester);
         }
 
+    }
+
+    /**
+     * THis will return an upsert result, regardless of whether it is
+     * using the original response, or the new return from SODA Server
+     *
+     * @param response
+     * @return
+     */
+    private UpsertResult deserializeUpsertResult(ClientResponse response) throws IOException
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonParser parser = mapper.getJsonFactory().createJsonParser(response.getEntityInputStream());
+
+
+        if (parser.nextToken() == JsonToken.START_ARRAY) {
+            //UNDONE(willpugh) Fix this to count up results
+            return new UpsertResult(0, 0, 0, null, 0, 0);
+        }
+
+        return parser.readValueAs(UpsertResult.class);
     }
 
 }
