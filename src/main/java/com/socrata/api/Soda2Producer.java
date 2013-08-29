@@ -460,6 +460,9 @@ public class Soda2Producer extends Soda2Consumer
         return parser.readValueAs(UpsertResult.class);
     }
 
+    /**
+     * Class that represents a row in the new upsert response stream.
+     */
     @JsonIgnoreProperties(ignoreUnknown=true)
     static public class NewUpsertRow {
         public final String typ;

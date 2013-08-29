@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
+ * A layer in the shape file.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ShapeLayer
@@ -20,11 +21,19 @@ public class ShapeLayer
         this.name = name;
     }
 
+    /**
+     * ID for the layer
+     * @return
+     */
     public int getLayerId()
     {
         return layerId;
     }
 
+    /**
+     * Name of the layer
+     * @return
+     */
     public String getName()
     {
         return name;

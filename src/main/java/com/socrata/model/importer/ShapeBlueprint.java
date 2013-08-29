@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * A blueprint to use for creating a View around a shape.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ShapeBlueprint
@@ -17,6 +18,12 @@ public class ShapeBlueprint
     public final List<ShapeLayer> layers;
 
 
+    /**
+     * Create a blueprint from the results of a Shape file scan.
+     *
+     * @param scanResults results from calling a scan of a shapefile
+     * @return a blueprint that can be used for creating a view based on a shapefile
+     */
     public static ShapeBlueprint fromScanResults(final ShapeScanResults scanResults) {
 
         final ImmutableList.Builder<ShapeLayer> layers = ImmutableList.builder();
@@ -36,6 +43,10 @@ public class ShapeBlueprint
         this.layers = layers;
     }
 
+    /**
+     * List of the layers to import
+     * @return List of the layers to import
+     */
     public List<ShapeLayer> getLayers()
     {
         return layers;

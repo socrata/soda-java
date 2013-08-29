@@ -7,6 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 
 /**
+ * Object returned from scanning a shape file from the import process.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ShapeScanSummary
@@ -22,11 +23,19 @@ public class ShapeScanSummary
         this.layers = layers;
     }
 
+    /**
+     * Total number of features in this file
+     * @return
+     */
     public long getTotalFeatureCount()
     {
         return totalFeatureCount;
     }
 
+    /**
+     * List of all the layers that were discovered.
+     * @return
+     */
     public List<ShapeLayerSummary> getLayers()
     {
         return layers;

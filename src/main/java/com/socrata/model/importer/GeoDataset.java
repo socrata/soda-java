@@ -28,11 +28,21 @@ public class GeoDataset extends NonDataFileDataset
         setViewType(GEODATASET_TYPE);
     }
 
+    /**
+     * List of IDs for all the child views of this geo dataset.  Each child view will contain
+     * the features for 1 layer.
+     *
+     * @return
+     */
     public List<String> getChildViews()
     {
         return childViews;
     }
 
+    /**
+     * @param childViews List of IDs for all the child views of this geo dataset.  Each child view will contain
+     * the features for 1 layer.
+     */
     public void setChildViews(List<String> childViews)
     {
         this.childViews = childViews;

@@ -24,6 +24,14 @@ public class LongRunningRequest<T, R>
         this.cls = cls;
     }
 
+    /**
+     * Checks the status for whether this long running operation is still going or not.
+     *
+     * @param httpLowLevel the low level connection to use for communicating to the server
+     * @param retries the number of retries to attempt, in case there are failures
+     * @param intervalMs the number of milliseconds to wait after an error, until it pings the server again
+     * @return the response this method is waiting for
+     */
     public R checkStatus(HttpLowLevel httpLowLevel, int retries, long intervalMs) throws SodaError, InterruptedException {
         for (int i = 0; i <= retries; i++) {
             try {

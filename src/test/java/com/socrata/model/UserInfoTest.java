@@ -1,6 +1,6 @@
 package com.socrata.model;
 
-import com.socrata.model.importer.Grant;
+import com.socrata.model.importer.UserInfo;
 import junit.framework.TestCase;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;

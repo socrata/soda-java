@@ -15,6 +15,10 @@
  * In addition, there are a few helper objects: {@code Soda2Base} + {@code HttpLowLevel} that are mainly to handle general
  * network operations.
  *
+ * For the most part, Socrata requests are synchronous requests that return immediately.  However, there are a number of export
+ * operations that take longer to complete that require asynchronous status checks.  For these operations, there is a LongRunningRequest
+ * object that allows these asynchronous checks in an error tolerant manner.  This should mostly be invisible to the caller, although,
+ * the amount of errors to tolerate can be set with the {@code HttpLowLevel.setStatusCheckErrorRetries} method.
  *
  **/
 package com.socrata.api;

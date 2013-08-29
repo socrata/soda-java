@@ -7,6 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 
 /**
+ * Results of scanning a shape file.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ShapeScanResults
@@ -41,6 +42,10 @@ public class ShapeScanResults
         return summary;
     }
 
+    /**
+     * List of warnings that came from analyzing the shape files.
+     * @return
+     */
     public List<String> getWarnings()
     {
         return warnings;

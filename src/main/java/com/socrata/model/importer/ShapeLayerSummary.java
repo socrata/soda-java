@@ -5,6 +5,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
+ * Summary of a shape file layer.
+ *
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class ShapeLayerSummary
@@ -26,21 +28,37 @@ public class ShapeLayerSummary
         this.referenceSystem = referenceSystem;
     }
 
+    /**
+     * Name of the layer
+     * @return
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Number of features in this layer.
+     * @return
+     */
     public int getFeatureCount()
     {
         return featureCount;
     }
 
+    /**
+     * ID of this layer
+     * @return
+     */
     public int getLayerId()
     {
         return layerId;
     }
 
+    /**
+     * Reference system for this layer.
+     * @return
+     */
     public String getReferenceSystem()
     {
         return referenceSystem;

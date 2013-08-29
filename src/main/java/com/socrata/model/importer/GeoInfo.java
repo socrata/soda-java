@@ -5,6 +5,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
+ * Describes the shapefile specific information.  The context for this object is
+ * normally that it is pulled from a view's metadata.
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class GeoInfo
@@ -34,11 +36,19 @@ public class GeoInfo
     }
 
 
+    /**
+     * The URL to the OWS endpoint.
+     * @return
+     */
     public String getOwsUrl()
     {
         return owsUrl;
     }
 
+    /**
+     * The bounding box for this map file.
+     * @return
+     */
     public String getBbox()
     {
         return bbox;
@@ -53,11 +63,20 @@ public class GeoInfo
                 : null;
     }
 
+    /**
+     * A comma delimited list of all the layers in this map
+     * @return
+     */
     public String getLayers()
     {
         return layers;
     }
 
+    /**
+     * A convenience method that splits the layers out into an array of
+     * layer names.
+     * @return
+     */
     public String[] decodeLayers() {
         return layers != null ? layers.split(",") : new String[0];
     }

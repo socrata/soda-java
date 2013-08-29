@@ -2,7 +2,6 @@ package com.socrata.model.importer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.socrata.model.UserInfo;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonSubTypes;
