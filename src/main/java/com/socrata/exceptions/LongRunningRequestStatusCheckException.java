@@ -7,20 +7,11 @@ import com.socrata.api.LongRunningRequest;
  *
  * Depending on the actual error, you may want to resume status check by using the long running request in the exception.
  */
-
-
 public class LongRunningRequestStatusCheckException extends SodaError
 {
-    final private LongRunningRequest longRunningRequest;
-
     public LongRunningRequestStatusCheckException(final Throwable cause, final LongRunningRequest<?, ?> longRunningRequest)
     {
         super(cause);
-        this.longRunningRequest = longRunningRequest;
-    }
-
-    public <T, R> LongRunningRequest<T, R> getLongRunningRequest()
-    {
-        return longRunningRequest;
+        setLongRunningRequest(longRunningRequest);
     }
 }

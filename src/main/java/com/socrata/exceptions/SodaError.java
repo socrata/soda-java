@@ -1,5 +1,6 @@
 package com.socrata.exceptions;
 
+import com.socrata.api.LongRunningRequest;
 import com.socrata.model.SodaErrorResponse;
 
 /**
@@ -8,6 +9,7 @@ import com.socrata.model.SodaErrorResponse;
 public class SodaError extends Exception
 {
     public final SodaErrorResponse sodaErrorResponse;
+    public       LongRunningRequest longRunningRequest;
 
     public SodaError(SodaErrorResponse sodaErrorResponse)
     {
@@ -25,5 +27,15 @@ public class SodaError extends Exception
     {
         super(throwable);
         this.sodaErrorResponse = new SodaErrorResponse("", "", "", null);
+    }
+
+    public <T, R> LongRunningRequest<T, R> getLongRunningRequest()
+    {
+        return longRunningRequest;
+    }
+
+    public void setLongRunningRequest(LongRunningRequest longRunningRequest)
+    {
+        this.longRunningRequest = longRunningRequest;
     }
 }

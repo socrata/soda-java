@@ -37,6 +37,11 @@ public class LongRunningRequest<T, R>
                 if (i >= retries) {
                     throw new LongRunningRequestStatusCheckException(exception, this);
                 }
+            } catch (SodaError sodaError) {
+                if (i >= retries) {
+                    sodaError.setLongRunningRequest(this);
+                    throw sodaError;
+                }
             }
             Thread.sleep(intervalMs);
         }
