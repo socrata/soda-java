@@ -72,6 +72,46 @@ simply need to get an instance of a `Soda2Producer`.  This is similar to the ear
 addition CUD operations.
 
 
+**Upserting CSV files**
+
+SODA2 makes it extremely easy to update a dataset from a CSV or JSON file through an operation called `upsert`.  Upsert allows you to
+ to insert, update and delete in a single operation.  It determines what operation to execute based on whether the object is already
+ uploaded and whether or not a special :deleted flag is set.  The way Upsert determines whether an object is already loaded or not is based
+ on it's row identifier.
+
+* If no row identifier is set on a dataset, the system columns `:id` will be used.
+* If a row identifier is set on a dataset, that column will be used.
+
+ So, for example.  If a dataset has a row identifier of `crime_id`, you may upload a CSV that looks like:
+
+     crime_id,crime_name,:deleted
+     new_one, New Crime, false
+     old_one, Update A Crime, false
+     del_one, , true
+
+In this example:
+
+* Since, there is no record with a `crime_id=new_one`, one will be creates
+* Since, there is already a record with `crime_id=old_one`, that record will be update
+* Since, there is already a record with `crime_id=del_one` AND `:deleted` is true in the CSV, this record will be deleted.
+
+The `:deleted` column is ONLY needed in this example if you are deleting rows.  If you are creating a CSV for purely updating and
+adding rows, you don't need to have the column at all.
+
+The code to actually upload a CSV is simple:
+
+    Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+    UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv");
+
+
+The code to create a new dataset from a CSV is also simple (if you want to use the default datatype Socrata chooses)
+
+    //Create the dataset from the CSV and set the RowColumnIdentifier to "crime_id"
+    final DatasetInfo     fakeCrimesDataset = importer.createViewFromCsv("fakeCrimes", "This is a test dataset using samples with the nominations schema", "/fake_crimes.csv", "crime_id");
+    importer.publish(fakeCrimesDataset.getId());
+
+
+
 **CRUD on Objects**
 
 SODA2 also provides mechanisms for creating, updating or deleting individual rows.  In this example, we will add, update and then
@@ -109,14 +149,4 @@ The library also allows callers to upsert based on a CSV file or stream.
     InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
     UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
 
-
-**Easiest way to import a CSV file**
-
-The library makes it simple to upload a CSV file and create a new dataset.
-
-        final SodaImporter    importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
-
-        //Create the dataset from the CSV and set the RowColumnIdentifier to "name"
-        final DatasetInfo     nominationsDataset = importer.createViewFromCsv(uniqueName, "This is a test dataset using samples with the nominations schema", NOMINATIONS_CSV, "Name");
-        importer.publish(nominationsDataset.getId());
 
