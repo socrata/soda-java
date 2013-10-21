@@ -154,7 +154,7 @@ public final class HttpLowLevel
             client.addFilter(new SodaTokenFilter(token));
         }
         client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
-        client.setConnectTimeout(1000 * 60);
+        //client.setConnectTimeout(1000 * 60);
         return new HttpLowLevel(client, url);
     }
 
@@ -485,6 +485,12 @@ public final class HttpLowLevel
 
         final ClientResponse response = builder.put(ClientResponse.class, form);
         return processErrors(response);
+    }
+
+    public void close() {
+        if (client != null) {
+            client.destroy();
+        }
     }
 
 

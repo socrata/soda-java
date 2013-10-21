@@ -274,6 +274,13 @@ public class Soda2Base
         return httpLowLevel;
     }
 
+    /**
+     * Closes the connection, getting rid of any system reasources being held onto.
+     */
+    public void close() {
+        httpLowLevel.close();
+    }
+
 
 
 

@@ -17,7 +17,7 @@ public class SodaErrorResponse
 
 
     @JsonCreator
-    public SodaErrorResponse(@JsonProperty("code") String code, @JsonProperty("message") String message, @JsonProperty("error") String error, @JsonProperty("data") JsonNode data)
+    public SodaErrorResponse(@JsonProperty("errorCode") String code, @JsonProperty("message") String message, @JsonProperty("error") String error, @JsonProperty("data") JsonNode data)
     {
         this.code = code;
         this.message = message;

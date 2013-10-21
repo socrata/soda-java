@@ -145,6 +145,43 @@ public class SodaWorkflowTest  extends TestBase
         }
     }
 
+
+    //@Test
+    public void testLongRunningOperations() throws IOException, SodaError, InterruptedException
+    {
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
+
+
+        final String name = "BigDatasetName" + UUID.randomUUID();
+
+        DatasetInfo di = importer.createViewFromCsv(name, name, CRIMES_CSV, "ID");
+        importer.publish(di.getId());
+        List ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(1000, ret.size());
+
+
+        DatasetInfo workingCopy = importer.createWorkingCopy(di.getId());
+        workingCopy = importer.replace(workingCopy.getId(), CRIMES_CSV, 1, null);
+        importer.publish(workingCopy.getId());
+        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(1000, ret.size());
+
+
+        final Soda2Producer producer = new Soda2Producer(connection);
+        producer.upsertCsv(workingCopy.getId(), CRIMES_CSV);
+        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(1000, ret.size());
+
+
+        producer.replaceCsv(workingCopy.getId(), CRIMES_CSV);
+        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(1000, ret.size());
+
+
+    }
+
     @Test
     public void testComments() throws IOException, SodaError, InterruptedException
     {

@@ -190,7 +190,6 @@
                     </groups>
                 </configuration>
             </plugin>
-            <!--
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>downloads-maven-plugin</artifactId>
@@ -217,7 +216,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>
