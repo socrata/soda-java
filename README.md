@@ -84,10 +84,10 @@ SODA2 makes it extremely easy to update a dataset from a CSV or JSON file throug
 
  So, for example.  If a dataset has a row identifier of `crime_id`, you may upload a CSV that looks like:
 
-     crime_id,crime_name,:deleted
-     new_one, New Crime, false
-     old_one, Update A Crime, false
-     del_one, , true
+    crime_id,crime_name,:deleted
+    new_one, New Crime, false
+    old_one, Update A Crime, false
+    del_one, , true
 
 In this example:
 
