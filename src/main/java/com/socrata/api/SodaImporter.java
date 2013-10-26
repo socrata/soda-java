@@ -379,7 +379,7 @@ public class SodaImporter extends SodaDdl
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             {
-                return httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, payload);
+                return httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 
@@ -417,7 +417,7 @@ public class SodaImporter extends SodaDdl
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             {
-                return httpLowLevel.postRaw(shapeImportUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, payload);
+                return httpLowLevel.postRaw(shapeImportUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 

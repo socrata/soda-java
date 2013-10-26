@@ -6,6 +6,7 @@ import com.socrata.exceptions.*;
 import com.socrata.model.SodaErrorResponse;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.utils.JacksonObjectMapperProvider;
+import com.socrata.utils.streams.CompressingGzipInputStream;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -27,15 +28,18 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Class to handle all the low level HTTP operations. This class provides the core data access methods
@@ -77,6 +81,8 @@ public final class HttpLowLevel
 
     private long retryTime = DEFAULT_RETRY_TIME;
     private long maxRetries = DEFAULT_MAX_RETRIES;
+    private ContentEncoding contentEncodingForUpserts = ContentEncoding.IDENTITY;
+
     private final ConcurrentHashMap<String, String> additionalParams = new ConcurrentHashMap<String, String>();
 
     private int statusCheckErrorRetries = DEFAULT_STATUS_CHECK_ERROR_RETRIES;
@@ -254,6 +260,29 @@ public final class HttpLowLevel
     }
 
     /**
+     * Gets the content encoding for upserts.  This defaults to GZIP, which basically
+     * means uncompressed streams will be gzipped before being sent up to the Socrata Service
+     *
+     * @return content encoding of the upserts.  If this is Identity, no encodings will be added.
+     */
+    public ContentEncoding getContentEncodingForUpserts()
+    {
+        return contentEncodingForUpserts;
+    }
+
+
+    /**
+     * Sets the content encoding for upserts.  This defaults to GZIP, which basically
+     * means uncompressed streams will be gzipped before being sent up to the Socrata Service
+     *
+     * @param contentEncodingForUpserts content encoding of the upserts.  If this is Identity, no encodings will be added.
+     */
+    public void setContentEncodingForUpserts(ContentEncoding contentEncodingForUpserts)
+    {
+        this.contentEncodingForUpserts = contentEncodingForUpserts;
+    }
+
+    /**
      * Get the map of additional parameters for this HttpLowLevel.  These parameters
      * will be added to every request.  The map returned will be thread safe for modifications.
      *
@@ -418,21 +447,52 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse postRaw(final URI uri, final MediaType mediaType, final Object object) throws LongRunningQueryException, SodaError
+    public ClientResponse postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
                 .accept("application/json")
                 .type(mediaType);
 
-        final ClientResponse response = builder.post(ClientResponse.class, object);
+
+        final Object encodedObject = encodeContents(contentEncoding, builder, object);
+        final ClientResponse response = builder.post(ClientResponse.class, encodedObject);
         return processErrors(response);
     }
+
+    private Object encodeContents(final ContentEncoding contentEncoding, final WebResource.Builder builder, final Object object) throws BadCompressionException
+    {
+
+        switch (contentEncoding) {
+            case GZIP: {
+                builder.header(HttpHeaders.CONTENT_ENCODING, contentEncoding.header);
+
+                if (!(object instanceof InputStream)) {
+                    throw new IllegalArgumentException("Can only compress puts that use an InputStream");
+                }
+
+                try {
+                    return new CompressingGzipInputStream((InputStream)object) ;
+                } catch (IOException ioe) {
+                    throw new BadCompressionException(ioe);
+                }
+            }
+
+            case IDENTITY: {
+                return object;
+            }
+
+            default: {
+                throw new IllegalArgumentException("Unknown ContentEncoding");
+            }
+        }
+    }
+
 
     public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
         return postFileRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, file);
     }
 
-    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final File file) throws LongRunningQueryException, SodaError
+    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, File file) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
                                                   .accept(acceptType)
@@ -459,13 +519,14 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> ClientResponse putRaw(final URI uri, final MediaType mediaType, final Object object) throws LongRunningQueryException, SodaError
+    public <T> ClientResponse putRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, final Object object) throws LongRunningQueryException, SodaError
     {
         final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
                                                   .accept("application/json")
                                                   .type(mediaType);
 
-        final ClientResponse response = builder.put(ClientResponse.class, object);
+        final Object encodedObject = encodeContents(contentEncoding, builder, object);
+        final ClientResponse response = builder.put(ClientResponse.class, encodedObject);
         return processErrors(response);
     }
 

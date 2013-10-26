@@ -12,9 +12,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Crime;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,6 +51,8 @@ public class Soda2ProducerTest extends TestBase
 
 
             UpsertResult replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_HEADER_CSV);
+            TestCase.assertEquals(2, replaceResult.getRowsCreated());
+            TestCase.assertEquals(0, replaceResult.errorCount());
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
@@ -198,5 +198,110 @@ public class Soda2ProducerTest extends TestBase
             sodaImporter.deleteDataset(datasetPublished.getId());
         }
 
+    }
+
+
+    public static final String UPSERT_RESULT_NO_ERRORS = "{ \"rows_created\":1, \"rows_updated\":2, \"rows_deleted\":3 }";
+    public static final String UPSERT_RESULT_1 = "{ \"rows_created\":1, \"rows_updated\":2, \"rows_deleted\":3, \"errors\":[{\"error\":\"Error1\", \"input_index\":1, \"primary_key\":\"key1\"}] }";
+    public static final String UPSERT_RESULT_2 = "{ \"rows_created\":1, \"rows_updated\":2, \"rows_deleted\":3, \"errors\":[{\"error\":\"Error1\", \"input_index\":1, \"primary_key\":\"key1\"},{\"error\":\"Error2\", \"input_index\":2, \"primary_key\":\"key2\"}] }";
+
+    @Test
+    public void testParsingUpsertResults() throws IOException
+    {
+
+        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
+        TestCase.assertEquals(0, noErrors.errorCount());
+        TestCase.assertEquals(1, noErrors.getRowsCreated());
+        TestCase.assertEquals(2, noErrors.getRowsUpdated());
+        TestCase.assertEquals(3, noErrors.getRowsDeleted());
+
+        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_1.getBytes("utf-8")));
+        TestCase.assertEquals(1, errors1.errorCount());
+        TestCase.assertEquals(1, errors1.getErrors().get(0).getIndex());
+        TestCase.assertEquals("Error1", errors1.getErrors().get(0).getError());
+        TestCase.assertEquals("key1", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals(1, errors1.getRowsCreated());
+        TestCase.assertEquals(2, errors1.getRowsUpdated());
+        TestCase.assertEquals(3, errors1.getRowsDeleted());
+
+        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_2.getBytes("utf-8")));
+        TestCase.assertEquals(2, errors2.errorCount());
+        TestCase.assertEquals(1, errors2.getErrors().get(0).getIndex());
+        TestCase.assertEquals("Error1", errors2.getErrors().get(0).getError());
+        TestCase.assertEquals("key1", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals(2, errors2.getErrors().get(1).getIndex());
+        TestCase.assertEquals("Error2", errors2.getErrors().get(1).getError());
+        TestCase.assertEquals("key2", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals(1, errors2.getRowsCreated());
+        TestCase.assertEquals(2, errors2.getRowsUpdated());
+        TestCase.assertEquals(3, errors2.getRowsDeleted());
+    }
+
+
+    public static final String SODA_SERVER_UPSERT_RESULT_NO_ERRORS = "[{\"typ\":\"insert\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"insert\", \"id\":\"key2\", \"ver\":\"1\"}, {\"typ\":\"insert\", \"id\":\"key3\", \"ver\":\"1\" }]";
+    public static final String SODA_SERVER_UPSERT_RESULT_1 =         "[{\"typ\":\"update\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"update\", \"id\":\"key2\", \"ver\":\"1\"}, {\"typ\":\"error\", \"id\":\"key3\", \"ver\":\"1\", \"err\":\"error3\" }]";
+    public static final String SODA_SERVER_UPSERT_RESULT_2 =         "[{\"typ\":\"delete\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"error\",  \"id\":\"key2\", \"ver\":\"1\", \"err\":\"error2\"}, {\"typ\":\"error\", \"id\":\"key3\", \"ver\":\"1\", \"err\":\"error3\" }]";
+
+    @Test
+    public void testParsingSodaServerUpsertResults() throws IOException
+    {
+
+        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
+        TestCase.assertEquals(0, noErrors.errorCount());
+        TestCase.assertEquals(3, noErrors.getRowsCreated());
+        TestCase.assertEquals(0, noErrors.getRowsUpdated());
+        TestCase.assertEquals(0, noErrors.getRowsDeleted());
+
+        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1.getBytes("utf-8")));
+        TestCase.assertEquals(1, errors1.errorCount());
+        TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
+        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals(0, errors1.getRowsCreated());
+        TestCase.assertEquals(2, errors1.getRowsUpdated());
+        TestCase.assertEquals(0, errors1.getRowsDeleted());
+
+        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2.getBytes("utf-8")));
+        TestCase.assertEquals(2, errors2.errorCount());
+        TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
+        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("error3", errors2.getErrors().get(1).getError());
+        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals(0, errors2.getRowsCreated());
+        TestCase.assertEquals(0, errors2.getRowsUpdated());
+        TestCase.assertEquals(1, errors2.getRowsDeleted());
+    }
+
+
+    public static final String SODA_SERVER_UPSERT_RESULT_NO_ERRORS_OLD = "[[{\"typ\":\"insert\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"insert\", \"id\":\"key2\", \"ver\":\"1\"}, {\"typ\":\"insert\", \"id\":\"key3\", \"ver\":\"1\" }]]";
+    public static final String SODA_SERVER_UPSERT_RESULT_1_OLD =         "[[{\"typ\":\"update\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"update\", \"id\":\"key2\", \"ver\":\"1\"}, {\"typ\":\"error\",  \"id\":\"key3\", \"ver\":\"1\", \"err\":\"error3\" }]]";
+    public static final String SODA_SERVER_UPSERT_RESULT_2_OLD =         "[[{\"typ\":\"delete\", \"id\":\"key1\", \"ver\":\"1\"}, {\"typ\":\"error\",  \"id\":\"key2\", \"ver\":\"1\", \"err\":\"error2\"}, {\"typ\":\"error\", \"id\":\"key3\", \"ver\":\"1\", \"err\":\"error3\" }]]";
+
+    @Test
+    public void testParsingOldSodaServerUpsertResults() throws IOException
+    {
+
+        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS_OLD.getBytes("utf-8")));
+        TestCase.assertEquals(0, noErrors.errorCount());
+        TestCase.assertEquals(3, noErrors.getRowsCreated());
+        TestCase.assertEquals(0, noErrors.getRowsUpdated());
+        TestCase.assertEquals(0, noErrors.getRowsDeleted());
+
+        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1_OLD.getBytes("utf-8")));
+        TestCase.assertEquals(1, errors1.errorCount());
+        TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
+        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals(0, errors1.getRowsCreated());
+        TestCase.assertEquals(2, errors1.getRowsUpdated());
+        TestCase.assertEquals(0, errors1.getRowsDeleted());
+
+        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2_OLD.getBytes("utf-8")));
+        TestCase.assertEquals(2, errors2.errorCount());
+        TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
+        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("error3", errors2.getErrors().get(1).getError());
+        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals(0, errors2.getRowsCreated());
+        TestCase.assertEquals(0, errors2.getRowsUpdated());
+        TestCase.assertEquals(1, errors2.getRowsDeleted());
     }
 }

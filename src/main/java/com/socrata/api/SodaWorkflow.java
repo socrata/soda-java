@@ -110,7 +110,7 @@ public class SodaWorkflow
                                                      .build();
 
 
-                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "viewId=" + resourceId);
+                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, "viewId=" + resourceId);
             }
         };
 
@@ -147,7 +147,7 @@ public class SodaWorkflow
                                                      .queryParam("method", "copy")
                                                      .build();
 
-                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=copy");
+                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, "method=copy");
             }
         };
 
@@ -181,7 +181,7 @@ public class SodaWorkflow
                                                      .queryParam("value", "public.read")
                                                      .build();
 
-                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=setPermission");
+                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, "method=setPermission");
             }
         };
 
@@ -214,7 +214,7 @@ public class SodaWorkflow
                                                      .queryParam("value", "private")
                                                      .build();
 
-                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, "method=setPermission");
+                return httpLowLevel.putRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, "method=setPermission");
             }
         };
 
@@ -289,7 +289,7 @@ public class SodaWorkflow
                                           .path(COMMENTS_METHOD_PATH)
                                           .build();
 
-                return httpLowLevel.postRaw(uri, HttpLowLevel.JSON_TYPE, comment);
+                return httpLowLevel.postRaw(uri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, comment);
             }
         };
 

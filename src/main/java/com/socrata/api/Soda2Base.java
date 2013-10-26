@@ -164,7 +164,7 @@ public class Soda2Base
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, object);
     }
 
     /**
@@ -187,7 +187,7 @@ public class Soda2Base
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, objects);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, objects);
     }
 
     /**
@@ -211,7 +211,7 @@ public class Soda2Base
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
 
-        return httpLowLevel.postRaw(builder.build(), mediaType, stream);
+        return httpLowLevel.postRaw(builder.build(), mediaType, httpLowLevel.getContentEncodingForUpserts(), stream);
 
     }
 
@@ -239,7 +239,7 @@ public class Soda2Base
                                              .path(resourceId)
                                              .path(uniqueId.toString());
 
-        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, object);
+        return httpLowLevel.postRaw(builder.build(), httpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, object);
 
     }
 
@@ -251,7 +251,7 @@ public class Soda2Base
                                                .path(SODA_BASE_PATH)
                                                .path(resourceId);
 
-        return httpLowLevel.putRaw(builder.build(), httpLowLevel.JSON_TYPE, objects);
+        return httpLowLevel.putRaw(builder.build(), httpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, objects);
     }
 
     public ClientResponse doReplaceStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
@@ -261,7 +261,7 @@ public class Soda2Base
                                                .path(SODA_BASE_PATH)
                                                .path(resourceId);
 
-        return httpLowLevel.putRaw(builder.build(), mediaType, stream);
+        return httpLowLevel.putRaw(builder.build(), mediaType, httpLowLevel.getContentEncodingForUpserts(), stream);
 
     }
 

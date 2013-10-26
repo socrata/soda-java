@@ -11,7 +11,6 @@ import com.socrata.model.requests.SodaTypedRequest;
 import com.socrata.utils.GeneralUtils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -195,7 +194,7 @@ public class Soda2Producer extends Soda2Consumer
 
         try {
             ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response);
+            return deserializeUpsertResult(response.getEntityInputStream());
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
         } catch (IOException ioe) {
@@ -225,7 +224,7 @@ public class Soda2Producer extends Soda2Consumer
 
         try {
             ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response);
+            return deserializeUpsertResult(response.getEntityInputStream());
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
         } catch (IOException ioe) {
@@ -264,7 +263,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
 
             ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response);
+            return deserializeUpsertResult(response.getEntityInputStream());
 
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
@@ -298,7 +297,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
 
             ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response);
+            return deserializeUpsertResult(response.getEntityInputStream());
 
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
@@ -338,7 +337,7 @@ public class Soda2Producer extends Soda2Consumer
 
             try {
                 ClientResponse response = requester.issueRequest();
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response.getEntityInputStream());
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -374,7 +373,7 @@ public class Soda2Producer extends Soda2Consumer
 
             try {
                 ClientResponse response = requester.issueRequest();
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response.getEntityInputStream());
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -419,13 +418,14 @@ public class Soda2Producer extends Soda2Consumer
      * THis will return an upsert result, regardless of whether it is
      * using the original response, or the new return from SODA Server
      *
-     * @param response
+     *
+     * @param is
      * @return
      */
-    private UpsertResult deserializeUpsertResult(ClientResponse response) throws IOException
+    static UpsertResult deserializeUpsertResult(InputStream is) throws IOException
     {
         ObjectMapper mapper = new ObjectMapper();
-        JsonParser parser = mapper.getJsonFactory().createJsonParser(response.getEntityInputStream());
+        JsonParser parser = mapper.getJsonFactory().createJsonParser(is);
 
 
         if (parser.nextToken() == JsonToken.START_ARRAY) {
@@ -436,22 +436,30 @@ public class Soda2Producer extends Soda2Consumer
             long    deletes = 0;
             List<UpsertError> errors = new LinkedList<UpsertError>();
 
+
+            JsonToken   currToken = parser.nextToken();
+
+            //Eliminate the nested array, in the case this is using an old SODA Server.
+            //THis is for backwards compatibility only.
             if (parser.nextToken() == JsonToken.START_ARRAY) {
+                currToken = parser.nextToken();
+            }
 
-                while (parser.nextToken() != JsonToken.END_ARRAY) {
-                    NewUpsertRow row = parser.readValueAs(NewUpsertRow.class);
-                    if ("insert".equals(row.typ)) {
-                        inserts++;
-                    } else if ("update".equals(row.typ)) {
-                        updates++;
-                    } else if ("delete".equals(row.typ)) {
-                        deletes++;
-                    } else if ("error".equals(row.typ)) {
-                        errors.add(new UpsertError(row.err, count, row.id));
-                    }
+            while (currToken != JsonToken.END_ARRAY) {
 
-                    count++;
+                NewUpsertRow row = parser.readValueAs(NewUpsertRow.class);
+                if ("insert".equals(row.typ)) {
+                    inserts++;
+                } else if ("update".equals(row.typ)) {
+                    updates++;
+                } else if ("delete".equals(row.typ)) {
+                    deletes++;
+                } else if ("error".equals(row.typ)) {
+                    errors.add(new UpsertError(row.err, count, row.id));
                 }
+
+                count++;
+                currToken = parser.nextToken();
             }
 
             return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null);

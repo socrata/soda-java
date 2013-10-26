@@ -127,7 +127,7 @@ public class SodaDdl extends SodaWorkflow
         SodaRequest requester = new SodaRequest<DatasetInfo>(null, dataset)
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
-            { return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, payload); }
+            { return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload); }
         };
 
         try {
@@ -192,7 +192,7 @@ public class SodaDdl extends SodaWorkflow
             {   URI uri = UriBuilder.fromUri(viewUri)
                                     .path(resourceId)
                                     .build();
-                return httpLowLevel.putRaw(uri, HttpLowLevel.JSON_TYPE, payload);
+                return httpLowLevel.putRaw(uri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 
@@ -252,7 +252,7 @@ public class SodaDdl extends SodaWorkflow
                                           .path(resourceId)
                                           .path(COLUMNS_PATH)
                                           .build();
-                return httpLowLevel.postRaw(uri, HttpLowLevel.JSON_TYPE, payload);
+                return httpLowLevel.postRaw(uri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 
@@ -307,7 +307,7 @@ public class SodaDdl extends SodaWorkflow
                                           .path(COLUMNS_PATH)
                                           .path(Integer.toString(payload.getId()))
                                           .build();
-                return httpLowLevel.putRaw(uri, HttpLowLevel.JSON_TYPE, payload);
+                return httpLowLevel.putRaw(uri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 
