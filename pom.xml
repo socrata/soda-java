@@ -19,7 +19,7 @@
       <connection>scm:git:git@github.com:socrata/soda-java.git</connection>
       <developerConnection>scm:git:git@github.com:socrata/soda-java.git</developerConnection>
       <url>https://github.com/socrata/soda-java</url>
-    <tag>v0.9.5</tag>
+    <tag>v0.9.6</tag>
   </scm>
 
    <properties>
