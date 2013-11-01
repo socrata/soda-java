@@ -42,12 +42,16 @@ Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata
                                                     "D8Atrg62F2j017ZTdkMpuZ9vY");
 
 //To get a raw String of the results
-ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
+ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy",
+                                                           HttpLowLevel.JSON_TYPE,
+                                                           SoqlQuery.SELECT_ALL);
 String payload = response.getEntity(String.class);
 System.out.println(payload);
 
 //Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
-List<Nomination> nominations = consumer.query("nominationsCopy", SoqlQuery.SELECT_ALL, Nomination.LIST_TYPE);
+List<Nomination> nominations = consumer.query("nominationsCopy",
+                                              SoqlQuery.SELECT_ALL,
+                                              Nomination.LIST_TYPE);
 TestCase.assertTrue(nominations.size() > 0);
 System.out.println(nominations.size());
 ```
@@ -134,17 +138,22 @@ delete Nomninations for a dataset that has test White House Appointee Nomination
 
 ```Java
 final Nomination NOMINATION_TO_ADD = new Nomination(
-        "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), null, null, null
+        "New, User", "Imaginary Friend", "Department of Imagination",
+        null, new Date(), null, null, null
 );
 
 //This is the White Nomination Java Bean, that I want to update to
 final Nomination NOMINATION_TO_UPDATE = new Nomination(
-        "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
+        "New, User", "Imaginary Friend", "Department of Imagination",
+        null, new Date(), new Date(), true, null
 );
 
 
 //Get the producer class to allow updates of the data set.
-final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com",
+                                                         "testuser@gmail.com",
+                                                         "OpenData",
+                                                         "D8Atrg62F2j017ZTdkMpuZ9vY");
 
 //Get get this automatically serialized into a set of Java Beans annotated with Jackson JOSN annotations
 Meta nominationAddedMeta = producer.addObject("testupdate", NOMINATION_TO_ADD);
@@ -161,7 +170,10 @@ producer.delete("testupdate", nominationUpdatedMeta.getId());
 The library also allows callers to upsert based on a CSV file or stream.
 
 ```Java
-Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com",
+                                                   "testuser@gmail.com",
+                                                   "OpenData",
+                                                   "D8Atrg62F2j017ZTdkMpuZ9vY");
 
 InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
 UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
