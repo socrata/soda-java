@@ -35,34 +35,36 @@ Consumer
 The consumer API is simple.  The following example will issue two requests, one will return the results from the "test-data" dataset,
 as the JSON string.  The other will return the results as the `Nomination` java objects:
 
-    Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+```Java
+Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
 
-    //To get a raw String of the results
-    ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
-    String payload = response.getEntity(String.class);
-    System.out.println(payload);
+//To get a raw String of the results
+ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
+String payload = response.getEntity(String.class);
+System.out.println(payload);
 
-    //Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
-    List<Nomination> nominations = consumer.query("nominationsCopy", SoqlQuery.SELECT_ALL, Nomination.LIST_TYPE);
-    TestCase.assertTrue(nominations.size() > 0);
-    System.out.println(nominations.size());
-
+//Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
+List<Nomination> nominations = consumer.query("nominationsCopy", SoqlQuery.SELECT_ALL, Nomination.LIST_TYPE);
+TestCase.assertTrue(nominations.size() > 0);
+System.out.println(nominations.size());
+```
 
 **Building Queries**
 
 Along with the consumer API, is a builder class to make it easier to build the SoQL queries.  For example, to query for the name, position and nomination date of
 nominees for the Department of State, sorted by position:
 
-    //Create a SoQL query to find the nominations for the Department of State
-    SoqlQuery   departmentOfStateQuery = new SoqlQueryBuilder()
-            .addSelectPhrase("name")
-            .addSelectPhrase("position")
-            .addSelectPhrase("nomination_date")
-            .setWhereClause("agency_name='Department of State'")
-            .addOrderByPhrase(new OrderByClause(SortOrder.Descending, "position"))
-            .build();
-    nominations = consumer.query("nominationsCopy", departmentOfStateQuery, Nomination.LIST_TYPE);
-
+```Java
+//Create a SoQL query to find the nominations for the Department of State
+SoqlQuery   departmentOfStateQuery = new SoqlQueryBuilder()
+        .addSelectPhrase("name")
+        .addSelectPhrase("position")
+        .addSelectPhrase("nomination_date")
+        .setWhereClause("agency_name='Department of State'")
+        .addOrderByPhrase(new OrderByClause(SortOrder.Descending, "position"))
+        .build();
+nominations = consumer.query("nominationsCopy", departmentOfStateQuery, Nomination.LIST_TYPE);
+```
 
 Producer
 --------
@@ -103,8 +105,8 @@ adding rows, you don't need to have the column at all.
 The code to actually upload a CSV is simple:
 
 ```Java
-    Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
-    UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv");
+Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv");
 ```
 
 The code to create a new dataset from a CSV is also simple (if you want to use the default datatype Socrata chooses)
