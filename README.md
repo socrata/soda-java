@@ -84,10 +84,12 @@ SODA2 makes it extremely easy to update a dataset from a CSV or JSON file throug
 
  So, for example.  If a dataset has a row identifier of `crime_id`, you may upload a CSV that looks like:
 
+```
     crime_id,crime_name,:deleted
-    new_one, New Crime, false
-    old_one, Update A Crime, false
-    del_one, , true
+    new_one,New Crime,false
+    old_one,Update A Crime,false
+    del_one,,true
+```
 
 In this example:
 
@@ -100,9 +102,10 @@ adding rows, you don't need to have the column at all.
 
 The code to actually upload a CSV is simple:
 
+```Java
     Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
     UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv");
-
+```
 
 The code to create a new dataset from a CSV is also simple (if you want to use the default datatype Socrata chooses)
 
