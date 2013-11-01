@@ -36,7 +36,10 @@ The consumer API is simple.  The following example will issue two requests, one 
 as the JSON string.  The other will return the results as the `Nomination` java objects:
 
 ```Java
-Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com",
+                                                    "testuser@gmail.com",
+                                                    "OpenData",
+                                                    "D8Atrg62F2j017ZTdkMpuZ9vY");
 
 //To get a raw String of the results
 ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
@@ -105,16 +108,23 @@ adding rows, you don't need to have the column at all.
 The code to actually upload a CSV is simple:
 
 ```Java
-Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com",
+                                                   "testuser@gmail.com",
+                                                   "OpenData",
+                                                   "D8Atrg62F2j017ZTdkMpuZ9vY");
 UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv");
 ```
 
 The code to create a new dataset from a CSV is also simple (if you want to use the default datatype Socrata chooses)
 
-    //Create the dataset from the CSV and set the RowColumnIdentifier to "crime_id"
-    final DatasetInfo     fakeCrimesDataset = importer.createViewFromCsv("fakeCrimes", "This is a test dataset using samples with the nominations schema", "/fake_crimes.csv", "crime_id");
-    importer.publish(fakeCrimesDataset.getId());
-
+```Java
+//Create the dataset from the CSV and set the RowColumnIdentifier to "crime_id"
+final DatasetInfo     fakeCrimesDataset = importer.createViewFromCsv("fakeCrimes",
+                                                                     "This is a test dataset",
+                                                                     "/fake_crimes.csv",
+                                                                     "crime_id");
+importer.publish(fakeCrimesDataset.getId());
+```
 
 
 **CRUD on Objects**
@@ -122,36 +132,38 @@ The code to create a new dataset from a CSV is also simple (if you want to use t
 SODA2 also provides mechanisms for creating, updating or deleting individual rows.  In this example, we will add, update and then
 delete Nomninations for a dataset that has test White House Appointee Nominations in it.
 
-    final Nomination NOMINATION_TO_ADD = new Nomination(
-            "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), null, null, null
-    );
+```Java
+final Nomination NOMINATION_TO_ADD = new Nomination(
+        "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), null, null, null
+);
 
-    //This is the White Nomination Java Bean, that I want to update to
-    final Nomination NOMINATION_TO_UPDATE = new Nomination(
-            "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
-    );
+//This is the White Nomination Java Bean, that I want to update to
+final Nomination NOMINATION_TO_UPDATE = new Nomination(
+        "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
+);
 
 
-    //Get the producer class to allow updates of the data set.
-    final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+//Get the producer class to allow updates of the data set.
+final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
 
-    //Get get this automatically serialized into a set of Java Beans annotated with Jackson JOSN annotations
-    Meta nominationAddedMeta = producer.addObject("testupdate", NOMINATION_TO_ADD);
+//Get get this automatically serialized into a set of Java Beans annotated with Jackson JOSN annotations
+Meta nominationAddedMeta = producer.addObject("testupdate", NOMINATION_TO_ADD);
 
-    //Update the nomination
-    Meta nominationUpdatedMeta = producer.update("testupdate", nominationAddedMeta.getId(), NOMINATION_TO_UPDATE);
+//Update the nomination
+Meta nominationUpdatedMeta = producer.update("testupdate", nominationAddedMeta.getId(), NOMINATION_TO_UPDATE);
 
-    //Delete the nomination
-    producer.delete("testupdate", nominationUpdatedMeta.getId());
-
+//Delete the nomination
+producer.delete("testupdate", nominationUpdatedMeta.getId());
+```
 
 **Upsert based on a stream**
 
 The library also allows callers to upsert based on a CSV file or stream.
 
-    Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+```Java
+Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
 
-    InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
-    UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
-
+InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
+UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
+```
 
