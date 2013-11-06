@@ -441,7 +441,7 @@ public class Soda2Producer extends Soda2Consumer
 
             //Eliminate the nested array, in the case this is using an old SODA Server.
             //THis is for backwards compatibility only.
-            if (parser.nextToken() == JsonToken.START_ARRAY) {
+            if (currToken == JsonToken.START_ARRAY) {
                 currToken = parser.nextToken();
             }
 
