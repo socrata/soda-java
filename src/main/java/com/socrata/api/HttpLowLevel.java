@@ -65,6 +65,7 @@ public final class HttpLowLevel
 
     public static final String SODA_VERSION = "$$version";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
+    public static final String SOCRATA_REQUEST_ID_HEADER = "X-Socrata-RequestId";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
     public static final String UNEXPECTED_ERROR = "uexpectedError";
     public static final String MALFORMED_RESPONSE = "malformedResponse";
@@ -152,12 +153,15 @@ public final class HttpLowLevel
      * @param token the App Token to use for authorization and usage tracking.  If this is {@code null}, no value will be sent.
      * @return HttpLowLevel object that is completely configured to use.
      */
-    public static final HttpLowLevel instantiateBasic(@Nonnull final String url, @Nonnull final String userName, @Nonnull final String password, @Nullable final String token)
+    public static final HttpLowLevel instantiateBasic(@Nonnull final String url, @Nonnull final String userName, @Nonnull final String password, @Nullable final String token, @Nullable final String requestId)
     {
         final Client client = createClient();
         client.addFilter(new HTTPBasicAuthFilter(userName, password));
         if (token != null) {
             client.addFilter(new SodaTokenFilter(token));
+        }
+        if (requestId != null) {
+            client.addFilter(new SodaRequestIdFilter(requestId));
         }
         client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
         //client.setConnectTimeout(1000 * 60);
