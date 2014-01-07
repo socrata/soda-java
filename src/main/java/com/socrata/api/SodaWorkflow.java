@@ -48,7 +48,7 @@ public class SodaWorkflow
      */
     public static final SodaWorkflow newWorkflow(final String url, String userName, String password, String token)
     {
-        return new SodaWorkflow(HttpLowLevel.instantiateBasic(url, userName, password, token));
+        return new SodaWorkflow(HttpLowLevel.instantiateBasic(url, userName, password, token, null));
     }
 
     /**

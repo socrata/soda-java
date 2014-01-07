@@ -45,7 +45,7 @@ public class SodaDdl extends SodaWorkflow
      */
     public static final SodaDdl newDdl(final String url, String userName, String password, String token)
     {
-        return new SodaDdl(HttpLowLevel.instantiateBasic(url, userName, password, token));
+        return new SodaDdl(HttpLowLevel.instantiateBasic(url, userName, password, token, null));
     }
 
     /**

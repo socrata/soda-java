@@ -74,7 +74,8 @@ public class TestBase
         final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(url == null ? testProperties.getProperty(URL_PROP) : url,
                                                                         testProperties.getProperty(USER_NAME_PROP),
                                                                         testProperties.getProperty(PASSWORD_PROP),
-                                                                        testProperties.getProperty(API_KEY_PROP));
+                                                                        testProperties.getProperty(API_KEY_PROP),
+                                                                        null);
         return httpLowLevel;
     }
 

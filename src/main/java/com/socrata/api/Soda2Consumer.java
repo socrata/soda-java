@@ -43,7 +43,7 @@ public class Soda2Consumer extends Soda2Base
      */
     public static final Soda2Consumer newConsumer(final String url, String userName, String password, String token)
     {
-        return new Soda2Consumer(HttpLowLevel.instantiateBasic(url, userName, password, token));
+        return new Soda2Consumer(HttpLowLevel.instantiateBasic(url, userName, password, token, null));
     }
 
     /**

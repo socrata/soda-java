@@ -46,7 +46,25 @@ public class Soda2Producer extends Soda2Consumer
      */
     public static final Soda2Producer newProducer(final String url, String userName, String password, String token)
     {
-        return new Soda2Producer(HttpLowLevel.instantiateBasic(url, userName, password, token));
+        return new Soda2Producer(HttpLowLevel.instantiateBasic(url, userName, password, token, null));
+    }
+
+    /**
+     * Create a new Soda2Producer object, using the supplied credentials for authentication
+     * as well as a 32 character request ID to include in the header when performing publish
+     * operations (used for tracking).
+     *
+     * @param url the base URL for the SODA2 domain to access.
+     * @param userName user name to log in as
+     * @param password password to log in with
+     * @param token the App Token to use for authorization and usage tracking.  If this is {@code null}, no value will be sent.
+     * @param requestId a 32 character id unique to a single SODA 2 publish operation.  If this is {@code null}, no value will be sent.
+     *
+     * @return fully configured Soda2Producer
+     */
+    public static final Soda2Producer newProducerWithRequestId(final String url, String userName, String password, String token, String requestId)
+    {
+        return new Soda2Producer(HttpLowLevel.instantiateBasic(url, userName, password, token, requestId));
     }
 
 

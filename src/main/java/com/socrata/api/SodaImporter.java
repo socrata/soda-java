@@ -51,7 +51,7 @@ public class SodaImporter extends SodaDdl
      */
     public static final SodaImporter newImporter(final String url, String userName, String password, String token)
     {
-        return new SodaImporter(HttpLowLevel.instantiateBasic(url, userName, password, token));
+        return new SodaImporter(HttpLowLevel.instantiateBasic(url, userName, password, token, null));
     }
 
     /**
