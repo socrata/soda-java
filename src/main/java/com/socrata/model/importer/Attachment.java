@@ -1,7 +1,10 @@
 package com.socrata.model.importer;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Attachment
 {
     private String blobId;
