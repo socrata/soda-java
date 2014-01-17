@@ -2,6 +2,7 @@ package com.socrata.model.importer;
 
 /**
  * */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Attachment
 {
     private String blobId;
