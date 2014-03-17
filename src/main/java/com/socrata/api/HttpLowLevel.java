@@ -64,6 +64,7 @@ public final class HttpLowLevel
     protected static final long DEFAULT_STATUS_CHECK_ERROR_TIME = 4000;
 
     public static final String SODA_VERSION = "$$version";
+    public static final String NBE_FLAG = "nbe";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String SOCRATA_REQUEST_ID_HEADER = "X-Socrata-RequestId";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
@@ -461,6 +462,18 @@ public final class HttpLowLevel
         final Object encodedObject = encodeContents(contentEncoding, builder, object);
         final ClientResponse response = builder.post(ClientResponse.class, encodedObject);
         return processErrors(response);
+    }
+
+    /**
+     * If true adds ?nbe=true flag to all URIs (to enable creating datasets on New Backend)
+     *
+     * @param useNbe iff true use New Backend, otherwise use old
+     */
+    public void setUseNewBackend(boolean useNbe) {
+        if(useNbe)
+            additionalParams.put(NBE_FLAG, "true");
+        else
+            additionalParams.remove(NBE_FLAG);
     }
 
     private Object encodeContents(final ContentEncoding contentEncoding, final WebResource.Builder builder, final Object object) throws BadCompressionException
