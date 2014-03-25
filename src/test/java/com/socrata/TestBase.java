@@ -69,7 +69,7 @@ public class TestBase
     protected HttpLowLevel connect(final String url) throws IOException
     {
         final Properties testProperties = new Properties();
-        testProperties.load(ClassLoader.getSystemResourceAsStream("TestConfig.properties"));
+        testProperties.load(getClass().getClassLoader().getResourceAsStream("TestConfig.properties"));
 
         final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(url == null ? testProperties.getProperty(URL_PROP) : url,
                                                                         testProperties.getProperty(USER_NAME_PROP),
