@@ -11,6 +11,6 @@ public class QueryTimeoutException extends SodaError
 {
     public QueryTimeoutException(@Nonnull final SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 408);
     }
 }

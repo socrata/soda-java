@@ -10,6 +10,6 @@ public class QueryTooComplexException extends SodaError
 
     public QueryTooComplexException(SodaErrorResponse errorDetail)
     {
-        super(errorDetail);
+        super(errorDetail, 403);
     }
 }

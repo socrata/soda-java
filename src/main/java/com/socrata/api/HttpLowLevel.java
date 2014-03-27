@@ -640,14 +640,14 @@ public final class HttpLowLevel
         }
 
         if (!response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null));
+            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null), response.getStatus());
         }
 
         SodaErrorResponse sodaErrorResponse;
         try {
             sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
         } catch (Exception e) {
-            throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null));
+            throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null), response.getStatus());
         }
 
         switch (response.getStatus()) {
@@ -670,7 +670,7 @@ public final class HttpLowLevel
             case 409:
                 throw new ConflictOperationException(sodaErrorResponse);
             default:
-                throw new SodaError(sodaErrorResponse);
+                throw new SodaError(sodaErrorResponse, response.getStatus());
         }
     }
 

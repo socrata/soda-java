@@ -10,14 +10,23 @@ public class SodaError extends Exception
 {
     public final SodaErrorResponse sodaErrorResponse;
     public       LongRunningRequest longRunningRequest;
+    public       int status = 500;
 
-    public SodaError(SodaErrorResponse sodaErrorResponse)
+
+
+    public SodaError(SodaErrorResponse sodaErrorResponse, int status)
     {
         super(sodaErrorResponse.message);
         this.sodaErrorResponse = sodaErrorResponse;
+        this.status = status;
     }
 
-    public SodaError(String error)
+    public SodaError(SodaErrorResponse sodaErrorResponse) {
+        this(sodaErrorResponse, 500);
+    }
+
+
+   public SodaError(String error)
     {
         super(error);
         this.sodaErrorResponse = new SodaErrorResponse("", error, "", null);
@@ -37,5 +46,13 @@ public class SodaError extends Exception
     public void setLongRunningRequest(LongRunningRequest longRunningRequest)
     {
         this.longRunningRequest = longRunningRequest;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

@@ -11,6 +11,6 @@ public class MalformedQueryError extends SodaError
 {
     public MalformedQueryError(@Nonnull final SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 400);
     }
 }

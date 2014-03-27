@@ -11,6 +11,6 @@ public class MustBeLoggedInException extends SodaError
 {
     public MustBeLoggedInException(@Nonnull final SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 403);
     }
 }

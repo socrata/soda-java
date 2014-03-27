@@ -9,6 +9,6 @@ public class ConflictOperationException extends SodaError {
 
     public ConflictOperationException(SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 409);
     }
 }

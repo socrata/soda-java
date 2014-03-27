@@ -16,6 +16,6 @@ public class MetadataUpdateError extends SodaError
 {
     public MetadataUpdateError(@Nonnull final SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 400);
     }
 }

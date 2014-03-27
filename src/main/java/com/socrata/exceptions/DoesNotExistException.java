@@ -10,6 +10,6 @@ public class DoesNotExistException extends SodaError
 
     public DoesNotExistException(SodaErrorResponse sodaErrorResponse)
     {
-        super(sodaErrorResponse);
+        super(sodaErrorResponse, 404);
     }
 }
