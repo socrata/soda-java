@@ -2,7 +2,7 @@ organization := "com.socrata"
 
 name := "soda-api-java"
 
-version := "0.9.11-SNAPSHOT"
+version := "0.9.11"
 
 javacOptions in compile ++= Seq("-g", "-Xlint:deprecation", "-Xlint:unchecked")
 
