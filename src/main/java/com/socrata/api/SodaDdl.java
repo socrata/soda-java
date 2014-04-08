@@ -111,7 +111,6 @@ public class SodaDdl extends SodaWorkflow
         }
     }
 
-
     /**
      * Creates an empty dataset, based on the dataset passed in.
      *
@@ -124,10 +123,29 @@ public class SodaDdl extends SodaWorkflow
      */
     public DatasetInfo createDataset(final DatasetInfo dataset) throws SodaError, InterruptedException
     {
+        return createDataset(dataset, false);
+    }
+
+    /**
+     * Creates an empty dataset, based on the dataset passed in.
+     *
+     * The new dataset will be unpublished.
+     *
+     * @param dataset dataset to create the new dataset on.  The ID should NOT be set.
+     * @param useNewBackend iff true create dataset on the New Backend
+     * @return the created dataset, the ID will be set on this.
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public DatasetInfo createDataset(final DatasetInfo dataset, final boolean useNewBackend) throws SodaError, InterruptedException
+    {
         SodaRequest requester = new SodaRequest<DatasetInfo>(null, dataset)
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
-            { return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload); }
+            {
+                httpLowLevel.setUseNewBackend(useNewBackend);
+                return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
+            }
         };
 
         try {
@@ -137,7 +155,6 @@ public class SodaDdl extends SodaWorkflow
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
         }
     }
-
 
     /**
      * Loads a dataset or view based on it's ID
