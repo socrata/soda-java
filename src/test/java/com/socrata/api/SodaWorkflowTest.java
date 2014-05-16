@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,7 +58,9 @@ public class SodaWorkflowTest  extends TestBase
             //
             //  Now create a working copy and make sure we can alter columns
             final Dataset workingCopy = (Dataset) importer.createWorkingCopy(dataset.getId());
-            final Column newColumn = new Column(null, "new_col", "new_col", "Description", "text", 3, null);
+            HashMap<String, String> format = new HashMap<>();
+            format.put("noCommas", "true");
+            final Column newColumn = new Column(null, "new_col", "new_col", "Description", "text", 3, null, format, "text");
             importer.addColumn(workingCopy.getId(), newColumn);
             importer.updateDatasetInfo(workingCopy);
             final DatasetInfo postPublish = importer.publish(workingCopy.getId());
@@ -218,9 +221,11 @@ public class SodaWorkflowTest  extends TestBase
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
+        HashMap<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 

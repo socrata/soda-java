@@ -48,10 +48,4 @@ public class UserInfoTest
         TestCase.assertNull(userInfo2.getDisplayName());
         TestCase.assertNull(userInfo2.getScreenName());
     }
-
-    @Test
-    public void testUser() {
-
-    }
-
 }

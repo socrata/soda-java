@@ -2,13 +2,16 @@ package com.socrata.model.importer;
 
 import com.google.common.base.Function;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonPropertyOrder(alphabetic=true)
 public class Column
 {
     private static final String[] RESERVED_FIELD_NAMES = { "_id", "_uuid", "_position", "_address" };
@@ -19,14 +22,16 @@ public class Column
     public static final Function<Column, Column>   COPY = new Function<Column, Column>()
     { @Override public Column apply(@Nullable Column input) { return (input != null) ? new Column(input) : null; } };
 
+    int position;
     Integer id;
+    Integer width;
     String name;
     String fieldName;
     String description;
     String dataTypeName;
+    String renderTypeName;
     List<Object> flags;
-    int position;
-    Integer width;
+    Map<String, String> format;
 
     public Column()
     {
@@ -43,6 +48,20 @@ public class Column
         this.width = width;
     }
 
+    public Column(Integer id, String name, String fieldName, String description, String dataTypeName, int position,
+                  Integer width, Map<String, String> format, String renderTypeName)
+    {
+        this.id = id;
+        this.name = name;
+        this.fieldName = fieldName;
+        this.description = description;
+        this.dataTypeName = dataTypeName;
+        this.position = position;
+        this.width = width;
+        this.format = format;
+        this.renderTypeName = renderTypeName;
+    }
+
     public Column(Column src)
     {
         this.id = src.id;
@@ -52,12 +71,11 @@ public class Column
         this.dataTypeName = src.dataTypeName;
         this.position = src.position;
         this.width = src.width;
+        this.format = src.format;
+        this.renderTypeName = src.renderTypeName;
     }
 
-    public Integer getId()
-    {
-        return id;
-    }
+    public Integer getId() { return id; }
 
     private void setId(Integer id)
     {
@@ -104,10 +122,14 @@ public class Column
         this.dataTypeName = dataTypeName;
     }
 
-    public int getPosition()
+    public String getRenderTypeName()
     {
-        return position;
+        return renderTypeName;
     }
+
+    public void setRenderTypeName(String renderTypeName) { this.renderTypeName = renderTypeName; }
+
+    public int getPosition() { return position; }
 
     public void setPosition(int position)
     {
@@ -124,13 +146,17 @@ public class Column
         this.width = width;
     }
 
-    public List<Object> getFlags()
+    public List<Object> getFlags() { return flags; }
+
+    public void setFlags(List<Object> flags) { this.flags = flags; }
+
+    public Map<String, String> getFormat()
     {
-        return flags;
+        return format;
     }
 
-    public void setFlags(List<Object> flags)
+    public void setFormat(Map<String, String> format)
     {
-        this.flags = flags;
+        this.format = format;
     }
 }

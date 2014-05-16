@@ -39,14 +39,17 @@ public class LocationTests extends TestBase
         final Soda2Producer producer = new Soda2Producer(connection);
         final Soda2Consumer consumer = new Soda2Consumer(connection);
 
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
+
         final Dataset view = new Dataset();
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Location", "Blue"));
         view.setColumns(Lists.newArrayList(
-                new Column(0, "uniqueId", "uniqueid", "A unique ID for this table", "Number", 0, 10),
-                new Column(0, "name", "name", "The name of this", "Text", 0, 10),
-                new Column(0, "location", "location", "A location", "Location", 0, 10)
+                new Column(0, "uniqueId", "uniqueid", "A unique ID for this table", "Number", 0, 10, format, "Number"),
+                new Column(0, "name", "name", "The name of this", "Text", 0, 10, format, "Text"),
+                new Column(0, "location", "location", "A location", "Location", 0, 10, format, "Location")
         ));
         view.setFlags(new ArrayList<String>());
 
@@ -84,19 +87,23 @@ public class LocationTests extends TestBase
         final Soda2Producer producer = new Soda2Producer(connection);
         final Soda2Consumer consumer = new Soda2Consumer(connection);
 
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
+
         final Dataset view = new Dataset();
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Location", "Blue"));
         view.setColumns(Lists.newArrayList(
-                new Column(0, "uniqueId", "uniqueid", "A unique ID for this table", "Number", 0, 10),
-                new Column(0, "name", "name", "The name of this", "Text", 0, 10)
+                new Column(0, "uniqueId", "uniqueid", "A unique ID for this table", "Number", 0, 10, format, "Number"),
+                new Column(0, "name", "name", "The name of this", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 
         final DatasetInfo createdView = importer.createDataset(view);
 
-        importer.addColumn(createdView.getId(), new Column(0, "location", "location", "A location", "Location", 0, 10));
+        importer.addColumn(createdView.getId(),
+                new Column(0, "location", "location", "A location", "Location", 0, 10, format, "Location"));
 
 
 

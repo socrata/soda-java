@@ -24,6 +24,7 @@ public class SodaDdlTest  extends TestBase
     public void testBasicColumnCrud() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
         final String name = "Name" + UUID.randomUUID();
+        final String formatDetail = "noCommas";
 
         final HttpLowLevel connection = connect();
         final SodaDdl importer = new SodaDdl(connection);
@@ -32,9 +33,12 @@ public class SodaDdlTest  extends TestBase
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
+
+        Map<String, String> format = new HashMap<>();
+        format.put(formatDetail, "true");
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 
@@ -45,7 +49,8 @@ public class SodaDdlTest  extends TestBase
 
         try {
 
-            final Column  newColumn1 = new Column(0, "newCol1 Name", "new_col_1", "newCol1 Description", "number", 3, 20);
+            final Column  newColumn1 = new Column(0, "newCol1 Name", "new_col_1", "newCol1 Description",
+                    "number", 3, 20, format, "Text");
 
             //Add a column
             final Column retVal1 = importer.addColumn(createdView.getId(), newColumn1);
@@ -54,6 +59,7 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn1.getFieldName(),    retVal1.getFieldName());
             TestCase.assertEquals(newColumn1.getDescription(),  retVal1.getDescription());
             TestCase.assertEquals(newColumn1.getDataTypeName(), retVal1.getDataTypeName());
+            TestCase.assertEquals(newColumn1.getFormat().get(formatDetail), retVal1.getFormat().get(formatDetail));
 
             final Dataset loadedDataset = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertEquals(3, loadedDataset.getColumns().size());
@@ -61,9 +67,12 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn1.getFieldName(),    loadedDataset.getColumns().get(2).getFieldName());
             TestCase.assertEquals(newColumn1.getDescription(),  loadedDataset.getColumns().get(2).getDescription());
             TestCase.assertEquals(newColumn1.getDataTypeName(), loadedDataset.getColumns().get(2).getDataTypeName());
+            TestCase.assertEquals(newColumn1.getFormat().get(formatDetail),
+                    loadedDataset.getColumns().get(2).getFormat().get(formatDetail));
 
             //Update the column
-            final Column  newColumn2 = new Column(retVal1.getId(), "newCol2 Name", "new_col_2", "newCol2 Description", "number", 3, 20);
+            final Column  newColumn2 = new Column(retVal1.getId(), "newCol2 Name", "new_col_2", "newCol2 Description",
+                    "number", 3, 20, format, "number");
 
             final Column retVal2 = importer.alterColumn(createdView.getId(), newColumn2);
             TestCase.assertNotNull(retVal2);
@@ -71,14 +80,17 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn2.getFieldName(),    retVal2.getFieldName());
             TestCase.assertEquals(newColumn2.getDescription(),  retVal2.getDescription());
             TestCase.assertEquals(newColumn2.getDataTypeName(), retVal2.getDataTypeName());
+            TestCase.assertEquals(newColumn2.getFormat().get(formatDetail), retVal2.getFormat().get(formatDetail));
 
-            final Column  newColumn3 = new Column(retVal2.getId(), "newCol2 Name", "new_col_2", "newCol2 Description", "number", 3, 20);
+            final Column  newColumn3 = new Column(retVal2.getId(), "newCol2 Name", "new_col_2", "newCol2 Description",
+                    "number", 3, 20, format, "number");
             final Column retVal3 = importer.alterColumn(createdView.getId(), newColumn2);
             TestCase.assertNotNull(retVal3);
             TestCase.assertEquals(newColumn3.getName(),         retVal3.getName());
             TestCase.assertEquals(newColumn3.getFieldName(),    retVal3.getFieldName());
             TestCase.assertEquals(newColumn3.getDescription(),  retVal3.getDescription());
             TestCase.assertEquals(newColumn3.getDataTypeName(), retVal3.getDataTypeName());
+            TestCase.assertEquals(newColumn3.getFormat().get(formatDetail), retVal3.getFormat().get(formatDetail));
 
             final Dataset loadedDataset2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertEquals(3, loadedDataset2.getColumns().size());
@@ -86,6 +98,8 @@ public class SodaDdlTest  extends TestBase
             TestCase.assertEquals(newColumn3.getFieldName(),    loadedDataset2.getColumns().get(2).getFieldName());
             TestCase.assertEquals(newColumn3.getDescription(),  loadedDataset2.getColumns().get(2).getDescription());
             TestCase.assertEquals(newColumn3.getDataTypeName(), loadedDataset2.getColumns().get(2).getDataTypeName());
+            TestCase.assertEquals(newColumn3.getFormat().get(formatDetail),
+                    loadedDataset2.getColumns().get(2).getFormat().get(formatDetail));
 
             importer.removeColumn(createdView.getId(), newColumn3.getId());
             final Dataset loadedDataset3 = (Dataset) importer.loadDatasetInfo(createdView.getId());
@@ -109,9 +123,11 @@ public class SodaDdlTest  extends TestBase
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 
@@ -195,9 +211,11 @@ public class SodaDdlTest  extends TestBase
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setResourceName(resourceName);
         view.setFlags(new ArrayList<String>());

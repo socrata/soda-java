@@ -238,14 +238,16 @@ public class SodaImporterTest extends TestBase
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
 
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
 
         final Dataset view = new Dataset();
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 
@@ -320,14 +322,16 @@ public class SodaImporterTest extends TestBase
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
 
+        Map<String, String> format = new HashMap<>();
+        format.put("noCommas", "true");
 
         final Dataset view = new Dataset();
         view.setName(name);
         view.setDescription("Hello Kitty");
         view.setTags(Lists.newArrayList("Red", "Blue"));
         view.setColumns(Lists.newArrayList(
-                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10),
-                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10)
+                new Column(0, "col1", "col1", "col1-desc", "Text", 0, 10, format, "Text"),
+                new Column(0, "col2", "col2", "col2-desc", "Text", 0, 10, format, "Text")
         ));
         view.setFlags(new ArrayList<String>());
 
