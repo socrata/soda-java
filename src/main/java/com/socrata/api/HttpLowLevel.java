@@ -602,16 +602,15 @@ public final class HttpLowLevel
      */
     private ClientResponse processErrors(final ClientResponse response) throws SodaError, LongRunningQueryException
     {
-
-        if (response.getStatus() == 200) {
+        int status = response.getStatus();
+        if (status == 200 || status == 201 || status == 204) {
             return response;
         }
 
         final ObjectMapper mapper = new ObjectMapper();
         final String body = response.getEntity(String.class);
 
-
-        if (response.getStatus() == 202) {
+        if (status == 202) {
             final String location = response.getHeaders().getFirst("Location");
             final String retryAfter = response.getHeaders().getFirst("Retry-After");
 
@@ -652,18 +651,22 @@ public final class HttpLowLevel
             throw new LongRunningQueryException(locationUri, parseRetryAfter(retryAfter), ticket);
         }
 
-        if (!response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null), response.getStatus());
+        if (response.getType() != null && !response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null), status);
         }
 
         SodaErrorResponse sodaErrorResponse;
-        try {
-            sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
-        } catch (Exception e) {
-            throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null), response.getStatus());
+        if(body.isEmpty()) {
+            sodaErrorResponse = new SodaErrorResponse(String.valueOf(status), null, null, null);
+        } else {
+            try {
+                sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
+            } catch (Exception e) {
+                throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null), status);
+            }
         }
 
-        switch (response.getStatus()) {
+        switch (status) {
             case 400:
                 if (sodaErrorResponse.message != null &&
                         sodaErrorResponse.message.startsWith("Row data was saved.")) {
@@ -683,7 +686,7 @@ public final class HttpLowLevel
             case 409:
                 throw new ConflictOperationException(sodaErrorResponse);
             default:
-                throw new SodaError(sodaErrorResponse, response.getStatus());
+                throw new SodaError(sodaErrorResponse, status);
         }
     }
 
