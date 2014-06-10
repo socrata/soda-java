@@ -8,7 +8,7 @@ organization := "com.socrata"
 
 name := "soda-api-java"
 
-version := "0.9.12"
+version := "0.9.13-SNAPSHOT"
 
 previousArtifact := Some("com.socrata" % "soda-api-java" % "0.9.11")
 
