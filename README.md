@@ -199,7 +199,7 @@ GeoDataset replacedDataset = (GeoDataset) importer.replaceViewFromShapefile(EXIS
 
 **Update dataset metadata**
 
-```
+```Java
 final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com",
                                                        "testuser@gmail.com",
                                                        "OpenData",
