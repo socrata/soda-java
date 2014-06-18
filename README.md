@@ -196,3 +196,29 @@ GeoDataset newDataset = (GeoDataset) importer.createViewFromShapefile(GEOSPATIAL
 // Replace an existing GeoSpatial (Mondara) dataset (EXISTING_DATASET_ID might be something like 'abcd-1234')
 GeoDataset replacedDataset = (GeoDataset) importer.replaceViewFromShapefile(EXISTING_DATASET_ID, NEW_GEOSPATIAL_FILE);
 ```
+
+**Update dataset metadata**
+
+```
+final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com",
+                                                       "testuser@gmail.com",
+                                                       "OpenData",
+                                                       "D8Atrg62F2j017ZTdkMpuZ9vY");
+// Load the dataset you wish to update metadata (EXISTING_DATASET_ID might be something like 'abcd-1234')
+// NOTE: requires creating a working copy of the dataset
+DatasetInfo loadedView = importer.createWorkingCopy(EXISTING_DATASET_ID);
+                                                       
+// To update primary metadata use these methods 
+loadedView.setName("New title");
+loadedView.setDescription("New description");
+// ...
+
+// To update custom metadata create a Metadata object with a map of Metadata fields to values you wish to update
+Map<String,Map<String,String>> customMetadataToUpdate = ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "DDDDDD"));
+Metadata metadata = new Metadata(customMetadataToUpdate, null, null, null, null);
+					
+// Actually perform the metadata update
+loadedView.setMetadata(metadata);
+importer.updateDatasetInfo(loadedView);
+importer.publish(loadedView.getId());
+```
