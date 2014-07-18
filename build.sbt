@@ -8,6 +8,7 @@ organization := "com.socrata"
 
 name := "soda-api-java"
 
+// remember to update the README when you change this to a new release
 version := "0.9.13-SNAPSHOT"
 
 previousArtifact := Some("com.socrata" % "soda-api-java" % "0.9.11")

@@ -27,6 +27,19 @@ use Jackson to do marshalling from the JSON to Java Objects.
 If you want to actually see any of these examples working.  You can take a look at the class `com.socrata.ExamplesTest`
 in the test directory, which has a working version of these examples.
 
+Getting the library
+-------------------
+
+soda-java is published to Maven Central.  The dependency is
+
+```xml
+<dependency>
+  <groupId>com.socrata</groupId>
+  <artifactId>soda-api-java</artifactId>
+  <version>0.9.12</version>
+</dependency>
+```
+
 Consumer
 --------
 
