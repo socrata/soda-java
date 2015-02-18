@@ -19,8 +19,8 @@ public class Dataset extends DatasetInfo
     public static final GenericType<List<Dataset>> LIST_TYPE = new GenericType<List<Dataset>>() {};
 
     private Integer rowIdentifierColumnId;
-    private List<String> flags = new ArrayList<String>();
-    private List<Column> columns = new ArrayList<Column>();
+    private final List<String> flags = new ArrayList<String>();
+    private final List<Column> columns = new ArrayList<Column>();
 
 
     public Dataset()
@@ -34,7 +34,7 @@ public class Dataset extends DatasetInfo
      */
     public List<Column> getColumns()
     {
-        return columns;
+        return new ArrayList<Column>(columns);
     }
 
     /**
@@ -43,7 +43,8 @@ public class Dataset extends DatasetInfo
      */
     public void setColumns(final List<Column> columns)
     {
-        this.columns = columns;
+        this.columns.clear();
+        this.columns.addAll(columns);
     }
 
     /**
@@ -53,7 +54,7 @@ public class Dataset extends DatasetInfo
      */
     public List<String> getFlags()
     {
-        return flags;
+        return new ArrayList<String>(flags);
     }
 
     /**
@@ -64,9 +65,9 @@ public class Dataset extends DatasetInfo
      */
     public void setFlags(List<String> flags)
     {
-        this.flags = flags;
+        this.flags.clear();
+        this.flags.addAll(flags);
     }
-
 
     /**
      * Looks up a column by it's name and uses that to setup the row identifier column.
@@ -76,14 +77,14 @@ public class Dataset extends DatasetInfo
     public void setupRowIdentifierColumnByName(final String columnName) {
 
         if (columnName != null) {
-            for (Column column : getColumns()) {
+            for (Column column : columns) {
                 if (columnName.equals(column.getName())) {
                     setupRowIdentifierColumn(column);
                     return;
                 }
             }
 
-            final String columnNames = StringUtils.join(Collections2.transform(getColumns(), Column.TO_NAME), ",");
+            final String columnNames = StringUtils.join(Collections2.transform(columns, Column.TO_NAME), ",");
             throw new IllegalArgumentException("No column named " + columnName + " exists for this dataset.  " +
                                                        "Current column names are: " + columnNames);
 
@@ -139,7 +140,7 @@ public class Dataset extends DatasetInfo
      */
     public Column lookupRowIdentifierColumn() {
         if (getRowIdentifierColumnId() != null) {
-            for (Column curr : getColumns()) {
+            for (Column curr : columns) {
                 if (getRowIdentifierColumnId().equals(curr.getId())) {
                     return curr;
                 }
@@ -159,6 +160,4 @@ public class Dataset extends DatasetInfo
     {
         this.rowIdentifierColumnId = rowIdentifierColumnId;
     }
-
-
 }
