@@ -15,7 +15,7 @@ import java.util.List;
 public class DatasetBuilder extends AbstractDatasetInfoBuilder<DatasetBuilder, Dataset>
 {
 
-    private List<Column>        columns = new ArrayList<Column>();
+    private final List<Column>  columns = new ArrayList<Column>();
 
     public DatasetBuilder()
     {
@@ -29,61 +29,49 @@ public class DatasetBuilder extends AbstractDatasetInfoBuilder<DatasetBuilder, D
             List<Column>  translatedColumns = Lists.newArrayList(Collections2.transform(columns, Column.COPY));
             setColumns(translatedColumns);
         }
-
     }
 
     public DatasetBuilder setColumns(List<Column> columns)
     {
-        this.columns = columns;
+        this.columns.clear();
+        this.columns.addAll(columns);
         return this;
     }
 
     public DatasetBuilder addColumn(Column column)
     {
-        if (columns == null) {
-            columns = Lists.newArrayList();
-        }
         columns.add(column);
         return this;
     }
 
     public DatasetBuilder removeColumn(String columnName)
     {
-        if (columns != null) {
-
-            for (Column column : columns) {
-                if (columnName.equals(column.getName())) {
-                    columns.remove(column);
-                    break;
-                }
+        for (Column column : columns) {
+            if (columnName.equals(column.getName())) {
+                columns.remove(column);
+                break;
             }
         }
-
         return this;
     }
 
     public DatasetBuilder updateColumn(String columnName, Column columnToUpdateTo)
     {
-        if (columns != null) {
-
-            int i=0;
-            for (Column column : columns) {
-                if (columnName.equals(column.getName())) {
-                    columns.set(i, columnToUpdateTo);
-                    break;
-                }
-                i++;
+        int i=0;
+        for (Column column : columns) {
+            if (columnName.equals(column.getName())) {
+                columns.set(i, columnToUpdateTo);
+                break;
             }
+            i++;
         }
-
         return this;
     }
 
     public Dataset build() {
         final Dataset retVal = new Dataset();
         populate(retVal);
-        retVal.setColumns(columns);
+        retVal.setColumns(new ArrayList<Column>(columns));
         return retVal;
     }
-
 }
