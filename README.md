@@ -40,6 +40,11 @@ soda-java is published to Maven Central.  The dependency is
 </dependency>
 ```
 
+Precompiled JARs
+================
+
+Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.
+
 Consumer
 --------
 
