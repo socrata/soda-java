@@ -1,3 +1,3 @@
-addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
+addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.3")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.3")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.7")
