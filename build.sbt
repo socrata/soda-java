@@ -4,6 +4,8 @@ import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 mimaDefaultSettings
 
+scalaVersion := "2.10.5"
+
 organization := "com.socrata"
 
 name := "soda-api-java"

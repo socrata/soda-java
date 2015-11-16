@@ -264,7 +264,7 @@ public class SodaImporterTest extends TestBase
 
         //Set license
         loadView.setLicenseId("CC_30_BY_NC");
-        loadView.setLicense(new License("Creative Commons Attribution-Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"));
+        loadView.setLicense(new License("Creative Commons Attribution | Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"));
         loadView.setAttribution("Socrata Test");
         loadView.setAttributionLink("https://www.socrata.com");
 
@@ -451,7 +451,7 @@ public class SodaImporterTest extends TestBase
             final NonDataFileDatasetBuilder nonDataFileDatasetBuilder = new NonDataFileDatasetBuilder(fileDatasetLoaded)
                     .addTag("TestFile")
                     .setLicenseId("CC_30_BY_NC")
-                    .setLicense(new License("Creative Commons Attribution-Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
+                    .setLicense(new License("Creative Commons Attribution | Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
                     .setAttribution("Socrata Test")
                     .setAttributionLink("https://www.socrata.com");
 
@@ -518,7 +518,7 @@ public class SodaImporterTest extends TestBase
             final ExternalDatasetBuilder externalDatasetBuilder = new ExternalDatasetBuilder(fileDatasetLoaded)
                     .addTag("TestFile")
                     .setLicenseId("CC_30_BY_NC")
-                    .setLicense(new License("Creative Commons Attribution-Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
+                    .setLicense(new License("Creative Commons Attribution | Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"))
                     .setAttribution("Socrata Test")
                     .setAttributionLink("https://www.socrata.com");
 
