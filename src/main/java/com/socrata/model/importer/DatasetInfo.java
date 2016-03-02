@@ -37,6 +37,7 @@ public class DatasetInfo
 
     private String              resourceName;
     private String              viewType;
+    private String              displayType;
     private String              attribution;
     private String              attributionLink;
     private String              category;
@@ -155,6 +156,24 @@ public class DatasetInfo
     public void setViewType(String viewType)
     {
         this.viewType = viewType;
+    }
+
+    /**
+     * describes the display type of the object.
+     *
+     * @return the display type
+     */
+    public String getDisplayType() {
+        return displayType;
+    }
+
+    /**
+     * Sets the display type of the object.
+     *
+     * @param displayType the display type
+     */
+    public void setDisplayType(String displayType) {
+        this.displayType = displayType;
     }
 
     /**

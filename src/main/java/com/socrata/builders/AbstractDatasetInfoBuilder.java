@@ -18,6 +18,7 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
 
     protected String              resourceName;
     protected String              viewType;
+    protected String              displayType;
     protected String              attribution;
     protected String              attributionLink;
     protected String              category;
@@ -77,6 +78,12 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
     public BUILDER setViewType(String viewType)
     {
         this.viewType = viewType;
+        return (BUILDER) this;
+    }
+
+    public BUILDER setDisplayType(String displayType)
+    {
+        this.displayType = displayType;
         return (BUILDER) this;
     }
 
@@ -190,6 +197,7 @@ abstract public class AbstractDatasetInfoBuilder<BUILDER extends AbstractDataset
         retVal.setAttributionLink(attributionLink);
         retVal.setCategory(category);
         retVal.setDescription(description);
+        retVal.setDisplayType(displayType);
         retVal.setExternalId(externalId);
         retVal.setId(id);
         retVal.setLicense(license);
