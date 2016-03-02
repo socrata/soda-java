@@ -7,7 +7,7 @@ a deeper discussion of the underlying protocol or the javadoc for better documen
 The API is broken into several logical parts:
 
 * The **Producer** api provides functions to add/update/delete objects for datasets that are updated frequently, or for updates
-that are small.  The advantage of this api is that the changes do NOT requre a working copy or to use the publishing cycle
+that are small.  The advantage of this api is that the changes do NOT require a working copy or to use the publishing cycle
 at all, so there is no overhead of copying the dataset data around.
 * The **Consumer** api provides a rich, simple query language called SoQL.  SoQL is based off of SQL, and the Consumer
 api provides methods to build, execute and consume the results for these queries.
