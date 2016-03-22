@@ -212,6 +212,29 @@ public class SodaWorkflowTest  extends TestBase
         }
     }
 
+    @Test
+    public void testAsyncPublish() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    {
+        final String name = "Name" + UUID.randomUUID();
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+
+        final Dataset view = new Dataset();
+        view.setName(name);
+        view.setColumns(new ArrayList<Column>());
+        view.setFlags(new ArrayList<String>());
+
+        final Dataset createdView = (Dataset) importer.createDataset(view);
+        TestCase.assertEquals("unpublished", createdView.getPublicationStage());
+
+        importer.publish(createdView.getId(), true);
+
+        final Dataset updatedView = (Dataset) importer.updateDatasetInfo(createdView);
+        TestCase.assertEquals("published", updatedView.getPublicationStage());
+    }
+
+
     Dataset createPrivateDataset(final SodaImporter importer) throws SodaError, InterruptedException, IOException
     {
         final String name = "Name" + UUID.randomUUID();

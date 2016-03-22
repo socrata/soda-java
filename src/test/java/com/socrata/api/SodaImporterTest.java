@@ -730,4 +730,44 @@ public class SodaImporterTest extends TestBase
         }
     }
 
+    @Test
+    public void testAsyncImports() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    {
+        final String name = "Name" + UUID.randomUUID();
+
+        final HttpLowLevel connection = connect();
+        final SodaImporter importer = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
+
+        final Dataset view = new Dataset();
+        view.setName(name);
+        view.setColumns(new ArrayList<Column>());
+        view.setFlags(new ArrayList<String>());
+
+        ScanResults scanResults = importer.scan(BABY_NAMES_LOC_3);
+
+        final Blueprint blueprint = new BlueprintBuilder()
+                .setName(name)
+                .setDescription("Test async imports")
+                .setSkip(1)
+                .addColumn(new BlueprintColumn("first_name", "First Name", "Text"))
+                .addColumn(new BlueprintColumn("county",    "County",       "Text"))
+                .build();
+
+
+        final String[] translation = new String[] {"col1", "col2"};
+        DatasetInfo dataset = importer.importScanResults(blueprint, translation, BABY_NAMES_LOC_3, scanResults, true);
+
+        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(results.size(), 4);
+
+        importer.append(dataset.getId(), BABY_NAMES_LOC_3, 1, translation, true);
+        results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(results.size(), 8);
+
+        importer.replace(dataset.getId(), NOMINATIONS_CSV, 1, translation, true);
+        results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+        TestCase.assertEquals(results.size(), 2);
+    }
+
 }

@@ -210,7 +210,7 @@ public class SodaImporter extends SodaDdl
      */
     public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
-       return importScanResults(name, description, file, scanResults, null);
+       return importScanResults(name, description, file, scanResults, null, false);
     }
 
 
@@ -222,9 +222,30 @@ public class SodaImporter extends SodaDdl
      * @param description description of the datset
      * @param file file that was scanned
      * @param scanResults results of the scan
+     * @param rowIdentifierColumnName api field name of the row identifier column
      * @return The default View object for the dataset that was just created.
      */
     public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName) throws SodaError, InterruptedException, IOException
+    {
+        return importScanResults(name, description, file, scanResults, rowIdentifierColumnName, false);
+    }
+
+    /**
+     * Imports the results of scanning a file.  This will build  a default blueprint from it, assuming the first rows are
+     * column names.
+     *
+     * @param name name of the dataset to create
+     * @param description description of the datset
+     * @param file file that was scanned
+     * @param scanResults results of the scan
+     * @param rowIdentifierColumnName api field name of the row identifier column
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
+     * @return The default View object for the dataset that was just created.
+     */
+    public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName, final boolean async) throws SodaError, InterruptedException, IOException
     {
         final Blueprint blueprint = new BlueprintBuilder(scanResults)
                                         .setSkip(1)
@@ -232,7 +253,7 @@ public class SodaImporter extends SodaDdl
                                         .setDescription(description)
                                         .build();
 
-        DatasetInfo createdDatasetInfo = importScanResults(blueprint, null, file, scanResults);
+        DatasetInfo createdDatasetInfo = importScanResults(blueprint, null, file, scanResults, async);
 
         if (rowIdentifierColumnName != null) {
 
@@ -261,10 +282,29 @@ public class SodaImporter extends SodaDdl
      */
     public DatasetInfo importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults) throws SodaError, InterruptedException, IOException
     {
+        return importScanResults(blueprint, translation, file, scanResults, false);
+    }
+
+    /**
+     * Imports the results of scanning a file.  This method does not assume anything about the CSV, but instead has
+     * the caller provide the blueprint and the translation for any schema defintion or data transforms.
+     *
+     * @param blueprint
+     * @param translation
+     * @param file file that was scanned
+     * @param scanResults results of the scan
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
+     * @return The default View object for the dataset that was just created.
+     */
+    public DatasetInfo importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults, final boolean async) throws SodaError, InterruptedException, IOException
+    {
         final String blueprintString = mapper.writeValueAsString(blueprint);
 
         final String blueprintBody = "blueprint="+URLEncoder.encode(blueprintString, "UTF-8");
-        return sendScanResults(blueprintBody, scanResults.getFileId(), translation, file);
+        return sendScanResults(blueprintBody, scanResults.getFileId(), translation, file, async);
     }
 
     /**
@@ -319,9 +359,39 @@ public class SodaImporter extends SodaDdl
      */
     public DatasetInfo append(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
     {
+        return append(datasetId, file, skip, translation, false);
+    }
+
+    /**
+     * This appends the contents of a file to a dataset on Socrata.  This operation requires the dataset is
+     * in a working copy, so unless you are doing large updates or your dataset is small, using the UPSERT functionality
+     * in Soda2Producer may give you better results.
+     *
+     * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
+     *
+     * In the case of errors, if the error is an MetadataUpdateError, then the data has all been committed, but there was a problem with
+     * the meta-data.  In the case of any other errors, the dataset is in an unknown state.  The only way to get it back into a clean
+     * state is to remove the working copy, and start again.  The Soda2Producer API has better error semantics where all rows will be
+     * either committed or rolledback.
+     *
+     *
+     * @param datasetId  id of the dataset to append to
+     * @param file file with the data in it
+     * @param skip number of rows in the data to skip (normally for skipping headers)
+     * @param translation an optional translation array for translating from values in the file and values in the dataset.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
+     * @return The info of the dataset after the append operation.
+     * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
+     * of a metadata inconsistency.  In this case, the data has already been committed.
+     */
+    public DatasetInfo append(String datasetId, File file, int skip, final String[] translation, final boolean async) throws SodaError, InterruptedException, IOException
+    {
 
         final ScanResults results = scan(file);
-        return updateFromScanResults(datasetId, "append", skip, results.getFileId(), translation, file);
+        return updateFromScanResults(datasetId, "append", skip, results.getFileId(), translation, file, async);
     }
 
     /**
@@ -346,11 +416,40 @@ public class SodaImporter extends SodaDdl
      */
     public DatasetInfo replace(String datasetId, File file, int skip, final String[] translation) throws SodaError, InterruptedException, IOException
     {
-        final ScanResults results = scan(file);
-        return updateFromScanResults(datasetId, "replace", skip, results.getFileId(), translation, file);
+        return replace(datasetId, file, skip, translation, false);
     }
 
-    protected DatasetInfo updateFromScanResults(final String datasetId, final String method, final int skip, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    /**
+     * This replaces the contents of a file to a dataset on Socrata.  This operation requires the dataset is
+     * in a working copy, which is an expensive operation.  If your dataset is large, you may want to figure out
+     * how to figure out which rows to update, rather than doing a full replace for updates.
+     *
+     * If you are doing frequent updates, the apis in Soda2Producer may give better results (since they don't require working copies)
+     *
+     * In the case of errors, if the error is an MetadataUpdateError, then the data has all been committed, but there was a problem with
+     * the meta-data.  In the case of any other errors, the dataset is in an unknown state.  The only way to get it back into a clean
+     * state is to remove the working copy, and start again.  The Soda2Producer API has better error semantics where all rows will be
+     * either committed or rolledback.
+     *
+     * @param datasetId  id of the dataset to append to
+     * @param file file with the data in it
+     * @param skip number of rows in the data to skip (normally for skipping headers)
+     * @param translation an optional translation array for translating from values in the file and values in the dataset.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
+     * @return The info of the dataset after the append operation.
+     * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
+     * of a metadata inconsistency.  In this case, the data has already been committed.
+     */
+    public DatasetInfo replace(String datasetId, File file, int skip, final String[] translation, final boolean async) throws SodaError, InterruptedException, IOException
+    {
+        final ScanResults results = scan(file);
+        return updateFromScanResults(datasetId, "replace", skip, results.getFileId(), translation, file, async);
+    }
+
+    protected DatasetInfo updateFromScanResults(final String datasetId, final String method, final int skip, final String fileId, final String[] translation, final File file, final boolean async) throws SodaError, InterruptedException, IOException
     {
 
 
@@ -360,11 +459,11 @@ public class SodaImporter extends SodaDdl
                   .append("&skip=").append(skip);
 
 
-        return sendScanResults(updateBody.toString(), fileId, translation, file);
+        return sendScanResults(updateBody.toString(), fileId, translation, file, async);
 
     }
 
-    protected DatasetInfo sendScanResults(final String basePostBody, final String fileId, final String[] translation, final File file) throws SodaError, InterruptedException, IOException
+    protected DatasetInfo sendScanResults(final String basePostBody, final String fileId, final String[] translation, final File file, final boolean async) throws SodaError, InterruptedException, IOException
     {
 
         final StringBuilder postbodyBuilder = new StringBuilder(basePostBody);
@@ -373,7 +472,8 @@ public class SodaImporter extends SodaDdl
 
         postbodyBuilder.append("&fileId=").append(fileId)
                        .append("&translation=").append(URLEncoder.encode(translationString, "UTF-8"))
-                       .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"));
+                       .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"))
+                       .append("&async=").append(URLEncoder.encode(Boolean.toString(async), "UTF-8"));
 
         SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())
         {
