@@ -239,7 +239,10 @@ public class SodaImporter extends SodaDdl
      * @param file file that was scanned
      * @param scanResults results of the scan
      * @param rowIdentifierColumnName api field name of the row identifier column
-     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
      * @return The default View object for the dataset that was just created.
      */
     public DatasetInfo importScanResults(final String name, final String description, final File file, final ScanResults scanResults, @Nullable final String rowIdentifierColumnName, final boolean async) throws SodaError, InterruptedException, IOException
@@ -290,7 +293,10 @@ public class SodaImporter extends SodaDdl
      * @param translation
      * @param file file that was scanned
      * @param scanResults results of the scan
-     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
      * @return The default View object for the dataset that was just created.
      */
     public DatasetInfo importScanResults(final Blueprint blueprint, final String[] translation, final File file, final ScanResults scanResults, final boolean async) throws SodaError, InterruptedException, IOException
@@ -373,7 +379,10 @@ public class SodaImporter extends SodaDdl
      * @param file file with the data in it
      * @param skip number of rows in the data to skip (normally for skipping headers)
      * @param translation an optional translation array for translating from values in the file and values in the dataset.
-     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
      * @return The info of the dataset after the append operation.
      * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
      * of a metadata inconsistency.  In this case, the data has already been committed.
@@ -426,7 +435,10 @@ public class SodaImporter extends SodaDdl
      * @param file file with the data in it
      * @param skip number of rows in the data to skip (normally for skipping headers)
      * @param translation an optional translation array for translating from values in the file and values in the dataset.
-     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
      * @return The info of the dataset after the append operation.
      * @throws com.socrata.exceptions.MetadataUpdateError thrown if the data was updated, but the process failed because
      * of a metadata inconsistency.  In this case, the data has already been committed.

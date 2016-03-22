@@ -103,7 +103,10 @@ public class SodaWorkflow
      * Publishes a dataset.
      *
      * @param datasetId id of the dataset to publish.
-     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't
+     *              like long-lived connections. this method call remains synchronous, and will block until the process
+     *              returns. leaving off this parameter or setting false will revert the API to automatic determination
+     *              of which response type to use.
      * @return the view of the published dataset.
      *
      * @throws com.socrata.exceptions.SodaError
@@ -125,6 +128,7 @@ public class SodaWorkflow
                                                      .path("publication")
                                                      .build();
 
+                // TODO: use StringBuilder and URIEncoder. would throw IOException, so change when API breaks.
                 final String querystring = "viewId=" + resourceId + "&async=" + Boolean.toString(async);
                 return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, querystring);
             }
