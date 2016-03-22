@@ -96,6 +96,22 @@ public class SodaWorkflow
      */
     public DatasetInfo publish(final String datasetId) throws SodaError, InterruptedException
     {
+        return publish(datasetId, false);
+    }
+
+    /**
+     * Publishes a dataset.
+     *
+     * @param datasetId id of the dataset to publish.
+     * @param async whether to force use of the ticketed/202 API response path. this can help with networks that don't like long-lived connections. defaults false.
+     * @return the view of the published dataset.
+     *
+     * @throws com.socrata.exceptions.SodaError
+     * @throws InterruptedException
+     * @throws com.socrata.exceptions.LongRunningQueryException
+     */
+    public DatasetInfo publish(final String datasetId, final boolean async) throws SodaError, InterruptedException
+    {
 
 
         waitForPendingGeocoding(datasetId);
@@ -109,8 +125,8 @@ public class SodaWorkflow
                                                      .path("publication")
                                                      .build();
 
-
-                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, "viewId=" + resourceId);
+                final String querystring = "viewId=" + resourceId + "&async=" + Boolean.toString(async);
+                return httpLowLevel.postRaw(publicationUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, querystring);
             }
         };
 
