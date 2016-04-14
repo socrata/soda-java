@@ -136,7 +136,7 @@ public class SodaDdlTest  extends TestBase
         TestCase.assertNotNull(createdView.getId());
         TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
-        final Metadata metadata = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "DDDDDD")), null, null, null, null);
+        final Metadata metadata = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "DDDDDD")), null, null, null, null, null);
         final Dataset loadedView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         loadedView.setMetadata(metadata);
         importer.updateDatasetInfo(loadedView);
@@ -148,7 +148,7 @@ public class SodaDdlTest  extends TestBase
 
         final DatasetInfo loadedView3 = new DatasetInfo();
         loadedView3.setId(loadedView2.getId());
-        final Metadata metadata2 = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "FFFFF")), null, null, null, null);
+        final Metadata metadata2 = new Metadata(ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "FFFFF")), null, null, null, null, null);
         loadedView3.setMetadata(metadata2);
         DatasetInfo loadedDataset = importer.updateDatasetInfo(loadedView3);
         TestCase.assertEquals("FFFFF", loadedDataset.getMetadata().getCustom_fields().get("Dataset Summary").get("Organization"));

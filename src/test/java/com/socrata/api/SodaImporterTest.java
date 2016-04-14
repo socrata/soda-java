@@ -270,7 +270,7 @@ public class SodaImporterTest extends TestBase
 
         //Set Metadata
         loadView.setMetadata(new Metadata(ImmutableMap.<String, Map<String, String>>of("geostuff", ImmutableMap.<String, String>of("stuff", "bax")),
-                                                                          "col1", null, null, null));
+                                                                          "col1", null, null, null, null));
         loadView.setRowIdentifierColumnId(loadView.getColumns().get(0).getId());
 
         loadView.setCategory("Fun");
@@ -356,7 +356,7 @@ public class SodaImporterTest extends TestBase
 
         //
         //  Test using assets for attachement
-        final Metadata    metadata = new Metadata(null, null, null, null, Lists.newArrayList(new Attachment(response.getId(), response.getNameForOutput(), response.getNameForOutput())));
+        final Metadata    metadata = new Metadata(null, null, null, null, null, Lists.newArrayList(new Attachment(response.getId(), response.getNameForOutput(), response.getNameForOutput())));
         final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
         loadView.setMetadata(metadata);
         importer.updateDatasetInfo(loadView);

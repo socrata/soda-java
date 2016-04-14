@@ -23,6 +23,7 @@ public class Metadata
     Map<String, Map<String, String>>    custom_fields;
     List<String>                        warnings;
     String                              rowIdentifier;
+    String                              rowLabel;
     String                              rdfSubject;
     String                              rdfClass;
     List<Attachment>                    attachments;
@@ -69,10 +70,11 @@ public class Metadata
     {
     }
 
-    public Metadata(Map<String, Map<String, String>> custom_metadata, String rowIdentifier, String rdfSubject, String rdfClass, List<Attachment> attachments)
+    public Metadata(Map<String, Map<String, String>> custom_metadata, String rowIdentifier, String rowLabel, String rdfSubject, String rdfClass, List<Attachment> attachments)
     {
         this.custom_fields = custom_metadata;
         this.rowIdentifier = rowIdentifier;
+        this.rowLabel = rowLabel;
         this.rdfSubject = rdfSubject;
         this.rdfClass = rdfClass;
         this.attachments = attachments;
@@ -111,6 +113,16 @@ public class Metadata
     public void setRowIdentifier(String rowIdentifier)
     {
         this.rowIdentifier = rowIdentifier;
+    }
+
+    public String getRowLabel()
+    {
+        return rowLabel;
+    }
+
+    public void setRowLabel(String rowLabel)
+    {
+        this.rowLabel = rowLabel;
     }
 
     public String getRdfSubject()
