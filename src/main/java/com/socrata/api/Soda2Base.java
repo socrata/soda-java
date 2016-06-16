@@ -10,9 +10,11 @@ import com.sun.jersey.api.client.GenericType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 
@@ -120,7 +122,14 @@ public class Soda2Base
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
-        return httpLowLevel.deleteRaw(builder.build());
+        InputStream inputStream = new ByteArrayInputStream("[]".getBytes(StandardCharsets.UTF_8));
+        try {
+            return httpLowLevel.putRaw(builder.build(), MediaType.APPLICATION_JSON_TYPE, httpLowLevel.getContentEncodingForUpserts(), inputStream);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException ex) { /* ByteArrayInputStream does nothing and should never throw IOException */ }
+        }
     }
 
     /**
