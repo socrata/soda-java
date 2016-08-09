@@ -54,19 +54,17 @@ The consumer API is simple.  The following example will issue two requests, one 
 as the JSON string.  The other will return the results as the `Nomination` java objects:
 
 ```Java
-Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com",
-                                                    "testuser@gmail.com",
-                                                    "OpenData",
-                                                    "D8Atrg62F2j017ZTdkMpuZ9vY");
+Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com");
 
-//To get a raw String of the results
-ClientResponse response = consumer.getHttpLowLevel().query("nominationsCopy",
-                                                           HttpLowLevel.JSON_TYPE,
-                                                           SoqlQuery.SELECT_ALL);
+// To get a raw String of the results
+ClientResponse response = consumer.query("nominationsCopy",
+                                         HttpLowLevel.JSON_TYPE,
+                                         SoqlQuery.SELECT_ALL);
+
 String payload = response.getEntity(String.class);
 System.out.println(payload);
 
-//Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
+// Get get this automatcally serialized into a set of Java Beans annotated with Jackson JSON annotations
 List<Nomination> nominations = consumer.query("nominationsCopy",
                                               SoqlQuery.SELECT_ALL,
                                               Nomination.LIST_TYPE);
