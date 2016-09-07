@@ -1,6 +1,3 @@
-soda-java
-=========
-
 This is the Java API for the Socrata Open Data API (SODA).  You can look at the developer site (http://dev.socrata.com/) for
 a deeper discussion of the underlying protocol or the javadoc for better documentation for this library (http://socrata.github.io/soda-java/apidocs/) .
 
@@ -27,8 +24,7 @@ use Jackson to do marshalling from the JSON to Java Objects.
 If you want to actually see any of these examples working.  You can take a look at the class `com.socrata.ExamplesTest`
 in the test directory, which has a working version of these examples.
 
-Getting the library
--------------------
+## Getting the library
 
 soda-java is published to Maven Central.  The dependency is
 
@@ -40,20 +36,20 @@ soda-java is published to Maven Central.  The dependency is
 </dependency>
 ```
 
-Precompiled JARs
-================
+### Precompiled JARs
 
 Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.
 
-Consumer
---------
+# Examples 
 
-**Simple Query**
+## Consumer
+
+### Simple Query
 
 The consumer API is simple.  The following example will issue two requests, one will return the results from the "test-data" dataset,
 as the JSON string.  The other will return the results as the `Nomination` java objects:
 
-```Java
+```java
 Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com");
 
 // To get a raw String of the results
@@ -72,12 +68,14 @@ TestCase.assertTrue(nominations.size() > 0);
 System.out.println(nominations.size());
 ```
 
-**Building Queries**
+For an example of how to create a Jackson Java class for your dataset, see [`Nomination.json`](https://github.com/socrata/soda-java/blob/master/src/test/java/test/model/Nomination.java)
+
+### Building Queries
 
 Along with the consumer API, is a builder class to make it easier to build the SoQL queries.  For example, to query for the name, position and nomination date of
 nominees for the Department of State, sorted by position:
 
-```Java
+```java
 //Create a SoQL query to find the nominations for the Department of State
 SoqlQuery   departmentOfStateQuery = new SoqlQueryBuilder()
         .addSelectPhrase("name")
@@ -89,15 +87,56 @@ SoqlQuery   departmentOfStateQuery = new SoqlQueryBuilder()
 nominations = consumer.query("nominationsCopy", departmentOfStateQuery, Nomination.LIST_TYPE);
 ```
 
-Producer
---------
+### Counting Records
+
+To count the records in a dataset, you'll first need to create a `Count` class to capture the results, and then use `SELECT COUNT(*)` to query the dataset for its count.
+
+```java
+import com.socrata.api.Soda2Consumer;
+import com.socrata.exceptions.LongRunningQueryException;
+import com.socrata.exceptions.SodaError;
+import com.sun.jersey.api.client.GenericType;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+class Count {
+    public static final GenericType<List<Count>> LIST_TYPE = new GenericType<List<Count>>() {};
+    private final Integer count;
+
+    @JsonCreator
+    public Count(@JsonProperty("count") Integer count) {
+        this.count = count;
+    }
+
+    public Integer getCount() {
+        return this.count;
+    }
+}
+
+public class example {
+    public static void main(String [] args) throws LongRunningQueryException, SodaError, InterruptedException {
+        Soda2Consumer consumer = Soda2Consumer.newConsumer("https://soda.demo.socrata.com");
+
+        List<Count> response = consumer.query("6yvf-kk3n", "SELECT COUNT(*)", Count.LIST_TYPE);
+        System.out.println(response.get(0).getCount() + " rows!");
+    }
+}
+```
+
+Your query can include a [full SoQL query](https://dev.socrata.com/docs/queries/query.html), so you can also filter the results before counting. For example: `SELECT COUNT(*) WHERE magnitude > 4.0`.
+
+## Producer
 
 A "Producer" is an object that allows us to actually add, remove or modify rows in Socrata.  To do these operations, you
 simply need to get an instance of a `Soda2Producer`.  This is similar to the earlier `Soda2Consumer` class with the
 addition CUD operations.
 
 
-**Upserting CSV files**
+### Upserting CSV files
 
 SODA2 makes it extremely easy to update a dataset from a CSV or JSON file through an operation called `upsert`.  Upsert allows you to
  to insert, update and delete in a single operation.  It determines what operation to execute based on whether the object is already
@@ -127,7 +166,7 @@ adding rows, you don't need to have the column at all.
 
 The code to actually upload a CSV is simple:
 
-```Java
+```java
 Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com",
                                                    "testuser@gmail.com",
                                                    "OpenData",
@@ -137,7 +176,7 @@ UpsertResult upsertResult = producer.upsertCsv("fakeCrimes", "/fake_crimes.csv")
 
 The code to create a new dataset from a CSV is also simple (if you want to use the default datatype Socrata chooses)
 
-```Java
+```java
 //Create the dataset from the CSV and set the RowColumnIdentifier to "crime_id"
 final DatasetInfo     fakeCrimesDataset = importer.createViewFromCsv("fakeCrimes",
                                                                      "This is a test dataset",
@@ -146,13 +185,12 @@ final DatasetInfo     fakeCrimesDataset = importer.createViewFromCsv("fakeCrimes
 importer.publish(fakeCrimesDataset.getId());
 ```
 
-
-**CRUD on Objects**
+### CRUD on Objects
 
 SODA2 also provides mechanisms for creating, updating or deleting individual rows.  In this example, we will add, update and then
 delete Nomninations for a dataset that has test White House Appointee Nominations in it.
 
-```Java
+```java
 final Nomination NOMINATION_TO_ADD = new Nomination(
         "New, User", "Imaginary Friend", "Department of Imagination",
         null, new Date(), null, null, null
@@ -181,11 +219,11 @@ Meta nominationUpdatedMeta = producer.update("testupdate", nominationAddedMeta.g
 producer.delete("testupdate", nominationUpdatedMeta.getId());
 ```
 
-**Upsert based on a stream**
+### Upsert based on a stream
 
 The library also allows callers to upsert based on a CSV file or stream.
 
-```Java
+```java
 Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com",
                                                    "testuser@gmail.com",
                                                    "OpenData",
@@ -195,12 +233,12 @@ InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv")
 UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
 ```
 
-**Import or Replace GeoSpatial Files**
+### Import or Replace GeoSpatial Files
 
 You can importing GeoSpatial data files as new Mondara datasets or replace GeoSpatial files of existing Mondara
 datasets. Supported formats are .kml, .kmz, and .zip (ESRI Shapefile).
 
-```Java
+```java
 final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com",
                                                        "testuser@gmail.com",
                                                        "OpenData",
@@ -213,9 +251,9 @@ GeoDataset newDataset = (GeoDataset) importer.createViewFromShapefile(GEOSPATIAL
 GeoDataset replacedDataset = (GeoDataset) importer.replaceViewFromShapefile(EXISTING_DATASET_ID, NEW_GEOSPATIAL_FILE);
 ```
 
-**Update dataset metadata**
+### Update dataset metadata
 
-```Java
+```java
 final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com",
                                                        "testuser@gmail.com",
                                                        "OpenData",
