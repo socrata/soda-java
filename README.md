@@ -235,7 +235,7 @@ UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV
 
 ### Import or Replace GeoSpatial Files
 
-You can importing GeoSpatial data files as new Mondara datasets or replace GeoSpatial files of existing Mondara
+You can import geospatial data files as new datasets or replace the data in existing 
 datasets. Supported formats are .kml, .kmz, and .zip (ESRI Shapefile).
 
 ```java
@@ -244,10 +244,10 @@ final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.soc
                                                        "OpenData",
                                                        "D8Atrg62F2j017ZTdkMpuZ9vY");
 
-// Import a new GeoSpatial File (as Mondara dataset)
+// Import a new geospatial file
 GeoDataset newDataset = (GeoDataset) importer.createViewFromShapefile(GEOSPATIAL_FILE_TO_IMPORT);
 
-// Replace an existing GeoSpatial (Mondara) dataset (EXISTING_DATASET_ID might be something like 'abcd-1234')
+// Replace an existing geospatial dataset (EXISTING_DATASET_ID might be something like 'abcd-1234')
 GeoDataset replacedDataset = (GeoDataset) importer.replaceViewFromShapefile(EXISTING_DATASET_ID, NEW_GEOSPATIAL_FILE);
 ```
 
