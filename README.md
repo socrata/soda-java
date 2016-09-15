@@ -276,3 +276,20 @@ loadedView.setMetadata(metadata);
 importer.updateDatasetInfo(loadedView);
 importer.publish(loadedView.getId());
 ```
+
+### Update dataset license
+
+The `setupLicense(...)` method on `DatasetInfo` can be used to set the license of a dataset:
+
+```java
+SodaImporter importer = SodaImporter.newImporter("https://data.agency.gov",
+    "you@agency.gov",
+    "yoursupersecurepassword",
+    APP_TOKEN);
+
+DatasetInfo di = importer.loadDatasetInfo("abcd-1234");
+
+// LicenseInfo contains the licenses you can select from
+di.setupLicense(LicenseInfo.ccAttribution_3_0, "Department of Redundancy Department", "http://drd.agency.gov");
+importer.updateDatasetInfo(di);
+```
