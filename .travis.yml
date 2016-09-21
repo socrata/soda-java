@@ -1,0 +1,5 @@
+# Actually java, but we build with sbt
+language: scala
+jdk:
+  - oraclejdk8
+  - oraclejdk7
