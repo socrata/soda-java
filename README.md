@@ -36,6 +36,10 @@ soda-java is published to Maven Central.  The dependency is
 </dependency>
 ```
 
+### Important Note!
+
+In order to access the SODA API via HTTPS, clients must now [support the Server Name Indication (SNI)](https://dev.socrata.com/changelog/2016/08/24/sni-now-required-for-https-connections.html) extension to the TLS protocol. What does this mean? It means that if you're using `soda-java`, you must [use JVM 1.7 or higher](https://en.wikipedia.org/wiki/Server_Name_Indication), as that is when support for SNI was introduced.
+
 ### Precompiled JARs
 
 Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.
