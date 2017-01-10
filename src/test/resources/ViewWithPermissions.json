@@ -2060,10 +2060,6 @@
         } ]
     },
     "rights" : [ "read" ],
-    "sortBys" : [ {
-        "id" : 0,
-        "viewColumnId" : 88519860
-    } ],
     "tableAuthor" : {
         "id" : "8910-1234",
         "displayName" : "Table Author",
