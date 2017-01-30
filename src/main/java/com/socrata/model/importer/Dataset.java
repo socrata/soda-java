@@ -1,13 +1,12 @@
 package com.socrata.model.importer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Collections2;
 import com.sun.jersey.api.client.GenericType;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  The schema portions of a dataset.  Anything changed in this class

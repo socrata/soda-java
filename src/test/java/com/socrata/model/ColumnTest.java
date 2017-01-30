@@ -1,14 +1,17 @@
 package com.socrata.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.socrata.model.importer.Column;
 import junit.framework.TestCase;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 public class ColumnTest
 {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private final ObjectReader reader;
+    private final ObjectWriter writer;
 
     public static final String JSON_COMPLETE = "{" +
             "\"dataTypeName\":\"number\"," +
@@ -43,11 +46,17 @@ public class ColumnTest
                         "\"non_null\":1," +
                         "\"smallest\":\"2\"" +
                     "}}";
+
+    public ColumnTest() {
+        final ObjectMapper mapper = new ObjectMapper();
+        reader = mapper.readerFor(Column.class);
+        writer = mapper.writerFor(Column.class);
+    }
     
     @Test
     public void testSerializationCompleteColumn() throws Exception
     {
-        Column col =  mapper.readValue(JSON_COMPLETE, Column.class);
+        Column col =  reader.readValue(JSON_COMPLETE);
         TestCase.assertNotNull(col);
         TestCase.assertEquals(col.getId(), (Integer) 1414729);
         TestCase.assertEquals(col.getPosition(), 1);
@@ -61,14 +70,14 @@ public class ColumnTest
         TestCase.assertEquals(col.getFormat().get("align"), "left");
         TestCase.assertEquals(col.getFormat().get("noCommas"), "true");
 
-        String roundTripJson = mapper.writeValueAsString(col);
+        String roundTripJson = writer.writeValueAsString(col);
         TestCase.assertEquals(roundTripJson, JSON_COMPLETE);
     }
 
     @Test
     public void testSerializationIncompleteColumn() throws Exception
     {
-        Column col =  mapper.readValue(JSON_INCOMPLETE, Column.class);
+        Column col =  reader.readValue(JSON_INCOMPLETE);
         TestCase.assertNotNull(col);
         TestCase.assertNull(col.getId());
         TestCase.assertEquals(col.getPosition(), 1);
@@ -83,7 +92,7 @@ public class ColumnTest
     @Test
     public void testSerializationOvercompleteColumn() throws Exception
     {
-        Column col =  mapper.readValue(JSON_OVERCOMPLETE, Column.class);
+        Column col =  reader.readValue(JSON_OVERCOMPLETE);
         TestCase.assertNotNull(col);
         TestCase.assertEquals(col.getId(), (Integer) 1414729);
         TestCase.assertEquals(col.getPosition(), 1);

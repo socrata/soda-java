@@ -1,9 +1,9 @@
 package com.socrata.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socrata.TestBase;
 import com.socrata.model.importer.Grant;
 import junit.framework.TestCase;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;

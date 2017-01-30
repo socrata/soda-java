@@ -18,7 +18,6 @@ import com.socrata.model.soql.SortOrder;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import test.model.Nomination;
 import test.model.NominationsWText;
@@ -575,7 +574,6 @@ public class SodaImporterTest extends TestBase
 
         //Verify the address got setup correctly
         List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        ObjectMapper mapper = new ObjectMapper();
         TestCase.assertEquals(4, results.size());
         for (Object curr : results) {
             Map currRow = (Map)curr;
@@ -629,7 +627,6 @@ public class SodaImporterTest extends TestBase
 
         //Verify the address got setup correctly
         List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        ObjectMapper mapper = new ObjectMapper();
         TestCase.assertEquals(4, results.size());
         for (Object curr : results) {
             Map currRow = (Map)curr;

@@ -1,5 +1,6 @@
 package com.socrata;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.socrata.api.Soda2Consumer;
@@ -7,16 +8,15 @@ import com.socrata.api.Soda2Producer;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.DoesNotExistException;
 import com.socrata.exceptions.SodaError;
-import com.socrata.model.UpsertResult;
 import com.socrata.model.DeleteRecord;
 import com.socrata.model.Meta;
+import com.socrata.model.UpsertResult;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.utils.ColumnUtil;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.time.DateUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import test.model.Nomination;

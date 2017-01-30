@@ -26,15 +26,14 @@ libraryDependencies ++= Seq(
   "joda-time" % "joda-time" % "2.1",
   "com.sun.jersey" % "jersey-bundle" % "1.9.1",
   "com.sun.jersey.contribs" % "jersey-multipart" % "1.9.1",
-  "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.3",
-  "org.codehaus.jackson" % "jackson-jaxrs" % "1.8.3",
-  "org.codehaus.jackson" % "jackson-xc" % "1.8.3",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.8.6",
+  "com.fasterxml.jackson.module" % "jackson-module-jaxb-annotations" % "2.8.6",
+  "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % "2.8.6",
   "com.google.guava" % "guava" % "12.0",
   "org.apache.commons" % "commons-lang3" % "3.1",
   "commons-beanutils" % "commons-beanutils" % "1.8.3",
   "commons-io" % "commons-io" % "1.3.2",
-  "com.novocode" % "junit-interface" % "0.9" % "test",
-  "junit-addons" % "junit-addons" % "1.4" % "test"
+  "com.novocode" % "junit-interface" % "0.9" % "test"
 )
 
 parallelExecution in Test := false

@@ -1,5 +1,7 @@
 package com.socrata.api;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Preconditions;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -9,8 +11,6 @@ import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.search.SearchClause;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;

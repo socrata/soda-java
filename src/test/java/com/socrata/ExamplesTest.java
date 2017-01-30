@@ -23,7 +23,7 @@ import java.util.UUID;
 public class ExamplesTest
 {
 
-    public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
+    public static final File  NOMINATIONS_CSV = Resources.file("/testNominations.csv");
 
 
     @Test

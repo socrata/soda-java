@@ -1,56 +1,109 @@
 package com.socrata.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socrata.model.importer.Dataset;
-import junit.framework.TestCase;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+
 /**
  * Test the JacksonObjectMapperProvider
- *
  */
-public class TestJacksonObjectMapperProvider
-{
+public class TestJacksonObjectMapperProvider {
 
-    @Test
-    public void testMapperProvider() {
+    private static final Date base = new Date(112, 5, 20, 7, 0);
 
-        //
-        //Make sure the ObjectMapper is setup correctly
-        final JacksonObjectMapperProvider objectMapperProvider = new JacksonObjectMapperProvider();
-        final ObjectMapper  mapper = objectMapperProvider.getContext(null);
-        TestCase.assertNotNull(mapper);
+    private static ObjectMapper mapper;
+    private static JacksonObjectMapperProvider.SocrataDateFormat format;
 
-        //
-        //  Make sure dates parse correctly
-        Date d = new Date(112, 5, 20, 7, 0);
-        final JacksonObjectMapperProvider.SocrataDateFormat socrataDateFormat = (JacksonObjectMapperProvider.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
+    @BeforeClass
+    public static void setupClass() {
+        // Make sure the ObjectMapper is setup correctly
+        final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider();
+        mapper = provider.getContext(null);
+        assertThat(mapper, notNullValue());
+        format = (JacksonObjectMapperProvider.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
+    }
 
-        TestCase.assertNull(socrataDateFormat.parseAsISO8601("12345", new ParsePosition(0)));
-        TestCase.assertEquals(d, socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00", new ParsePosition(0)));
-        TestCase.assertEquals(d, socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00.000", new ParsePosition(0)));
-
-        TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00-0300", new ParsePosition(0))));
-        TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00.000-0300", new ParsePosition(0))));
-
-        TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00Z", new ParsePosition(0))));
-        TestCase.assertTrue(d.after(socrataDateFormat.parseAsISO8601("2012-6-20T07:00:00.000Z", new ParsePosition(0))));
-
+    @Test(expected = ParseException.class)
+    public void testParseBadDateString() throws ParseException {
+        parse("12345");
     }
 
     @Test
-    public void testViewMapping() throws IOException
-    {
-        final JacksonObjectMapperProvider objectMapperProvider = new JacksonObjectMapperProvider();
-        final ObjectMapper  mapper = objectMapperProvider.getContext(null);
+    public void testParseISONoSecondsNoTZ() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00"), equalTo(base));
+    }
 
-        Dataset v = mapper.readValue(new File("src/test/resources/view.json"), Dataset.class);
-        TestCase.assertNotNull(v);
+    @Test
+    public void testParseISONoTZ() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00.000"), equalTo(base));
+    }
+
+    @Test
+    public void testParseISONoSeconds() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00-0300"), is(before(base)));
+    }
+
+    @Test
+    public void testParseISO() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00.000-0300"), is(before(base)));
+    }
+
+    @Test
+    public void testParseISONoSecondsZulu() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00Z"), is(before(base)));
+    }
+
+    @Test
+    public void testParseISOZulu() throws ParseException {
+        assertThat(parse("2012-6-20T07:00:00.000Z"), is(before(base)));
+    }
+
+    @Test
+    public void testViewMapping() throws IOException {
+        final Dataset v = mapper.readValue(TestJacksonObjectMapperProvider.class.getResource("/view.json"), Dataset.class);
+        assertThat(v, notNullValue());
+    }
+
+    private static Date parse(final String str) throws ParseException {
+        return format.parseAsISO8601(str, new ParsePosition(0), false);
+    }
+
+    private static BeforeDateMatcher before(final Date base) {
+        return new BeforeDateMatcher(base);
+    }
+
+    private static class BeforeDateMatcher extends BaseMatcher<Date> {
+
+        private final Date base;
+
+        private BeforeDateMatcher(final Date base) {
+            this.base = base;
+        }
+
+        @Override
+        public void describeTo(final Description description) {
+            description.appendText("expected date to be after " + base);
+        }
+
+        @Override
+        public boolean matches(final Object o) {
+            if (!(o instanceof Date)) {
+                return false;
+            }
+            final Date subject = (Date) o;
+            return subject.before(base);
+        }
     }
 
 }

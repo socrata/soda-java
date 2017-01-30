@@ -1,8 +1,9 @@
 package com.socrata.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.socrata.model.importer.UserInfo;
 import junit.framework.TestCase;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 /**
@@ -15,7 +16,7 @@ import org.junit.Test;
 public class UserInfoTest
 {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private final ObjectReader reader = new ObjectMapper().readerFor(UserInfo.class);
 
     public static final String  JSON_TEST = "{\n" +
             "    \"id\" : \"et53-5za7\",\n" +
@@ -36,13 +37,13 @@ public class UserInfoTest
     @Test
     public void testSerialization() throws Exception
     {
-        UserInfo userInfo =  mapper.readValue(JSON_TEST, UserInfo.class);
+        UserInfo userInfo =  reader.readValue(JSON_TEST);
         TestCase.assertNotNull(userInfo);
         TestCase.assertEquals(userInfo.getId(), "et53-5za7");
         TestCase.assertEquals(userInfo.getDisplayName(), "Will Pugh");
         TestCase.assertEquals(userInfo.getScreenName(), "Will Pugh");
 
-        UserInfo userInfo2 =  mapper.readValue(JSON_TEST_NO_ITEMS, UserInfo.class);
+        UserInfo userInfo2 =  reader.readValue(JSON_TEST_NO_ITEMS);
         TestCase.assertNotNull(userInfo2);
         TestCase.assertNull(userInfo2.getId());
         TestCase.assertNull(userInfo2.getDisplayName());

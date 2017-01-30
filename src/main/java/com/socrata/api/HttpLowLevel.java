@@ -1,6 +1,8 @@
 package com.socrata.api;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.socrata.exceptions.*;
 import com.socrata.model.SodaErrorResponse;
@@ -20,7 +22,6 @@ import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -56,6 +57,8 @@ public final class HttpLowLevel
             .withLocale(Locale.US)
             .withZone(DateTimeZone.UTC);
 
+    private static final TypeReference<Map<String,Object>> GENERIC_JSON_OBJECT_TYPE = new TypeReference<Map<String, Object>>() {};
+
 
     protected static final int DEFAULT_MAX_RETRIES = 200;
     public static final long   DEFAULT_RETRY_TIME = 4000;
@@ -77,6 +80,8 @@ public final class HttpLowLevel
     public static final MediaType UTF8_TEXT_TYPE = new MediaType("text", "plain", UTF_PARAMS);
 
     public static final GenericType<List<Object>> MAP_OBJECT_TYPE = new GenericType<List<Object>>() {};
+
+    private final ObjectMapper mapper;
 
     private final Client client;
     private final String url;
@@ -169,6 +174,10 @@ public final class HttpLowLevel
         return new HttpLowLevel(client, url);
     }
 
+    public HttpLowLevel(final Client client, final String url) {
+        this(client, url, new ObjectMapper());
+    }
+
 
     /**
      * Constructor
@@ -176,10 +185,11 @@ public final class HttpLowLevel
      * @param client the Jersey Client class that will be used for actually issuing requests
      * @param url the base URL for the SODA2 domain to access.
      */
-    public HttpLowLevel(Client client, final String url)
+    public HttpLowLevel(final Client client, final String url, final ObjectMapper mapper)
     {
         this.client = client;
         this.url = url;
+        this.mapper = mapper;
     }
 
     /**
@@ -607,7 +617,6 @@ public final class HttpLowLevel
             return response;
         }
 
-        final ObjectMapper mapper = new ObjectMapper();
         final String body = response.getEntity(String.class);
 
         if (status == 202) {
@@ -631,7 +640,7 @@ public final class HttpLowLevel
                 }
 
                 try {
-                    final Map<String, Object> bodyProperties = (Map<String, Object>)mapper.readValue(body, Object.class);
+                    final Map<String, Object> bodyProperties = mapper.readValue(body, GENERIC_JSON_OBJECT_TYPE);
                     if (bodyProperties.get("ticket") != null) {
                         ticket = bodyProperties.get("ticket").toString();
                     }

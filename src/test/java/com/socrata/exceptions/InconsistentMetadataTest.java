@@ -1,5 +1,6 @@
 package com.socrata.exceptions;
 
+import com.socrata.Resources;
 import com.socrata.TestBase;
 import com.socrata.api.HttpLowLevel;
 import com.socrata.api.SodaImporter;
@@ -17,8 +18,8 @@ import java.util.UUID;
 public class InconsistentMetadataTest  extends TestBase
 {
 
-    public static final File  WIDE_CSV = new File("src/test/resources/wideDataset.csv");
-    public static final File  TEST_NOMINATIONA_CSV = new File("src/test/resources/testNominations.csv");
+    private static final File  WIDE_CSV = Resources.file("/wideDataset.csv");
+    private static final File TEST_NOMINATIONS_CSV = Resources.file("/testNominations.csv");
 
 
     @Test
@@ -30,7 +31,7 @@ public class InconsistentMetadataTest  extends TestBase
         final HttpLowLevel connection = connect();
         final SodaImporter sodaImporter = new SodaImporter(connection);
 
-        DatasetInfo datasetCreated = sodaImporter.createViewFromCsv(name, description, TEST_NOMINATIONA_CSV, "Name");
+        DatasetInfo datasetCreated = sodaImporter.createViewFromCsv(name, description, TEST_NOMINATIONS_CSV, "Name");
         try {
             //Get the ID column
             int columnId = ((Dataset)datasetCreated).getRowIdentifierColumnId();
@@ -38,7 +39,7 @@ public class InconsistentMetadataTest  extends TestBase
 
 
             try {
-                sodaImporter.append(datasetCreated.getId(), TEST_NOMINATIONA_CSV, 1, null);
+                sodaImporter.append(datasetCreated.getId(), TEST_NOMINATIONS_CSV, 1, null);
                 TestCase.fail("Expected failure after updating a non-existing column as a rowidentifier");
             } catch (MetadataUpdateError mue) {
                  //Success error expected

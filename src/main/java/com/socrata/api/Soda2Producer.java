@@ -1,22 +1,22 @@
 package com.socrata.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
+import com.socrata.model.Meta;
 import com.socrata.model.UpsertError;
 import com.socrata.model.UpsertResult;
-import com.socrata.model.Meta;
 import com.socrata.model.requests.SodaModRequest;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.requests.SodaTypedRequest;
 import com.socrata.utils.GeneralUtils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -33,6 +33,8 @@ import java.util.List;
  */
 public class Soda2Producer extends Soda2Consumer
 {
+
+    private final JsonFactory factory;
 
     /**
      * Create a new Soda2Producer object, using the supplied credentials for authentication.
@@ -76,6 +78,7 @@ public class Soda2Producer extends Soda2Consumer
     public Soda2Producer(HttpLowLevel httpLowLevel)
     {
         super(httpLowLevel);
+        factory = new JsonFactory();
     }
 
 
@@ -433,17 +436,16 @@ public class Soda2Producer extends Soda2Consumer
     }
 
     /**
-     * THis will return an upsert result, regardless of whether it is
+     * This will return an upsert result, regardless of whether it is
      * using the original response, or the new return from SODA Server
      *
      *
      * @param is
      * @return
      */
-    static UpsertResult deserializeUpsertResult(InputStream is) throws IOException
+    UpsertResult deserializeUpsertResult(InputStream is) throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonParser parser = mapper.getJsonFactory().createJsonParser(is);
+        JsonParser parser = factory.createParser(is);
 
 
         if (parser.nextToken() == JsonToken.START_ARRAY) {

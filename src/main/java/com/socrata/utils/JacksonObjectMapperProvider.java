@@ -1,17 +1,14 @@
 package com.socrata.utils;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.util.StdDateFormat;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 import javax.annotation.concurrent.Immutable;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -80,13 +77,12 @@ public class JacksonObjectMapperProvider implements ContextResolver<ObjectMapper
          * @return the Date returned.
          */
         @Override
-        protected Date parseAsISO8601(String dateStr, ParsePosition pos)
-        {
+        protected Date parseAsISO8601(String dateStr, ParsePosition pos, boolean throwErrors) throws ParseException {
             final Date retVal = parseAsFloatingISO8601(dateStr, pos);
             if (retVal != null) {
                 return retVal;
             }
-            return super.parseAsISO8601(dateStr, pos);
+            return super.parseAsISO8601(dateStr, pos, throwErrors);
         }
 
         @Override

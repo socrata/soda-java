@@ -1,11 +1,10 @@
 package com.socrata.model.importer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.jersey.api.client.GenericType;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A Dataset backed by a map file of some sort (Esri, kml, kmz, etc.)

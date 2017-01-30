@@ -1,10 +1,9 @@
 package com.socrata.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
-import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.annotation.Nullable;
 
