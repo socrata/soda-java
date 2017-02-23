@@ -78,7 +78,7 @@ public class Soda2Producer extends Soda2Consumer
     public Soda2Producer(HttpLowLevel httpLowLevel)
     {
         super(httpLowLevel);
-        factory = new JsonFactory();
+        factory = httpLowLevel.getObjectMapper().getFactory();
     }
 
 

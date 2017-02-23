@@ -8,6 +8,7 @@ import com.socrata.exceptions.*;
 import com.socrata.model.SodaErrorResponse;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.utils.JacksonObjectMapperProvider;
+import com.socrata.utils.ObjectMapperFactory;
 import com.socrata.utils.streams.CompressingGzipInputStream;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -175,7 +176,7 @@ public final class HttpLowLevel
     }
 
     public HttpLowLevel(final Client client, final String url) {
-        this(client, url, new ObjectMapper());
+        this(client, url, ObjectMapperFactory.create());
     }
 
 
@@ -579,6 +580,14 @@ public final class HttpLowLevel
         if (client != null) {
             client.destroy();
         }
+    }
+
+    /**
+     * make the {@link ObjectMapper} available to other classes in this package so that they can
+     * share the same configured instance instead of potentially using differently configured ObjectMappers
+     */
+    ObjectMapper getObjectMapper() {
+        return mapper;
     }
 
 

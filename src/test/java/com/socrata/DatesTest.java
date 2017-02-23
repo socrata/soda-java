@@ -1,6 +1,5 @@
 package com.socrata;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.socrata.api.Soda2Consumer;
@@ -15,7 +14,6 @@ import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.utils.ColumnUtil;
 import junit.framework.TestCase;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -183,7 +181,7 @@ public class DatesTest extends TestBase
 
         final Meta objectMetadata = producer.addObject(UPDATE_DATA_SET, nomination);
         final Nomination createdNomination = producer.getById(UPDATE_DATA_SET, objectMetadata.getId(), Nomination.class);
-        TestCase.assertTrue(EqualsBuilder.reflectionEquals(nomination, createdNomination));
+        TestCase.assertEquals(nomination, createdNomination);
 
         final Meta updateMeta= producer.update(UPDATE_DATA_SET, objectMetadata.getId(), nominationUpdate);
         TestCase.assertEquals(objectMetadata.getId(), updateMeta.getId());
@@ -198,8 +196,6 @@ public class DatesTest extends TestBase
         //TestCase.assertTrue(EqualsBuilder.reflectionEquals(nominationUpdate, updatedNomination));
 
         List l = Lists.newArrayList(new DeleteRecord(objectMetadata.getId(), true));
-        ObjectMapper m = new ObjectMapper();
-        System.out.println(m.writeValueAsString(l));
         UpsertResult result = producer.upsert(UPDATE_DATA_SET, l);
         try {
             final Nomination deletedNomination = producer.getById(UPDATE_DATA_SET, objectMetadata.getId(), Nomination.class);

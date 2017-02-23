@@ -3,6 +3,7 @@ package com.socrata.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socrata.TestBase;
 import com.socrata.model.importer.Grant;
+import com.socrata.utils.ObjectMapperFactory;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class GrantTest extends TestBase
 {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     public static final String NO_USER_ID = "{\n" +
             "    \"inherited\" : false,\n" +

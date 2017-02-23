@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.socrata.model.importer.Column;
+import com.socrata.utils.ObjectMapperFactory;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -48,7 +49,7 @@ public class ColumnTest
                     "}}";
 
     public ColumnTest() {
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = ObjectMapperFactory.create();
         reader = mapper.readerFor(Column.class);
         writer = mapper.writerFor(Column.class);
     }

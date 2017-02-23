@@ -1,7 +1,5 @@
 package com.socrata.api;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Preconditions;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -15,7 +13,6 @@ import com.sun.jersey.api.client.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -355,16 +352,9 @@ public class SodaDdl extends SodaWorkflow
 
         try {
             final ClientResponse response = requester.issueRequest();
-            return mapper.readValue(response.getEntity(InputStream.class), AssetResponse.class);
-            //return response.getEntity(AssetResponse.class);
+            return response.getEntity(AssetResponse.class);
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), AssetResponse.class, requester);
-        } catch (JsonMappingException e) {
-            throw new SodaError("Illegal response from the service.");
-        } catch (JsonParseException e) {
-            throw new SodaError("Invalid JSON returned from the service.");
-        } catch (IOException e) {
-            throw new SodaError("Error communicating with service.");
         }
     }
 

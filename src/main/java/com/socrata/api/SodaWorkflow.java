@@ -33,8 +33,8 @@ public class SodaWorkflow
 
     protected final URI           geocodingUri;
     protected final HttpLowLevel  httpLowLevel;
-    protected final ObjectMapper  mapper;
     protected final URI           viewUri;
+    protected final ObjectMapper  mapper;
 
     /**
      * Create a new SodaWorkflow object, using the supplied credentials for authentication.
@@ -70,7 +70,7 @@ public class SodaWorkflow
                               .path(VIEWS_BASE_PATH)
                               .build();
 
-        mapper = new ObjectMapper();
+        mapper = httpLowLevel.getObjectMapper();
     }
 
     /**

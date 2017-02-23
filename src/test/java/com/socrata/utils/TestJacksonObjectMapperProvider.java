@@ -23,15 +23,15 @@ public class TestJacksonObjectMapperProvider {
     private static final Date base = new Date(112, 5, 20, 7, 0);
 
     private static ObjectMapper mapper;
-    private static JacksonObjectMapperProvider.SocrataDateFormat format;
+    private static ObjectMapperFactory.SocrataDateFormat format;
 
     @BeforeClass
     public static void setupClass() {
         // Make sure the ObjectMapper is setup correctly
-        final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider();
+        final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider(mapper);
         mapper = provider.getContext(null);
         assertThat(mapper, notNullValue());
-        format = (JacksonObjectMapperProvider.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
+        format = (ObjectMapperFactory.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
     }
 
     @Test(expected = ParseException.class)

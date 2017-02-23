@@ -1,8 +1,8 @@
 package com.socrata.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.socrata.model.importer.UserInfo;
+import com.socrata.utils.ObjectMapperFactory;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ import org.junit.Test;
 public class UserInfoTest
 {
 
-    private final ObjectReader reader = new ObjectMapper().readerFor(UserInfo.class);
+    private static final ObjectReader reader = ObjectMapperFactory.create().readerFor(UserInfo.class);
 
     public static final String  JSON_TEST = "{\n" +
             "    \"id\" : \"et53-5za7\",\n" +

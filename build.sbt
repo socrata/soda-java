@@ -28,6 +28,7 @@ libraryDependencies ++= Seq(
   "com.sun.jersey.contribs" % "jersey-multipart" % "1.9.1",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.8.6",
   "com.fasterxml.jackson.module" % "jackson-module-jaxb-annotations" % "2.8.6",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.8.6",
   "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % "2.8.6",
   "com.google.guava" % "guava" % "12.0",
   "org.apache.commons" % "commons-lang3" % "3.1",

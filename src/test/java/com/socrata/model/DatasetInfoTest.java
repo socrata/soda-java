@@ -3,6 +3,7 @@ package com.socrata.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socrata.Resources;
 import com.socrata.model.importer.DatasetInfo;
+import com.socrata.utils.ObjectMapperFactory;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class DatasetInfoTest
 {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     @Test
     public void testNoUserId() throws IOException
