@@ -18,6 +18,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTimeZone;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import test.model.Nomination;
 import test.model.NominationWithJoda;
@@ -33,6 +34,11 @@ import java.util.UUID;
  */
 public class DatesTest extends TestBase
 {
+    @BeforeClass
+    public static void useUTCTimezone()
+    {
+        System.setProperty("user.timezone", "UTC");
+    }
 
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.
