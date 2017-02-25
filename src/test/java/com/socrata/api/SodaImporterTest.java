@@ -2,6 +2,7 @@ package com.socrata.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.socrata.Resources;
 import com.socrata.TestBase;
 import com.socrata.builders.BlueprintBuilder;
 import com.socrata.builders.ExternalDatasetBuilder;
@@ -33,13 +34,13 @@ import java.util.*;
 public class SodaImporterTest extends TestBase
 {
 
-    public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
-    public static final File  CRIMES_CSV = new File("src/test/resources/testCrimes.csv");
-    public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
-    public static final File  BABY_NAMES_LOC = new File("src/test/resources/testBabyNames.csv");
-    public static final File  BABY_NAMES_LOC_2 = new File("src/test/resources/testBabyNames2.csv");
-    public static final File  BABY_NAMES_LOC_3 = new File("src/test/resources/testBabyNames3.csv");
-    public static final File  BRONX_ADMIN_BOUNDARY = new File("src/test/resources/BronxAdminBoundaryLayers.zip");
+    public static final File  NOMINATIONS_CSV = Resources.file("/testNominations.csv");
+    public static final File  CRIMES_CSV = Resources.file("/testCrimes.csv");
+    public static final File  CRIMES_HEADER_CSV = Resources.file("/testCrimesHeader.csv");
+    public static final File  BABY_NAMES_LOC = Resources.file("/testBabyNames.csv");
+    public static final File  BABY_NAMES_LOC_2 = Resources.file("/testBabyNames2.csv");
+    public static final File  BABY_NAMES_LOC_3 = Resources.file("/testBabyNames3.csv");
+    public static final File  BRONX_ADMIN_BOUNDARY = Resources.file("/BronxAdminBoundaryLayers.zip");
 
 
     /**

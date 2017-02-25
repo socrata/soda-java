@@ -20,7 +20,7 @@ import java.util.UUID;
 
 /**
  */
-public class ExamplesTest
+public class ExamplesTest extends TestBase
 {
 
     public static final File  NOMINATIONS_CSV = Resources.file("/testNominations.csv");
@@ -29,7 +29,7 @@ public class ExamplesTest
     @Test
     public void readmeConsumerExamples() throws Exception {
 
-        Soda2Consumer consumer = Soda2Consumer.newConsumer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        Soda2Consumer consumer = createConsumer();
 
         //To get a raw String of the results
         ClientResponse response = consumer.query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
@@ -87,7 +87,7 @@ public class ExamplesTest
 
 
         //Get the producer class to allow updates of the data set.
-        final Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        final Soda2Producer producer = createProducer();
 
         //Get get this automatically serialized into a set of Java Beans annotated with Jackson JOSN annotations
         Meta nominationAddedMeta = producer.addObject("testupdate", NOMINATION_TO_ADD);
@@ -102,7 +102,7 @@ public class ExamplesTest
     @Test
     public void upsertExamples() throws Exception {
 
-        Soda2Producer producer = Soda2Producer.newProducer("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        Soda2Producer producer = createProducer();
 
         InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
         UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
@@ -116,7 +116,7 @@ public class ExamplesTest
         //Create a name with a GUID on the end so we know we are not conflicting with someone else running this.
         final String uniqueName = "Nominations-" + UUID.randomUUID().toString();
 
-        final SodaImporter    importer = SodaImporter.newImporter("https://sandbox.demo.socrata.com", "testuser@gmail.com", "OpenData", "D8Atrg62F2j017ZTdkMpuZ9vY");
+        final SodaImporter    importer = createImporter();
         final DatasetInfo     nominationsDataset = importer.createViewFromCsv(uniqueName, "This is a test dataset using samples with the nominations schema", NOMINATIONS_CSV, "Name");
         importer.publish(nominationsDataset.getId());
         //Now the dataset is ready to go!

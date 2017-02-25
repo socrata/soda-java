@@ -132,12 +132,16 @@ public final class HttpLowLevel
         clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
         clientConfig.getClasses().add(JacksonObjectMapperProvider.class);
 
+        final Client client;
         if (StringUtils.isNotEmpty(proxyHost)) {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort == null ? 443 : proxyPort));
-            return new Client(new URLConnectionClientHandler(new ProxyHandler(proxy)), clientConfig);
+            client = new Client(new URLConnectionClientHandler(new ProxyHandler(proxy)), clientConfig);
+        } else {
+            client = Client.create(clientConfig);
         }
 
-        return Client.create(clientConfig);
+        client.addFilter(new AssetRequestFilter());
+        return client;
     }
 
     /**

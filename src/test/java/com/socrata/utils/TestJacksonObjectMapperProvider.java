@@ -28,7 +28,7 @@ public class TestJacksonObjectMapperProvider {
     @BeforeClass
     public static void setupClass() {
         // Make sure the ObjectMapper is setup correctly
-        final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider(mapper);
+        final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider();
         mapper = provider.getContext(null);
         assertThat(mapper, notNullValue());
         format = (ObjectMapperFactory.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();

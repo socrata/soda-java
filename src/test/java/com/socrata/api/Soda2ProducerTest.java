@@ -210,7 +210,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingUpsertResults() throws IOException
     {
-        final Soda2Producer producer = new Soda2Producer(null);
+        final Soda2Producer producer = new Soda2Producer(connect());
 
         UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());
@@ -248,7 +248,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingSodaServerUpsertResults() throws IOException
     {
-        final Soda2Producer producer = new Soda2Producer(null);
+        final Soda2Producer producer = new Soda2Producer(connect());
 
         UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());
@@ -283,7 +283,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingOldSodaServerUpsertResults() throws IOException
     {
-        final Soda2Producer producer = new Soda2Producer(null);
+        final Soda2Producer producer = new Soda2Producer(connect());
 
         UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS_OLD.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());

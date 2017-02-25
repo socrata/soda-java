@@ -2,6 +2,7 @@ package com.socrata.api;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.socrata.Resources;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -22,8 +23,8 @@ import java.util.UUID;
  */
 public class SodaWorkflowTest  extends TestBase
 {
-    public static final File CRIMES_CSV = new File("src/test/resources/testCrimes.csv");
-    public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
+    private static final File CRIMES_CSV = Resources.file("/testCrimes.csv");
+    private static final File  CRIMES_HEADER_CSV = Resources.file("/testCrimes.csv");
 
 
     @Test
