@@ -8,7 +8,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Class to provide a customer ObjectMapper to Jersey (for Jackson).<p/>
+ * Class to provide a customer ObjectMapper to Jersey (for Jackson).
  */
 @Immutable
 @Provider

@@ -125,8 +125,6 @@ public class DatasetInfo
      * be accessible via:
      *
      *   https://mysite.socrata.com/id/my_dataset
-     *
-     * @return the resource name
      */
     public void setResourceName(String resourceName)
     {
@@ -347,8 +345,6 @@ public class DatasetInfo
     /**
      * Sets the license structure that defines this license.  This should describe the license
      * specified in the licenseId field.
-     *
-     * @return the license structure for this license.
      */
     public void setLicense(License license)
     {
@@ -528,9 +524,7 @@ public class DatasetInfo
     }
 
     /**
-     * Gets the list of freeform tags describing this dataset.
-     *
-     * @return the list of freeform tags describing this dataset.
+     * Sets the list of freeform tags describing this dataset.
      */
     public void setTags(List<String> tags)
     {

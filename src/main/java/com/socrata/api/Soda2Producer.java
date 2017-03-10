@@ -193,7 +193,7 @@ public class Soda2Producer extends Soda2Consumer
      *     <li>If an object already exists with this value, it will update it.</li>
      *     <li>If the object has a :deleted=true value, the object will be deleted.</li>
      * </ol>
-     *   <br/>
+     *   <br>
      *   In order to delete objects using the Upsert function, use the DeleteRecord object to map ":deleted" to
      *   an :id.
      *
@@ -260,7 +260,7 @@ public class Soda2Producer extends Soda2Consumer
      *     <li>If an object already exists with this value, it will update it.</li>
      *     <li>If the object has a :deleted=true value, the object will be deleted.</li>
      * </ol>
-     *   <br/>
+     *   <br>
      *   In order to delete objects using the Upsert function, use the DeleteRecord object to map ":deleted" to
      *   an :id.
      *
@@ -334,7 +334,7 @@ public class Soda2Producer extends Soda2Consumer
      *     <li>If an object already exists with this value, it will update it.</li>
      *     <li>If the object has a :deleted=true value, the object will be deleted.</li>
      * </ol>
-     *   <br/>
+     *   <br>
      *   In order to delete objects using the Upsert function, use the DeleteRecord object to map ":deleted" to
      *   an :id.
      *
