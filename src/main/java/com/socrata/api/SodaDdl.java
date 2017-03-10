@@ -162,7 +162,7 @@ public class SodaDdl extends SodaWorkflow
      * @param id the ID to load the view through.
      * @return The View with the supplied ID.
      *
-     * @throws LongRunningQueryException
+     * @throws InterruptedException
      * @throws SodaError
      */
     public DatasetInfo loadDatasetInfo(final String id) throws SodaError, InterruptedException
@@ -287,9 +287,8 @@ public class SodaDdl extends SodaWorkflow
      *
      * @param datasetId id of the dataset to add the column to
      * @param columnId if of the column to delete
-     * @return the added column
+     * @throws LongRunningQueryException
      * @throws SodaError
-     * @throws InterruptedException
      */
     public void removeColumn(final String datasetId, final int columnId) throws LongRunningQueryException, SodaError
     {

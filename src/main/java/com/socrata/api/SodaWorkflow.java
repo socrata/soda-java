@@ -92,7 +92,6 @@ public class SodaWorkflow
      *
      * @throws com.socrata.exceptions.SodaError
      * @throws InterruptedException
-     * @throws com.socrata.exceptions.LongRunningQueryException
      */
     public DatasetInfo publish(final String datasetId) throws SodaError, InterruptedException
     {
@@ -111,7 +110,6 @@ public class SodaWorkflow
      *
      * @throws com.socrata.exceptions.SodaError
      * @throws InterruptedException
-     * @throws com.socrata.exceptions.LongRunningQueryException
      */
     public DatasetInfo publish(final String datasetId, final boolean async) throws SodaError, InterruptedException
     {

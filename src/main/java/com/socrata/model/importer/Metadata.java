@@ -169,7 +169,7 @@ public class Metadata
      * Gets the access points for an external dataset.  If this metadata
      * is for any other kind of dataset, this value will be null.
      *
-     * @return map of access points with form label=>url
+     * @return map of access points with form label: url
      */
     public Map<String, String> getAccessPoints()
     {
@@ -180,7 +180,7 @@ public class Metadata
      * Sets the access points for an external dataset.  If this metadata
      * is for any other kind of dataset, this value will be null.
      *
-     * @param accessPoints map of access points with form label=>url
+     * @param accessPoints map of access points with form label: url
      */
     public void setAccessPoints(Map<String, String> accessPoints)
     {

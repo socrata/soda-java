@@ -30,7 +30,6 @@ public class UserInfo
 
     /**
      * Unique id for this user
-     * @return
      */
     @JsonProperty("id")
     public void setId(String id)
@@ -50,7 +49,6 @@ public class UserInfo
 
     /**
      * User's human readable display name
-     * @return
      */
     @JsonProperty("displayName")
     public void setDisplayName(String displayName)
@@ -70,7 +68,6 @@ public class UserInfo
 
     /**
      * User's human readable screen name
-     * @return
      */
     @JsonProperty("screenName")
     public void setScreenName(String screenName)
