@@ -139,8 +139,6 @@ public final class HttpLowLevel
         } else {
             client = Client.create(clientConfig);
         }
-
-        client.addFilter(new AssetRequestFilter());
         return client;
     }
 
