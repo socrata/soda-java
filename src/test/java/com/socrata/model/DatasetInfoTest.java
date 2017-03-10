@@ -1,12 +1,12 @@
 package com.socrata.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socrata.Resources;
 import com.socrata.model.importer.DatasetInfo;
-import com.socrata.model.importer.Grant;
+import com.socrata.utils.ObjectMapperFactory;
 import junit.framework.TestCase;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -14,15 +14,12 @@ import java.io.IOException;
 public class DatasetInfoTest
 {
 
-    ObjectMapper mapper = new ObjectMapper();
-
-    public static final File VIEW_W_PERMISSIONS = new File("src/test/resources/ViewWithPermissions.json");
-
+    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     @Test
     public void testNoUserId() throws IOException
     {
-        DatasetInfo datasetInfo =  mapper.readValue(VIEW_W_PERMISSIONS, DatasetInfo.class);
+        DatasetInfo datasetInfo =  mapper.readValue(Resources.url("/ViewWithPermissions.json"), DatasetInfo.class);
         TestCase.assertNotNull(datasetInfo);
         TestCase.assertNotNull(datasetInfo.getGrants());
         TestCase.assertNotNull(datasetInfo.getTableAuthor());

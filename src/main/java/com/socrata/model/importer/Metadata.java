@@ -1,10 +1,10 @@
 package com.socrata.model.importer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.BeanUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

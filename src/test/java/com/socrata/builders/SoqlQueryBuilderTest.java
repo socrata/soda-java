@@ -6,8 +6,12 @@ import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
 import junit.framework.TestCase;
-import junitx.framework.ListAssert;
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test the SoqlQueryBuilder
@@ -86,18 +90,14 @@ public class SoqlQueryBuilderTest extends TestCase
         assertEquals(3, query.selectClause.size());
         assertEquals(3, query.orderByClause.size());
 
-        ListAssert.assertEquals(Lists.newArrayList("Group1", "Group2", "Group3"),
-                                query.groupByClause);
 
-        ListAssert.assertEquals(Lists.newArrayList("Column1", "Column2", "Column3"),
-                                query.selectClause);
+        assertThat(query.groupByClause, equalTo(Arrays.asList("Group1", "Group2", "Group3")));
 
-        ListAssert.assertEquals(Lists.newArrayList(new OrderByClause(SortOrder.Ascending, "Order1"),
-                                                   new OrderByClause(SortOrder.Descending, "Order2"),
-                                                   new OrderByClause(SortOrder.Ascending, "Order3")),
-                                query.orderByClause);
+        assertThat(query.selectClause, equalTo(Arrays.asList("Column1", "Column2", "Column3")));
 
-
+        assertThat(query.orderByClause, equalTo(Arrays.asList(new OrderByClause(SortOrder.Ascending, "Order1"),
+                new OrderByClause(SortOrder.Descending, "Order2"),
+                new OrderByClause(SortOrder.Ascending, "Order3"))));
     }
 
     public void testSetMethodsOnCollections() {
@@ -113,17 +113,13 @@ public class SoqlQueryBuilderTest extends TestCase
         assertEquals(2, query.selectClause.size());
         assertEquals(2, query.orderByClause.size());
 
-        ListAssert.assertEquals(Lists.newArrayList("Group2", "Group3"),
-                                query.groupByClause);
+        assertThat(query.groupByClause, equalTo(Arrays.asList("Group2", "Group3")));
 
-        ListAssert.assertEquals(Lists.newArrayList("Column2", "Column3"),
-                                query.selectClause);
+        assertThat(query.selectClause, equalTo(Arrays.asList("Column2", "Column3")));
 
-        ListAssert.assertEquals(Lists.newArrayList(new OrderByClause(SortOrder.Descending, "Order2"),
-                                                   new OrderByClause(SortOrder.Ascending, "Order3")),
-                                query.orderByClause);
-
-
+        assertThat(query.orderByClause, equalTo(Arrays.asList(
+                new OrderByClause(SortOrder.Descending, "Order2"),
+                new OrderByClause(SortOrder.Ascending, "Order3"))));
     }
 
 

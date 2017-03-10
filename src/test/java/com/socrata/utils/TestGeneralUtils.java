@@ -1,5 +1,6 @@
 package com.socrata.utils;
 
+import com.socrata.Resources;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 public class TestGeneralUtils
 {
 
-    public static final File NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
+    private static final File NOMINATIONS_CSV = Resources.file("/testNominations.csv");
 
 
     @Test

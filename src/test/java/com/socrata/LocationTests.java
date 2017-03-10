@@ -22,7 +22,7 @@ import java.util.*;
 public class LocationTests extends TestBase
 {
 
-    public static final File LOCATION_TEST_CSV = new File("src/test/resources/locationImports.csv");
+    private static final File LOCATION_TEST_CSV = Resources.file("/locationImports.csv");
 
 
     /**

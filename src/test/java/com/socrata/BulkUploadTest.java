@@ -23,8 +23,8 @@ import java.util.UUID;
  */
 public class BulkUploadTest extends TestBase
 {
-    public static final File CRIMES_CSV_HEADER = new File("src/test/resources/testCrimesHeader.csv");
-    public static final File CRIMES_CSV_UPSERT = new File("src/test/resources/testCrimesAppend.csv");
+    private static final File CRIMES_CSV_HEADER = Resources.file("/testCrimesHeader.csv");
+    private static final File CRIMES_CSV_UPSERT = Resources.file("/testCrimesAppend.csv");
 
 
     /**

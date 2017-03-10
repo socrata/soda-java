@@ -1,15 +1,13 @@
 package test.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.jersey.api.client.GenericType;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This is a java class that represents a White House Nomination.  This will get
@@ -94,5 +92,39 @@ public class Nomination
     public Boolean getHoldover()
     {
         return holdover;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Nomination)) return false;
+        final Nomination that = (Nomination) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(position, that.position) &&
+                Objects.equals(agencyName, that.agencyName) &&
+                Objects.equals(agencyWebsite, that.agencyWebsite) &&
+                Objects.equals(nominationDate, that.nominationDate) &&
+                Objects.equals(confirmationVoteDate, that.confirmationVoteDate) &&
+                Objects.equals(confirmed, that.confirmed) &&
+                Objects.equals(holdover, that.holdover);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, position, agencyName, agencyWebsite, nominationDate, confirmationVoteDate, confirmed, holdover);
+    }
+
+    @Override
+    public String toString() {
+        return "Nomination{" +
+                "name='" + name + '\'' +
+                ", position='" + position + '\'' +
+                ", agencyName='" + agencyName + '\'' +
+                ", agencyWebsite='" + agencyWebsite + '\'' +
+                ", nominationDate=" + nominationDate +
+                ", confirmationVoteDate=" + confirmationVoteDate +
+                ", confirmed=" + confirmed +
+                ", holdover=" + holdover +
+                '}';
     }
 }

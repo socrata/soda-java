@@ -1,6 +1,7 @@
 package com.socrata.api;
 
 import com.google.common.collect.Lists;
+import com.socrata.Resources;
 import com.socrata.TestBase;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
@@ -12,7 +13,10 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Crime;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,11 +25,9 @@ import java.util.UUID;
 public class Soda2ProducerTest extends TestBase
 {
 
-    public static final File  CRIMES_HEADER_CSV = new File("src/test/resources/testCrimesHeader.csv");
-    public static final File  CRIMES_HEADER2_CSV = new File("src/test/resources/testCrimesHeader2.csv");
-    public static final File  CRIMES_APPEND_CSV = new File("src/test/resources/testCrimesAppend.csv");
-
-    public static final File  DELETE_CRIMES_CSV = new File("src/test/resources/testDeletingCrimes.csv");
+    private static final File  CRIMES_HEADER_CSV = Resources.file("/testCrimesHeader.csv");
+    private static final File  CRIMES_HEADER2_CSV = Resources.file("/testCrimesHeader2.csv");
+    private static final File  DELETE_CRIMES_CSV = Resources.file("/testDeletingCrimes.csv");
 
 
     /**
@@ -208,14 +210,15 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingUpsertResults() throws IOException
     {
+        final Soda2Producer producer = new Soda2Producer(connect());
 
-        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
+        UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());
         TestCase.assertEquals(1, noErrors.getRowsCreated());
         TestCase.assertEquals(2, noErrors.getRowsUpdated());
         TestCase.assertEquals(3, noErrors.getRowsDeleted());
 
-        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_1.getBytes("utf-8")));
+        UpsertResult errors1 = producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_1.getBytes("utf-8")));
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals(1, errors1.getErrors().get(0).getIndex());
         TestCase.assertEquals("Error1", errors1.getErrors().get(0).getError());
@@ -224,7 +227,7 @@ public class Soda2ProducerTest extends TestBase
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(3, errors1.getRowsDeleted());
 
-        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_2.getBytes("utf-8")));
+        UpsertResult errors2 = producer.deserializeUpsertResult(new ByteArrayInputStream(UPSERT_RESULT_2.getBytes("utf-8")));
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals(1, errors2.getErrors().get(0).getIndex());
         TestCase.assertEquals("Error1", errors2.getErrors().get(0).getError());
@@ -245,14 +248,15 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingSodaServerUpsertResults() throws IOException
     {
+        final Soda2Producer producer = new Soda2Producer(connect());
 
-        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
+        UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());
         TestCase.assertEquals(3, noErrors.getRowsCreated());
         TestCase.assertEquals(0, noErrors.getRowsUpdated());
         TestCase.assertEquals(0, noErrors.getRowsDeleted());
 
-        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1.getBytes("utf-8")));
+        UpsertResult errors1 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1.getBytes("utf-8")));
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
         TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
@@ -260,7 +264,7 @@ public class Soda2ProducerTest extends TestBase
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(0, errors1.getRowsDeleted());
 
-        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2.getBytes("utf-8")));
+        UpsertResult errors2 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2.getBytes("utf-8")));
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
         TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());
@@ -279,14 +283,15 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testParsingOldSodaServerUpsertResults() throws IOException
     {
+        final Soda2Producer producer = new Soda2Producer(connect());
 
-        UpsertResult noErrors = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS_OLD.getBytes("utf-8")));
+        UpsertResult noErrors = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_NO_ERRORS_OLD.getBytes("utf-8")));
         TestCase.assertEquals(0, noErrors.errorCount());
         TestCase.assertEquals(3, noErrors.getRowsCreated());
         TestCase.assertEquals(0, noErrors.getRowsUpdated());
         TestCase.assertEquals(0, noErrors.getRowsDeleted());
 
-        UpsertResult errors1 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1_OLD.getBytes("utf-8")));
+        UpsertResult errors1 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1_OLD.getBytes("utf-8")));
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
         TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
@@ -294,7 +299,7 @@ public class Soda2ProducerTest extends TestBase
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(0, errors1.getRowsDeleted());
 
-        UpsertResult errors2 = Soda2Producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2_OLD.getBytes("utf-8")));
+        UpsertResult errors2 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2_OLD.getBytes("utf-8")));
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
         TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());

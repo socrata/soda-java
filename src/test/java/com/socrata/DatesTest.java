@@ -7,16 +7,14 @@ import com.socrata.api.Soda2Producer;
 import com.socrata.builders.SoqlQueryBuilder;
 import com.socrata.exceptions.DoesNotExistException;
 import com.socrata.exceptions.SodaError;
-import com.socrata.model.UpsertResult;
 import com.socrata.model.DeleteRecord;
 import com.socrata.model.Meta;
+import com.socrata.model.UpsertResult;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.utils.ColumnUtil;
 import junit.framework.TestCase;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.time.DateUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import test.model.Nomination;
@@ -183,7 +181,7 @@ public class DatesTest extends TestBase
 
         final Meta objectMetadata = producer.addObject(UPDATE_DATA_SET, nomination);
         final Nomination createdNomination = producer.getById(UPDATE_DATA_SET, objectMetadata.getId(), Nomination.class);
-        TestCase.assertTrue(EqualsBuilder.reflectionEquals(nomination, createdNomination));
+        TestCase.assertEquals(nomination, createdNomination);
 
         final Meta updateMeta= producer.update(UPDATE_DATA_SET, objectMetadata.getId(), nominationUpdate);
         TestCase.assertEquals(objectMetadata.getId(), updateMeta.getId());
@@ -198,8 +196,6 @@ public class DatesTest extends TestBase
         //TestCase.assertTrue(EqualsBuilder.reflectionEquals(nominationUpdate, updatedNomination));
 
         List l = Lists.newArrayList(new DeleteRecord(objectMetadata.getId(), true));
-        ObjectMapper m = new ObjectMapper();
-        System.out.println(m.writeValueAsString(l));
         UpsertResult result = producer.upsert(UPDATE_DATA_SET, l);
         try {
             final Nomination deletedNomination = producer.getById(UPDATE_DATA_SET, objectMetadata.getId(), Nomination.class);

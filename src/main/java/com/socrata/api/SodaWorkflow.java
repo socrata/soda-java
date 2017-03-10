@@ -1,5 +1,6 @@
 package com.socrata.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.Comment;
@@ -8,7 +9,6 @@ import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.requests.SodaRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -33,8 +33,8 @@ public class SodaWorkflow
 
     protected final URI           geocodingUri;
     protected final HttpLowLevel  httpLowLevel;
-    protected final ObjectMapper  mapper;
     protected final URI           viewUri;
+    protected final ObjectMapper  mapper;
 
     /**
      * Create a new SodaWorkflow object, using the supplied credentials for authentication.
@@ -70,7 +70,7 @@ public class SodaWorkflow
                               .path(VIEWS_BASE_PATH)
                               .build();
 
-        mapper = new ObjectMapper();
+        mapper = httpLowLevel.getObjectMapper();
     }
 
     /**
