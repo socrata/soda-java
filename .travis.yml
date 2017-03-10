@@ -1,0 +1,7 @@
+language: scala
+jdk:
+- oraclejdk8
+- oraclejdk7
+notifications:
+  slack:
+    secure: NiPSKYk3ZeVYRUc/JeX/ueUFrOaYr7SJmjX7GeOQSjzJaaGG0APXr5Z896nEo7QyQkF9P9GJJM3zIF8VPv43ZWe5zIXd8U+vjrfdsmc7UCczZ08tTVEErxSgp6IqzmkApz37NS/8uNaVRbZZQQc9j9aEZccyfge90ewG6wCPnlQ=

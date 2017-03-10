@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/socrata/soda-java.svg?branch=chrismetcalf%2Ftravis)](https://travis-ci.org/socrata/soda-java)
+
 This is the Java API for the Socrata Open Data API (SODA).  You can look at the developer site (http://dev.socrata.com/) for
 a deeper discussion of the underlying protocol or the javadoc for better documentation for this library (http://socrata.github.io/soda-java/apidocs/) .
 
@@ -35,6 +38,10 @@ soda-java is published to Maven Central.  The dependency is
   <version>0.9.12</version>
 </dependency>
 ```
+
+### Important Note!
+
+In order to access the SODA API via HTTPS, clients must now [support the Server Name Indication (SNI)](https://dev.socrata.com/changelog/2016/08/24/sni-now-required-for-https-connections.html) extension to the TLS protocol. What does this mean? It means that if you're using `soda-java`, you must [use JVM 1.7 or higher](https://en.wikipedia.org/wiki/Server_Name_Indication), as that is when support for SNI was introduced.
 
 ### Precompiled JARs
 
