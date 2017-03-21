@@ -32,7 +32,7 @@ soda-java is published to Maven Central.  The dependency is
 <dependency>
   <groupId>com.socrata</groupId>
   <artifactId>soda-api-java</artifactId>
-  <version>0.9.12</version>
+  <version>0.9.13</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ soda-java is published to Maven Central.  The dependency is
 2. Run `sbt package`. This will download most of the Internet, so [give it some time](https://xkcd.com/303/).
 3. A new JAR will be generated as `target/soda-api-java-${version}-SNAPSHOT.jar`
 
-You can also build an assembly JAR with all of the dependencies baked in by running `sbt assembly`. However, to do so, you'll need to first set up the test suite using the instructions below. You may instead want to just grab a [pre-built release JAR](./releases).
+You can also build an assembly JAR with all of the dependencies baked in by running `sbt assembly`. However, to do so, you'll need to first set up the test suite using the instructions below. You may instead want to just grab a [pre-built release JAR](https://github.com/socrata/soda-java/releases).
 
 ### Running the tests
 
