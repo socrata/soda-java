@@ -1,0 +1,12 @@
+language: scala
+jdk:
+    - oraclejdk8
+    - oraclejdk7
+    - openjdk6
+script:
+    # Build a config file
+    - echo "baseurl=https://sandbox.demo.socrata.com" > src/test/resources/TestConfig.properties
+    - echo "token=${SOCRATA_APP_TOKEN}"  >> src/test/resources/TestConfig.properties
+    - echo "username=${SOCRATA_USERNAME}"  >> src/test/resources/TestConfig.properties
+    - echo "password=${SOCRATA_PASSWORD}"  >> src/test/resources/TestConfig.properties
+    - sbt test

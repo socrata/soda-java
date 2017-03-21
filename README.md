@@ -36,6 +36,24 @@ soda-java is published to Maven Central.  The dependency is
 </dependency>
 ```
 
+### Compiling
+
+`soda-java` is built with [sbt](http://www.scala-sbt.org/), and once you have that installed, building a JAR is fairly straightforward.
+
+1. Install SBT. If you're running MacOSX and [homebrew](https://brew.sh/), you can run `brew bundle` to install dependencies.
+2. Run `sbt package`. This will download most of the Internet, so [give it some time](https://xkcd.com/303/).
+3. A new JAR will be generated as `target/soda-api-java-${version}-SNAPSHOT.jar`
+
+You can also build an assembly JAR with all of the dependencies baked in by running `sbt assembly`. However, to do so, you'll need to first set up the test suite using the instructions below. You may instead want to just grab a [pre-built release JAR](./releases).
+
+### Running the tests
+
+Before submitting pull requests, please set up and run the test suite to make sure you haven't introduced any bugs. Same goes for building an assembly JAR with `sbt assembly`:
+
+1. Before starting, you'll need a Socrata account that has the ability to create datasets on a sandbox domain. If you don't have one, [file a ticket](./issues) and the Socrata team will set you up.
+2. Copy `src/test/resources/TestConfig.properties.example` to `src/test/resources/TestConfig.properties` and update it with your own application token, email address, and password
+3. Run `sbt test` to run the test suite
+
 ### Precompiled JARs
 
 Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.

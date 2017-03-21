@@ -114,7 +114,7 @@ public class SodaWorkflowTest  extends TestBase
 
 
         List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(2, results2.size());
+        TestCase.assertTrue(results2.size() >= 2);
 
         //
         //  Now delete
