@@ -34,6 +34,11 @@ public class TestJacksonObjectMapperProvider {
         format = (ObjectMapperFactory.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
     }
 
+    @BeforeClass
+    public static void useUTCTimezone() {
+        System.setProperty("user.timezone", "UTC");
+    }
+
     @Test(expected = ParseException.class)
     public void testParseBadDateString() throws ParseException {
         parse("12345");
