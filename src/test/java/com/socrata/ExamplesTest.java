@@ -34,12 +34,11 @@ public class ExamplesTest extends TestBase
         //To get a raw String of the results
         ClientResponse response = consumer.query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
         String payload = response.getEntity(String.class);
-        System.out.println(payload);
+        TestCase.assertTrue(payload.length() > 0);
 
         //Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
         List<Nomination> nominations = consumer.query("nominationsCopy", SoqlQuery.SELECT_ALL, Nomination.LIST_TYPE);
         TestCase.assertTrue(nominations.size() > 0);
-        System.out.println(nominations.size());
 
 
         //Create a SoQL query to find the nominations for the Department of State
@@ -52,7 +51,6 @@ public class ExamplesTest extends TestBase
                 .build();
         nominations = consumer.query("nominationsCopy", departmentOfStateQuery, Nomination.LIST_TYPE);
         TestCase.assertTrue(nominations.size() > 0);
-        System.out.println(nominations.size());
     }
 
     public static final String NOMINATION_STREAM_TO_ADD = "{\n" +
