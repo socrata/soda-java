@@ -8,4 +8,7 @@ script:
     - echo "token=${SOCRATA_APP_TOKEN}"  >> src/test/resources/TestConfig.properties
     - echo "username=${SOCRATA_USERNAME}"  >> src/test/resources/TestConfig.properties
     - echo "password=${SOCRATA_PASSWORD}"  >> src/test/resources/TestConfig.properties
-    - sbt test
+
+    # Force TLS 1.1 or 1.2 for tests
+    - sbt -Ddeployment.security.SSLv2Hello=false -Ddeployment.security.SSLv3=false -Ddeployment.security.TLSv1=false -D\
+      deployment.security.TLSv1.1=true -Ddeployment.security.TLSv1.2=true test
