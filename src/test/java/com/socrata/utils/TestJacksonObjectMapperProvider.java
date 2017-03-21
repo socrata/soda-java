@@ -32,10 +32,8 @@ public class TestJacksonObjectMapperProvider {
         mapper = provider.getContext(null);
         assertThat(mapper, notNullValue());
         format = (ObjectMapperFactory.SocrataDateFormat) mapper.getDeserializationConfig().getDateFormat();
-    }
 
-    @BeforeClass
-    public static void useUTCTimezone() {
+        // Make sure we're running in the right timezone
         System.setProperty("user.timezone", "UTC");
     }
 
