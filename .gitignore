@@ -4,3 +4,7 @@
 /.idea/
 /.idea_modules/
 /credentials.sbt
+src/test/resources/TestConfig.properties
+.classpath
+.project
+.settings

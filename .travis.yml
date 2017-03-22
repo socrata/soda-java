@@ -1,0 +1,13 @@
+language: scala
+jdk:
+- oraclejdk8
+- oraclejdk7
+script:
+- echo "baseurl=https://sandbox.demo.socrata.com" > src/test/resources/TestConfig.properties
+- echo "token=${SOCRATA_APP_TOKEN}"  >> src/test/resources/TestConfig.properties
+- echo "username=${SOCRATA_USERNAME}"  >> src/test/resources/TestConfig.properties
+- echo "password=${SOCRATA_PASSWORD}"  >> src/test/resources/TestConfig.properties
+- travis_retry sbt -Ddeployment.security.SSLv2Hello=false -Ddeployment.security.SSLv3=false -Ddeployment.security.TLSv1=false -Ddeployment.security.TLSv1.1=true -Ddeployment.security.TLSv1.2=true -Dhttps.protocols=TLSv1.1,TLSv1.2 test
+notifications:
+  slack:
+    secure: E6xzNkkqyveUY5bmH3wFi+hhhTJsjf7R9mUBqWhO0f/iazVlZvbyJHN/peR5OaqgLRCp+d/Sg+Pp18oF6vybasoOXGQG+kgd0KDE0gpje8+DTfbrBj7PCiuEQSfkU6lXEoDhUHEOFMnu/h1SQMd8Mu3QkIlp98Pwvu0ORFFxWbs=

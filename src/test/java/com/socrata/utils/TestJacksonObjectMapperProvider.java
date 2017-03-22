@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -20,13 +21,15 @@ import static org.junit.Assert.assertThat;
  */
 public class TestJacksonObjectMapperProvider {
 
-    private static final Date base = new Date(112, 5, 20, 7, 0);
-
     private static ObjectMapper mapper;
     private static ObjectMapperFactory.SocrataDateFormat format;
 
     @BeforeClass
     public static void setupClass() {
+        // Make sure we're running in the right timezone
+        System.setProperty("user.timezone", "UTC");
+        TimeZone.setDefault(null);
+
         // Make sure the ObjectMapper is setup correctly
         final JacksonObjectMapperProvider provider = new JacksonObjectMapperProvider();
         mapper = provider.getContext(null);
@@ -41,32 +44,50 @@ public class TestJacksonObjectMapperProvider {
 
     @Test
     public void testParseISONoSecondsNoTZ() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00"), equalTo(base));
+        assertThat(
+                new Date(112, 5, 20, 7, 0),
+                equalTo(parse("2012-06-20T07:00:00"))
+                );
     }
 
     @Test
     public void testParseISONoTZ() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00.000"), equalTo(base));
+        assertThat(
+                new Date(112, 5, 20, 7, 0),
+                equalTo(parse("2012-06-20T07:00:00.000"))
+                );
     }
 
     @Test
     public void testParseISONoSeconds() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00-0300"), is(before(base)));
+        assertThat(
+                new Date(112, 5, 20, 10, 0),
+                equalTo(parse("2012-6-20T07:00:00-0300"))
+                );
     }
 
     @Test
     public void testParseISO() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00.000-0300"), is(before(base)));
+        assertThat(
+                new Date(112, 5, 20, 10, 0),
+                equalTo(parse("2012-6-20T07:00:00.000-0300"))
+                );
     }
 
     @Test
     public void testParseISONoSecondsZulu() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00Z"), is(before(base)));
+        assertThat(
+                new Date(112, 5, 20, 7, 0),
+                equalTo(parse("2012-6-20T07:00:00Z"))
+                );
     }
 
     @Test
     public void testParseISOZulu() throws ParseException {
-        assertThat(parse("2012-6-20T07:00:00.000Z"), is(before(base)));
+        assertThat(
+                new Date(112, 5, 20, 7, 0),
+                equalTo(parse("2012-6-20T07:00:00.000Z"))
+                );
     }
 
     @Test

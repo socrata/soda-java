@@ -1,0 +1,4 @@
+baseurl=https://sandbox.demo.socrata.com
+token=YourApplicationToken
+username=you@example.com
+password=yourverysecurelongpassword

@@ -226,7 +226,7 @@ public class SodaImporterTest extends TestBase
         TestCase.assertNotNull(loadedView);
         TestCase.assertEquals("published", loadedView.getPublicationStage());
 
-        importer.deleteDataset(createdView.getId());
+        importer.deleteDataset(loadedView.getId());
     }
 
 
