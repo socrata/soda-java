@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -35,6 +36,7 @@ public class TestJacksonObjectMapperProvider {
 
         // Make sure we're running in the right timezone
         System.setProperty("user.timezone", "UTC");
+        TimeZone.setDefault(null);
     }
 
     @Test(expected = ParseException.class)
