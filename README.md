@@ -291,10 +291,8 @@ loadedView.setDescription("New description");
 
 // To update custom metadata create a Metadata object with a map of Metadata fields to values you wish to update
 Map<String,Map<String,String>> customMetadataToUpdate = ImmutableMap.of("Dataset Summary", (Map<String, String>) ImmutableMap.of("Organization", "DDDDDD"));
-Metadata metadata = new Metadata(customMetadataToUpdate, null, null, null, null);
-					
-// Actually perform the metadata update
-loadedView.setMetadata(metadata);
+Metadata metadata = loadedView.getMetadata();
+metadata.setCustom_fields(customMetadataToUpdate);
 importer.updateDatasetInfo(loadedView);
 importer.publish(loadedView.getId());
 ```
