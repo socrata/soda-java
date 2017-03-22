@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/socrata/soda-java.svg?branch=master)](https://travis-ci.org/socrata/soda-java)
+
 This is the Java API for the Socrata Open Data API (SODA).  You can look at the developer site (http://dev.socrata.com/) for
 a deeper discussion of the underlying protocol or the javadoc for better documentation for this library (http://socrata.github.io/soda-java/apidocs/) .
 
@@ -53,6 +55,8 @@ Before submitting pull requests, please set up and run the test suite to make su
 1. Before starting, you'll need a Socrata account that has the ability to create datasets on a sandbox domain. If you don't have one, [file a ticket](./issues) and the Socrata team will set you up.
 2. Copy `src/test/resources/TestConfig.properties.example` to `src/test/resources/TestConfig.properties` and update it with your own application token, email address, and password
 3. Run `sbt test` to run the test suite
+
+Tests are also run for all branches and PRs via [Travis-CI](https://travis-ci.org/socrata/soda-java).
 
 ### Precompiled JARs
 
