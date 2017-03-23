@@ -11,11 +11,11 @@ organization := "com.socrata"
 name := "soda-api-java"
 
 // remember to update the README when you change this to a new release
-version := "0.9.13-SNAPSHOT"
+version := "0.9.13"
 
 previousArtifact := Some("com.socrata" % "soda-api-java" % "0.9.11")
 
-javacOptions in compile ++= Seq("-g", "-Xlint:deprecation", "-Xlint:unchecked")
+javacOptions in compile ++= Seq("-g", "-Xlint:deprecation", "-Xlint:unchecked", "-target", "1.7", "-source", "1.7")
 
 autoScalaLibrary := false
 
