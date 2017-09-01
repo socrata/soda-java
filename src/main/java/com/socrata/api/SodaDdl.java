@@ -30,7 +30,6 @@ public class SodaDdl extends SodaWorkflow
     protected static final String FILE_RESOURCE_PATH   = "file_data";
     protected static final String SEARCH_BASE_PATH     = "search";
     private final URI assetUri;
-    private final URI fileResourceUri;
     private final URI searchUri;
 
     /**
@@ -68,14 +67,6 @@ public class SodaDdl extends SodaWorkflow
                                 .path(SEARCH_BASE_PATH)
                                 .path(VIEWS_BASE_PATH)
                                 .build();
-
-        fileResourceUri = httpLowLevel.uriBuilder()
-                               .path(API_BASE_PATH)
-                               .path(FILE_RESOURCE_PATH)
-                               .build();
-
-
-
     }
 
 
@@ -396,6 +387,17 @@ public class SodaDdl extends SodaWorkflow
         }
     }
 
+
+    protected URI fileResourceUri(String datasetId, String fileId) {
+        return httpLowLevel.uriBuilder()
+            .path(API_BASE_PATH)
+            .path("views")
+            .path(datasetId)
+            .path("files")
+            .path(fileId)
+            .build();
+    };
+
     /**
      * Downloads a file blob, based on the NonDataFileDataset it's part of.
      * @return
@@ -409,10 +411,7 @@ public class SodaDdl extends SodaWorkflow
         {
             public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
             {
-                final URI uri = UriBuilder.fromUri(fileResourceUri)
-                                          .path(resourceId)
-                                          .build();
-
+                final URI uri = fileResourceUri(dataset.getId(), resourceId);
                 return httpLowLevel.queryRaw(uri, MediaType.WILDCARD_TYPE);
             }
         };
