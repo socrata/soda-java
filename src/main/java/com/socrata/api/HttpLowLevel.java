@@ -10,18 +10,20 @@ import com.socrata.model.requests.SodaRequest;
 import com.socrata.utils.JacksonObjectMapperProvider;
 import com.socrata.utils.ObjectMapperFactory;
 import com.socrata.utils.streams.CompressingGzipInputStream;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.urlconnection.HttpURLConnectionFactory;
-import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
-import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
+import org.glassfish.jersey.client.JerseyClient;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.client.Entity;
+import org.glassfish.jersey.client.JerseyWebTarget;
+import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.client.JerseyInvocation;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -84,7 +86,7 @@ public final class HttpLowLevel
 
     private final ObjectMapper mapper;
 
-    private final Client client;
+    private final JerseyClient client;
     private final String url;
 
     private long retryTime = DEFAULT_RETRY_TIME;
@@ -104,7 +106,7 @@ public final class HttpLowLevel
      *
      * @return the Client that was created.
      */
-    private static Client createClient() {
+    private static JerseyClient createClient() {
 
         String  proxyHost = System.getProperty("https.proxyHost");
         Integer proxyPort = null;
@@ -127,19 +129,19 @@ public final class HttpLowLevel
      *
      * @return the Client that was created.
      */
-    private static Client createClient(@Nullable final String proxyHost, @Nullable final Integer proxyPort) {
-        final ClientConfig clientConfig = new DefaultClientConfig();
-        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-        clientConfig.getClasses().add(JacksonObjectMapperProvider.class);
+    private static JerseyClient createClient(@Nullable final String proxyHost, @Nullable final Integer proxyPort) {
+        final ClientConfig clientConfig = new ClientConfig();
+        clientConfig.register(JacksonObjectMapperProvider.class);
+        clientConfig.register(JacksonFeature.class);
+        clientConfig.register(MultiPartFeature.class);
 
-        final Client client;
         if (StringUtils.isNotEmpty(proxyHost)) {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort == null ? 443 : proxyPort));
-            client = new Client(new URLConnectionClientHandler(new ProxyHandler(proxy)), clientConfig);
-        } else {
-            client = Client.create(clientConfig);
+            HttpUrlConnectorProvider cp = new HttpUrlConnectorProvider();
+            cp.connectionFactory(new ProxyHandler(proxy));
+            clientConfig.connectorProvider(cp);
         }
-        return client;
+        return new JerseyClientBuilder().withConfig(clientConfig).build();
     }
 
     /**
@@ -164,20 +166,23 @@ public final class HttpLowLevel
      */
     public static final HttpLowLevel instantiateBasic(@Nonnull final String url, @Nonnull final String userName, @Nonnull final String password, @Nullable final String token, @Nullable final String requestId)
     {
-        final Client client = createClient();
-        client.addFilter(new HTTPBasicAuthFilter(userName, password));
+        final JerseyClient client = createClient();
+        client.register(HttpAuthenticationFeature.basic(userName, password));
         if (token != null) {
-            client.addFilter(new SodaTokenFilter(token));
+            client.register(new SodaTokenFilter(token));
         }
         if (requestId != null) {
-            client.addFilter(new SodaRequestIdFilter(requestId));
+            client.register(new SodaRequestIdFilter(requestId));
         }
-        client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
+
+        // I think this isn't necessary with jersey 2; in any event it's not done this way.
+        //client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
+
         //client.setConnectTimeout(1000 * 60);
         return new HttpLowLevel(client, url);
     }
 
-    public HttpLowLevel(final Client client, final String url) {
+    public HttpLowLevel(final JerseyClient client, final String url) {
         this(client, url, ObjectMapperFactory.create());
     }
 
@@ -188,7 +193,7 @@ public final class HttpLowLevel
      * @param client the Jersey Client class that will be used for actually issuing requests
      * @param url the base URL for the SODA2 domain to access.
      */
-    public HttpLowLevel(final Client client, final String url, final ObjectMapper mapper)
+    public HttpLowLevel(final JerseyClient client, final String url, final ObjectMapper mapper)
     {
         this.client = client;
         this.url = url;
@@ -200,7 +205,7 @@ public final class HttpLowLevel
      *
      * @return Jersey Client object this connection will use.
      */
-    public Client getClient()
+    public JerseyClient getClient()
     {
         return client;
     }
@@ -319,14 +324,14 @@ public final class HttpLowLevel
      *
      * @param uri the URI to go back to
      * @param retryTime the amount of time to wait for a retry
-     * @return the ClientResponse from this operation
+     * @return the Response from this operation
      *
      * @throws InterruptedException if this thread is interrupted
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse follow202(final URI uri, final MediaType mediaType, final long retryTime, final SodaRequest request2Rerun) throws InterruptedException, LongRunningQueryException, SodaError
+    public Response follow202(final URI uri, final MediaType mediaType, final long retryTime, final SodaRequest request2Rerun) throws InterruptedException, LongRunningQueryException, SodaError
     {
         if (retryTime > 0) {
             synchronized (this) {
@@ -355,9 +360,12 @@ public final class HttpLowLevel
      */
     final public <T> T getAsyncResults(URI uri, long waitTime, long numRetries, Class<T> cls, final SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
-
-        final ClientResponse response = getAsyncResults(uri, HttpLowLevel.JSON_TYPE, waitTime, numRetries, request2Rerun);
-        return response.getEntity(cls);
+        Response response = getAsyncResults(uri, HttpLowLevel.JSON_TYPE, waitTime, numRetries, request2Rerun);
+        try {
+            return response.readEntity(cls);
+        } finally {
+            response.close();
+        }
     }
 
     /**
@@ -374,8 +382,12 @@ public final class HttpLowLevel
      */
     final public <T> T getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, GenericType<T> cls, SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
-        final ClientResponse response = getAsyncResults(uri, mediaType, waitTime, numRetries, request2Rerun);
-        return response.getEntity(cls);
+        final Response response = getAsyncResults(uri, mediaType, waitTime, numRetries, request2Rerun);
+        try {
+             return response.readEntity(cls);
+        } finally {
+            response.close();
+        }
     }
 
     /**
@@ -390,16 +402,14 @@ public final class HttpLowLevel
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    final public ClientResponse getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, SodaRequest request2Rerun) throws SodaError, InterruptedException
+    final public Response getAsyncResults(URI uri, MediaType mediaType, long waitTime, long numRetries, SodaRequest request2Rerun) throws SodaError, InterruptedException
     {
 
         for (int i=0; i<numRetries; i++) {
 
             try {
-                final ClientResponse response = follow202(uri, mediaType, waitTime, request2Rerun);
-                return response;
+                return follow202(uri, mediaType, waitTime, request2Rerun);
             } catch (LongRunningQueryException e) {
-
                 if (e.location != null) {
                     uri = e.location;
                 }
@@ -412,7 +422,7 @@ public final class HttpLowLevel
 
 
     /**
-     * Raw version of the API for issuing a delete, doing common error processing and returning the ClientResponse.
+     * Raw version of the API for issuing a delete, doing common error processing and returning the Response.
      *
      * @param uri URI to issue a request to.  Any id information should have already been added.
      * @return the raw ClientReponse to the request.  Any errors will have already been processed, and have thrown
@@ -421,12 +431,12 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse deleteRaw(final URI uri) throws LongRunningQueryException, SodaError
+    public Response deleteRaw(final URI uri) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                  .accept("application/json");
+        final Response response = client.target(soda2ifyUri(uri)).request().
+            accept("application/json").
+            delete(Response.class);
 
-        final ClientResponse response = builder.delete(ClientResponse.class);
         return processErrors(response);
     }
 
@@ -442,12 +452,12 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse queryRaw(final URI uri, final MediaType acceptType) throws LongRunningQueryException, SodaError
+    public Response queryRaw(final URI uri, final MediaType acceptType) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                    .accept(acceptType);
+        final Response response = client.target(soda2ifyUri(uri)).request().
+            accept(acceptType).
+            get(Response.class);
 
-        final ClientResponse response = builder.get(ClientResponse.class);
         return processErrors(response);
     }
 
@@ -465,15 +475,13 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError
+    public Response postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                .accept("application/json")
-                .type(mediaType);
-
-
+        final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
+            accept("application/json");
         final Object encodedObject = encodeContents(contentEncoding, builder, object);
-        final ClientResponse response = builder.post(ClientResponse.class, encodedObject);
+        final Response response = builder.post(Entity.entity(encodedObject, mediaType), Response.class);
+
         return processErrors(response);
     }
 
@@ -489,7 +497,9 @@ public final class HttpLowLevel
             additionalParams.remove(NBE_FLAG);
     }
 
-    private Object encodeContents(final ContentEncoding contentEncoding, final WebResource.Builder builder, final Object object) throws BadCompressionException
+    private Object encodeContents(final ContentEncoding contentEncoding,
+                                  final JerseyInvocation.Builder builder,
+                                  final Object object) throws BadCompressionException
     {
 
         switch (contentEncoding) {
@@ -518,20 +528,23 @@ public final class HttpLowLevel
     }
 
 
-    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
+    public Response postFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
         return postFileRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, file);
     }
 
-    public ClientResponse postFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, File file) throws LongRunningQueryException, SodaError
+    public Response postFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, File file) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                  .accept(acceptType)
-                                                  .type(MediaType.MULTIPART_FORM_DATA_TYPE);
+        final Response response;
 
-        FormDataMultiPart form = new FormDataMultiPart();
-        form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
+        try(FormDataMultiPart form = new FormDataMultiPart()) {
+            form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
+            response = client.target(soda2ifyUri(uri)).request().
+                accept(acceptType).
+                post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
+        } catch (IOException e) {
+            throw new SodaError("IO error", e);
+        }
 
-        final ClientResponse response = builder.post(ClientResponse.class, form);
         return processErrors(response);
     }
 
@@ -549,38 +562,40 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> ClientResponse putRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, final Object object) throws LongRunningQueryException, SodaError
+    public <T> Response putRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, final Object object) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                  .accept("application/json")
-                                                  .type(mediaType);
+        final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
+            accept("application/json");
 
         final Object encodedObject = encodeContents(contentEncoding, builder, object);
-        final ClientResponse response = builder.put(ClientResponse.class, encodedObject);
+        final Response response = builder.put(Entity.entity(encodedObject, mediaType), Response.class);
         return processErrors(response);
     }
 
 
-    public ClientResponse putFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
+    public Response putFileRaw(final URI uri, final MediaType mediaType, final File file) throws LongRunningQueryException, SodaError {
         return putFileRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, file);
     }
 
-    public ClientResponse putFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final File file) throws LongRunningQueryException, SodaError
+    public Response putFileRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final File file) throws LongRunningQueryException, SodaError
     {
-        final WebResource.Builder builder = client.resource(soda2ifyUri(uri))
-                                                  .accept(acceptType)
-                                                  .type(MediaType.MULTIPART_FORM_DATA_TYPE);
+        final Response response;
 
-        FormDataMultiPart form = new FormDataMultiPart();
-        form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
+        try(FormDataMultiPart form = new FormDataMultiPart()) {
+            form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
+            response = client.target(soda2ifyUri(uri)).request().
+                accept(acceptType).
+                put(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
+        } catch (IOException e) {
+            throw new SodaError("IO error", e);
+        }
 
-        final ClientResponse response = builder.put(ClientResponse.class, form);
         return processErrors(response);
     }
 
     public void close() {
         if (client != null) {
-            client.destroy();
+            client.close();
         }
     }
 
@@ -612,84 +627,85 @@ public final class HttpLowLevel
     }
 
     /**
-     * Looks through a ClientResponse and throws any appropriate Java exceptions if there is an error.
+     * Looks through a Response and throws any appropriate Java exceptions if there is an error.
      *
-     * @param response ClientResponse to check for errors.
+     * @param response Response to check for errors.
      * @return response that was passed in.
      *
      * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    private ClientResponse processErrors(final ClientResponse response) throws SodaError, LongRunningQueryException
+    private Response processErrors(final Response response) throws SodaError, LongRunningQueryException
     {
         int status = response.getStatus();
         if (status == 200 || status == 201 || status == 204) {
             return response;
         }
 
-        final String body = response.getEntity(String.class);
+        try {
+            final String body = response.readEntity(String.class);
 
-        if (status == 202) {
-            final String location = response.getHeaders().getFirst("Location");
-            final String retryAfter = response.getHeaders().getFirst("Retry-After");
+            if (status == 202) {
+                final String location = response.getStringHeaders().getFirst("Location");
+                final String retryAfter = response.getStringHeaders().getFirst("Retry-After");
 
-            String ticket = null;
-            URI locationUri = null;
+                String ticket = null;
+                URI locationUri = null;
 
 
-            //
-            //  There are actually two ways Socrata currently deals with 202s, in the newer mechanism, they use
-            //  the Location and Retry-After headers to direct where the "future" result is.  In the other mechanism,
-            //  A specific "ticket" is created that needs to be combined with the original URL to get the "future"
-            //  result.
-            //
-            if (StringUtils.isEmpty(location)) {
+                //
+                //  There are actually two ways Socrata currently deals with 202s, in the newer mechanism, they use
+                //  the Location and Retry-After headers to direct where the "future" result is.  In the other mechanism,
+                //  A specific "ticket" is created that needs to be combined with the original URL to get the "future"
+                //  result.
+                //
+                if (StringUtils.isEmpty(location)) {
 
-                if (StringUtils.isEmpty(body)) {
-                    throw new SodaError("Illegal body for 202 response.  No location and body is empty.");
-                }
-
-                try {
-                    final Map<String, Object> bodyProperties = mapper.readValue(body, GENERIC_JSON_OBJECT_TYPE);
-                    if (bodyProperties.get("ticket") != null) {
-                        ticket = bodyProperties.get("ticket").toString();
+                    if (StringUtils.isEmpty(body)) {
+                        throw new SodaError("Illegal body for 202 response.  No location and body is empty.");
                     }
 
-                } catch (IOException ioe) {
-                    throw new SodaError("Illegal body for 202 response.  No location or ticket.  Body = " + body);
+                    try {
+                        final Map<String, Object> bodyProperties = mapper.readValue(body, GENERIC_JSON_OBJECT_TYPE);
+                        if (bodyProperties.get("ticket") != null) {
+                            ticket = bodyProperties.get("ticket").toString();
+                        }
+
+                    } catch (IOException ioe) {
+                        throw new SodaError("Illegal body for 202 response.  No location or ticket.  Body = " + body);
+                    }
+
+                } else {
+                    try {
+                        locationUri = new URI(location);
+                    } catch (URISyntaxException e) {
+                        throw new InvalidLocationError(location);
+                    }
                 }
 
+                throw new LongRunningQueryException(locationUri, parseRetryAfter(retryAfter), ticket);
+            }
+
+            if (response.getMediaType() != null && !response.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
+                throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null), status);
+            }
+
+            SodaErrorResponse sodaErrorResponse;
+            if(body.isEmpty()) {
+                sodaErrorResponse = new SodaErrorResponse(String.valueOf(status), null, null, null);
             } else {
                 try {
-                    locationUri = new URI(location);
-                } catch (URISyntaxException e) {
-                    throw new InvalidLocationError(location);
+                    sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
+                } catch (Exception e) {
+                    throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null), status);
                 }
             }
 
-            throw new LongRunningQueryException(locationUri, parseRetryAfter(retryAfter), ticket);
-        }
-
-        if (response.getType() != null && !response.getType().isCompatible(MediaType.APPLICATION_JSON_TYPE)) {
-            throw new SodaError(new SodaErrorResponse(UNEXPECTED_ERROR, body, null, null), status);
-        }
-
-        SodaErrorResponse sodaErrorResponse;
-        if(body.isEmpty()) {
-            sodaErrorResponse = new SodaErrorResponse(String.valueOf(status), null, null, null);
-        } else {
-            try {
-                sodaErrorResponse = mapper.readValue(body, SodaErrorResponse.class);
-            } catch (Exception e) {
-                throw new SodaError(new SodaErrorResponse(MALFORMED_RESPONSE, body, null, null), status);
-            }
-        }
-
-        switch (status) {
+            switch (status) {
             case 400:
                 if (sodaErrorResponse.message != null &&
-                        sodaErrorResponse.message.startsWith("Row data was saved.")) {
+                    sodaErrorResponse.message.startsWith("Row data was saved.")) {
                     throw new MetadataUpdateError(sodaErrorResponse);
                 }
                 throw new MalformedQueryError(sodaErrorResponse);
@@ -707,6 +723,9 @@ public final class HttpLowLevel
                 throw new ConflictOperationException(sodaErrorResponse);
             default:
                 throw new SodaError(sodaErrorResponse, status);
+            }
+        } finally {
+            response.close();
         }
     }
 
@@ -742,7 +761,7 @@ public final class HttpLowLevel
     /**
      * An internal class we use for setting the proxy for an Http connection.
      */
-    private static class ProxyHandler implements HttpURLConnectionFactory
+    private static class ProxyHandler implements HttpUrlConnectorProvider.ConnectionFactory
     {
 
         final Proxy proxy;
@@ -753,7 +772,7 @@ public final class HttpLowLevel
         }
 
         @Override
-        public HttpURLConnection getHttpURLConnection(URL url) throws IOException
+        public HttpURLConnection getConnection(URL url) throws IOException
         {
             return (HttpURLConnection)url.openConnection(proxy);
         }

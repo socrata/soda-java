@@ -9,8 +9,8 @@ import com.socrata.model.SearchResults;
 import com.socrata.model.importer.*;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.search.SearchClause;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -99,13 +99,17 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<URI>(null, searchBuilder.build())
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return httpLowLevel.queryRaw(payload, MediaType.APPLICATION_JSON_TYPE); }
         };
 
         try {
-            final ClientResponse    response = requester.issueRequest();
-            return response.getEntity(SearchResults.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(SearchResults.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, MediaType.APPLICATION_JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<SearchResults>() {}, requester);
         }
@@ -141,7 +145,7 @@ public class SodaDdl extends SodaWorkflow
     {
         SodaRequest requester = new SodaRequest<DatasetInfo>(null, dataset)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 httpLowLevel.setUseNewBackend(useNewBackend);
                 return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
@@ -149,8 +153,12 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(DatasetInfo.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
         }
@@ -174,14 +182,18 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<URI>(null, uri)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return httpLowLevel.queryRaw(payload, HttpLowLevel.JSON_TYPE); }
         };
 
         try {
 
-            final ClientResponse response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
-            return response.getEntity(DatasetInfo.class);
+            final Response response = httpLowLevel.queryRaw(uri, HttpLowLevel.JSON_TYPE);
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
         }
@@ -205,7 +217,7 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<DatasetInfo>(datasetInfo.getId(), datasetInfo)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {   URI uri = UriBuilder.fromUri(viewUri)
                                     .path(resourceId)
                                     .build();
@@ -214,9 +226,12 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(DatasetInfo.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), DatasetInfo.class, requester);
         }
@@ -234,7 +249,7 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<DatasetInfo>(id, null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {   URI uri = UriBuilder.fromUri(viewUri)
                                     .path(id)
                                     .build();
@@ -243,7 +258,7 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            requester.issueRequest();
+            requester.issueRequest().close();
         } catch (LongRunningQueryException e) {
             getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
@@ -263,7 +278,7 @@ public class SodaDdl extends SodaWorkflow
     {
         SodaRequest requester = new SodaRequest<Column>(datasetId, column)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(viewUri)
                                           .path(resourceId)
@@ -274,8 +289,12 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(Column.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(Column.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Column.class, requester);
         }
@@ -299,7 +318,7 @@ public class SodaDdl extends SodaWorkflow
                                   .path(Integer.toString(columnId))
                                   .build();
 
-        final ClientResponse response = httpLowLevel.deleteRaw(uri);
+        httpLowLevel.deleteRaw(uri).close();
     }
 
     /**
@@ -316,7 +335,7 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<Column>(datasetId, column)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(viewUri)
                                           .path(resourceId)
@@ -328,8 +347,12 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(Column.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(Column.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Column.class, requester);
         }
@@ -341,20 +364,24 @@ public class SodaDdl extends SodaWorkflow
      * @param file file to upload
      * @return the asset ID and name
      */
-    public AssetResponse addAsset(final File file) throws SodaError, InterruptedException
+    public AssetResponse addAsset(final File file) throws SodaError, InterruptedException, IOException
     {
 
         SodaRequest requester = new SodaRequest<File>(null, file)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 return httpLowLevel.postFileRaw(assetUri, MediaType.TEXT_PLAIN_TYPE, MediaType.TEXT_PLAIN_TYPE, payload);
             }
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return mapper.readValue(response.getEntity(InputStream.class), AssetResponse.class);
+            final Response response = requester.issueRequest();
+            try {
+                return mapper.readValue(response.readEntity(InputStream.class), AssetResponse.class);
+            } finally {
+                response.close();
+            }
             //return response.getEntity(AssetResponse.class);
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), AssetResponse.class, requester);
@@ -363,7 +390,7 @@ public class SodaDdl extends SodaWorkflow
         } catch (JsonParseException e) {
             throw new SodaError("Invalid JSON returned from the service.");
         } catch (IOException e) {
-            throw new SodaError("Error communicating with service.");
+            throw new SodaError("Error communicating with service.", e);
         }
     }
 
@@ -378,7 +405,7 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<File>(id, null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(assetUri)
                                           .path(resourceId)
@@ -389,8 +416,8 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(InputStream.class);
+            final Response response = requester.issueRequest();
+            return response.readEntity(InputStream.class); // ...and how does the response get closed?
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), InputStream.class, requester);
         }
@@ -407,7 +434,7 @@ public class SodaDdl extends SodaWorkflow
 
         SodaRequest requester = new SodaRequest<File>(dataset.getBlobId(), null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(fileResourceUri)
                                           .path(resourceId)
@@ -418,8 +445,8 @@ public class SodaDdl extends SodaWorkflow
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(InputStream.class);
+            final Response response = requester.issueRequest();
+            return response.readEntity(InputStream.class); // ...and how does the response get closed?
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), InputStream.class, requester);
         }

@@ -2,7 +2,7 @@ package test.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.GenericType;
 
 import java.util.List;
 

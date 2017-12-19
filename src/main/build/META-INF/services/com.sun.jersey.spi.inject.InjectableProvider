@@ -1,5 +1,5 @@
-com.sun.jersey.core.impl.provider.xml.SAXParserContextProvider
-com.sun.jersey.core.impl.provider.xml.XMLStreamReaderContextProvider
-com.sun.jersey.core.impl.provider.xml.DocumentBuilderFactoryProvider
-com.sun.jersey.core.impl.provider.xml.TransformerFactoryProvider
-com.sun.jersey.multipart.impl.MultiPartConfigProvider
+org.glassfish.jersey.core.impl.provider.xml.SAXParserContextProvider
+org.glassfish.jersey.core.impl.provider.xml.XMLStreamReaderContextProvider
+org.glassfish.jersey.core.impl.provider.xml.DocumentBuilderFactoryProvider
+org.glassfish.jersey.core.impl.provider.xml.TransformerFactoryProvider
+org.glassfish.jersey.multipart.impl.MultiPartConfigProvider

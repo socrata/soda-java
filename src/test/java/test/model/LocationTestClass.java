@@ -3,7 +3,7 @@ package test.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.socrata.model.Location;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.GenericType;
 
 import java.util.List;
 

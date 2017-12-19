@@ -1,8 +1,10 @@
 package com.socrata.model.requests;
 
+import java.io.IOException;
+
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -20,5 +22,5 @@ abstract public class SodaRequest<T>
         this.payload = payload;
     }
 
-    abstract public ClientResponse  issueRequest() throws LongRunningQueryException, SodaError;
+    abstract public Response  issueRequest() throws LongRunningQueryException, SodaError;
 }

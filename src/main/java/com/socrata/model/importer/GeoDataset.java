@@ -1,7 +1,7 @@
 package com.socrata.model.importer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.GenericType;
 
 import java.util.ArrayList;
 import java.util.List;

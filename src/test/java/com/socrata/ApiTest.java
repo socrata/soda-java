@@ -10,9 +10,9 @@ import com.socrata.model.SearchResults;
 import com.socrata.model.search.SearchClause;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,8 +81,8 @@ public class ApiTest extends TestBase
 
         //
         //   Issue query as a full query
-        final ClientResponse responseFullQuery = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
-        final List<ToxinData> resultsFullQuery = responseFullQuery.getEntity(new GenericType<List<ToxinData>>() {});
+        final Response responseFullQuery = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
+        final List<ToxinData> resultsFullQuery = responseFullQuery.readEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, resultsFullQuery.size());
         for (ToxinData toxinData : resultsFullQuery) {
             TestCase.assertEquals(325510L, toxinData.getPrimaryNAICS());
@@ -92,8 +92,8 @@ public class ApiTest extends TestBase
         //
         //   Issue query as a through $where, etc.
 
-        final ClientResponse response = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE,query);
-        final List<ToxinData> results = response.getEntity(new GenericType<List<ToxinData>>() {});
+        final Response response = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE,query);
+        final List<ToxinData> results = response.readEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, results.size());
         for (ToxinData toxinData : results) {
             TestCase.assertEquals(325510L, toxinData.getPrimaryNAICS());

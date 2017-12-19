@@ -8,7 +8,7 @@ import com.socrata.model.GeocodingResults;
 import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.requests.SodaRequest;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -117,9 +117,9 @@ public class SodaWorkflow
 
         waitForPendingGeocoding(datasetId);
 
-        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId,null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI publicationUri = UriBuilder.fromUri(viewUri)
                                                      .path(resourceId)
@@ -133,10 +133,14 @@ public class SodaWorkflow
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return response.getEntity(DatasetInfo.class);
+            Response response = requester.issueRequest();
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
-            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest(e, DatasetInfo.class, requester);
+            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest<>(e, DatasetInfo.class, requester);
             HttpLowLevel http = getHttpLowLevel();
             return longRunningRequest.checkStatus(http, http.getStatusCheckErrorRetries(), http.getStatusCheckErrorTime());
         }
@@ -155,9 +159,9 @@ public class SodaWorkflow
      */
     public DatasetInfo createWorkingCopy(final String datasetId) throws SodaError, InterruptedException{
 
-        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId,null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI publicationUri = UriBuilder.fromUri(viewUri)
                                                      .path(resourceId)
@@ -170,10 +174,14 @@ public class SodaWorkflow
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return response.getEntity(Dataset.class);
+            Response response = requester.issueRequest();
+            try {
+                return response.readEntity(Dataset.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
-            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest(e, DatasetInfo.class, requester);
+            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest<>(e, DatasetInfo.class, requester);
             HttpLowLevel http = getHttpLowLevel();
             return longRunningRequest.checkStatus(http, http.getStatusCheckErrorRetries(), http.getStatusCheckErrorTime());
         }
@@ -186,11 +194,11 @@ public class SodaWorkflow
      * @param datasetId id of the dataset to make public.
      */
     public void makePublic(final String datasetId) throws SodaError, InterruptedException {
-        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId,null)
         {
 
             //accessType=WEBSITE&method=setPermission&value=public.read
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI publicationUri = UriBuilder.fromUri(viewUri)
                                                      .path(resourceId)
@@ -204,8 +212,7 @@ public class SodaWorkflow
         };
 
         try {
-
-            requester.issueRequest();
+            requester.issueRequest().close();
         } catch (LongRunningQueryException e) {
             getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
@@ -219,11 +226,11 @@ public class SodaWorkflow
      * @param datasetId id of the dataset
      */
     public void makePrivate(final String datasetId) throws SodaError, InterruptedException {
-        SodaRequest requester = new SodaRequest<String>(datasetId,null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId,null)
         {
 
             //accessType=WEBSITE&method=setPermission&value=public.read
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI publicationUri = UriBuilder.fromUri(viewUri)
                                                      .path(resourceId)
@@ -237,8 +244,7 @@ public class SodaWorkflow
         };
 
         try {
-
-            requester.issueRequest();
+            requester.issueRequest().close();
         } catch (LongRunningQueryException e) {
             getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Dataset.class, requester);
         }
@@ -273,9 +279,9 @@ public class SodaWorkflow
      */
     public GeocodingResults findPendingGeocodingResults(final String datasetId) throws SodaError, InterruptedException
     {
-        SodaRequest requester = new SodaRequest<String>(datasetId, null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId, null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(geocodingUri)
                                           .path(datasetId)
@@ -288,8 +294,12 @@ public class SodaWorkflow
 
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(GeocodingResults.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(GeocodingResults.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), GeocodingResults.class, requester);
         }
@@ -298,9 +308,9 @@ public class SodaWorkflow
     public Comment addComment(final String datasetId, final Comment comment) throws SodaError, InterruptedException
     {
 
-        SodaRequest requester = new SodaRequest<String>(datasetId, null)
+        SodaRequest<String> requester = new SodaRequest<String>(datasetId, null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI uri = UriBuilder.fromUri(viewUri)
                                           .path(datasetId)
@@ -313,8 +323,12 @@ public class SodaWorkflow
 
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(Comment.class);
+            final Response response = requester.issueRequest();
+            try {
+                 return response.readEntity(Comment.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Comment.class, requester);
         }

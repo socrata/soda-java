@@ -1,10 +1,12 @@
 package com.socrata.api;
 
+import java.io.IOException;
+
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.LongRunningRequestStatusCheckException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.requests.SodaRequest;
-import com.sun.jersey.api.client.ClientHandlerException;
+import javax.ws.rs.ProcessingException;
 
 /**
  * This class holds a long running request ticket so that users can check status despite of
@@ -41,7 +43,7 @@ public class LongRunningRequest<T, R>
                     Integer.MAX_VALUE,
                     cls,
                     sodaRequest);
-            } catch (ClientHandlerException exception) {
+            } catch (ProcessingException exception) {
                 if (i >= retries) {
                     throw new LongRunningRequestStatusCheckException(exception, this);
                 }

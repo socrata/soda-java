@@ -8,7 +8,7 @@ import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.soql.OrderByClause;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Nomination;
@@ -32,8 +32,8 @@ public class ExamplesTest extends TestBase
         Soda2Consumer consumer = createConsumer();
 
         //To get a raw String of the results
-        ClientResponse response = consumer.query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
-        String payload = response.getEntity(String.class);
+        Response response = consumer.query("nominationsCopy", HttpLowLevel.JSON_TYPE, SoqlQuery.SELECT_ALL);
+        String payload = response.readEntity(String.class);
         TestCase.assertTrue(payload.length() > 0);
 
         //Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
