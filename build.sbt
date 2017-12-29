@@ -48,3 +48,21 @@ logBuffered in Test := false
 testOptions in Test ++= Seq(
   Tests.Argument(TestFrameworks.JUnit, "-v")
 )
+
+sourceGenerators in Compile += Def.task {
+  val targetDir = (sourceManaged in Compile).value / "com" / "socrata" / "api"
+  targetDir.mkdirs()
+  val target = targetDir / "APIVersion.java"
+  val out = new java.io.FileWriter(target)
+  try {
+    out.write(s"""
+package com.socrata.api;
+class APIVersion {
+  static final String version = ${com.rojoma.json.v3.ast.JString(version.value)};
+}
+""")
+  } finally {
+    out.close()
+  }
+  Seq(target)
+}.taskValue

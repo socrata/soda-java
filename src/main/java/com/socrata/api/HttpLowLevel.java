@@ -73,6 +73,7 @@ public final class HttpLowLevel
     public static final String NBE_FLAG = "nbe";
     public static final String SOCRATA_TOKEN_HEADER = "X-App-Token";
     public static final String SOCRATA_REQUEST_ID_HEADER = "X-Socrata-RequestId";
+    public static final String USER_AGENT_HEADER = "User-Agent";
     public static final String AUTH_REQUIRED_CODE = "authentication_required";
     public static final String UNEXPECTED_ERROR = "uexpectedError";
     public static final String MALFORMED_RESPONSE = "malformedResponse";
@@ -174,6 +175,7 @@ public final class HttpLowLevel
         if (requestId != null) {
             client.register(new SodaRequestIdFilter(requestId));
         }
+        client.register(new UserAgentFilter());
 
         // I think this isn't necessary with jersey 2; in any event it's not done this way.
         //client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
