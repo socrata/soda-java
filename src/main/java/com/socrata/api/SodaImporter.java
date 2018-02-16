@@ -5,8 +5,7 @@ import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.importer.*;
 import com.socrata.model.requests.SodaRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.header.InBoundHeaders;
+import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -178,7 +177,7 @@ public class SodaImporter extends SodaDdl
 
         SodaRequest requester = new SodaRequest<File>(null, file)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI scanUri = UriBuilder.fromUri(importUri)
                                               .queryParam("method", method)
@@ -189,8 +188,12 @@ public class SodaImporter extends SodaDdl
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(retType);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(retType);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), retType, requester);
         }
@@ -475,21 +478,25 @@ public class SodaImporter extends SodaDdl
                        .append("&name=").append(URLEncoder.encode(file.getName(), "UTF-8"))
                        .append("&async=").append(URLEncoder.encode(Boolean.toString(async), "UTF-8"));
 
-        SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())
+        SodaRequest<String> requester = new SodaRequest<String>(null, postbodyBuilder.toString())
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 return httpLowLevel.postRaw(importUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };
 
         try {
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(DatasetInfo.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             LongRunningQueryException lrqe = e.location != null ? e :
                 new LongRunningQueryException(UriBuilder.fromUri(importUri).queryParam("ticket", e.ticket).build(), e.timeToRetry, e.ticket);
-            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest(lrqe, DatasetInfo.class, requester);
+            LongRunningRequest<String, DatasetInfo> longRunningRequest = new LongRunningRequest<>(lrqe, DatasetInfo.class, requester);
             HttpLowLevel http = getHttpLowLevel();
             return longRunningRequest.checkStatus(http, http.getStatusCheckErrorRetries(), http.getStatusCheckErrorTime());
         }
@@ -515,7 +522,7 @@ public class SodaImporter extends SodaDdl
 
         SodaRequest requester = new SodaRequest<String>(null, postbodyBuilder.toString())
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 return httpLowLevel.postRaw(shapeImportUri, MediaType.APPLICATION_FORM_URLENCODED_TYPE, ContentEncoding.IDENTITY, payload);
             }
@@ -524,8 +531,12 @@ public class SodaImporter extends SodaDdl
 
         try {
 
-            final ClientResponse response = requester.issueRequest();
-            return response.getEntity(DatasetInfo.class);
+            final Response response = requester.issueRequest();
+            try {
+                return response.readEntity(DatasetInfo.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
 
             if (e.location != null) {
@@ -557,7 +568,7 @@ public class SodaImporter extends SodaDdl
 
         SodaRequest requester = new SodaRequest<File>(null, file)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI scanUri = UriBuilder.fromUri(importUri)
                                               .queryParam("method", "blob")
@@ -567,28 +578,29 @@ public class SodaImporter extends SodaDdl
                 try {
                     final InputStream   is = new FileInputStream(file);
                     try {
-                        ClientResponse clientResponse = httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
-
-                        //Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
-                        //response needs to be processed as JSON.  So, wrap the return in a ClientResponse that acts
-                        //as if the content type is JSON. There is a bug on the core server side to fix this.
-                        InBoundHeaders  headers = new InBoundHeaders();
-                        headers.putSingle("Content-Type", MediaType.APPLICATION_JSON);
-                        return new ClientResponse(clientResponse.getStatus(), headers, clientResponse.getEntityInputStream(), clientResponse.getClient().getMessageBodyWorkers());
-
+                        // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                        // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
+                        // is a bug on the core server side to fix this.
+                        return httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
                     } finally {
                         is.close();
                     }
                 } catch (IOException ioe) {
-                    throw new SodaError("Unable to load file: " + file.getAbsolutePath());
+                    throw new SodaError("Unable to load file: " + file.getAbsolutePath(), ioe);
                 }
             }
         };
 
         NonDataFileDataset nonDataFileDataset;
         try {
-            final ClientResponse response = requester.issueRequest();
-            nonDataFileDataset = response.getEntity(NonDataFileDataset.class);
+            final Response response = requester.issueRequest();
+            try {
+                nonDataFileDataset = mapper.readValue(response.readEntity(String.class), NonDataFileDataset.class);
+            } catch (IOException ioe) {
+                throw new SodaError("Unparsable result", ioe);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), NonDataFileDataset.class, requester);
         }
@@ -612,7 +624,7 @@ public class SodaImporter extends SodaDdl
 
         SodaRequest requester = new SodaRequest<File>(null, file)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             {
                 final URI scanUri = UriBuilder.fromUri(viewUri)
                                               .path(id + ".txt")
@@ -623,28 +635,30 @@ public class SodaImporter extends SodaDdl
                 try {
                     final InputStream   is = new FileInputStream(file);
                     try {
-                        ClientResponse clientResponse = httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
-
-                        //Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
-                        //response needs to be processed as JSON.  So, wrap the return in a ClientResponse that acts
-                        //as if the content type is JSON. There is a bug on the core server side to fix this.
-                        InBoundHeaders  headers = new InBoundHeaders();
-                        headers.putSingle("Content-Type", MediaType.APPLICATION_JSON);
-                        return new ClientResponse(clientResponse.getStatus(), headers, clientResponse.getEntityInputStream(), clientResponse.getClient().getMessageBodyWorkers());
+                        // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                        // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
+                        // is a bug on the core server side to fix this.
+                        return httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
 
                     } finally {
                         is.close();
                     }
                 } catch (IOException ioe) {
-                    throw new SodaError("Unable to load file: " + file.getAbsolutePath());
+                    throw new SodaError("Unable to load file: " + file.getAbsolutePath(), ioe);
                 }
             }
         };
 
         NonDataFileDataset nonDataFileDataset;
         try {
-            final ClientResponse response = requester.issueRequest();
-            nonDataFileDataset = response.getEntity(NonDataFileDataset.class);
+            final Response response = requester.issueRequest();
+            try {
+                nonDataFileDataset = mapper.readValue(response.readEntity(String.class), NonDataFileDataset.class);
+            } catch (IOException ioe) {
+                throw new SodaError("Unparsable result", ioe);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             nonDataFileDataset = getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), NonDataFileDataset.class, requester);
         }

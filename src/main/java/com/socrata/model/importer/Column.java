@@ -32,6 +32,7 @@ public class Column
     String renderTypeName;
     List<Object> flags;
     Map<String, String> format;
+    Map<String, Object> computationStrategy;
 
     public Column()
     {
@@ -158,5 +159,9 @@ public class Column
     public void setFormat(Map<String, String> format)
     {
         this.format = format;
+    }
+
+    public Map<String, Object> getComputationStrategy() {
+        return computationStrategy;
     }
 }

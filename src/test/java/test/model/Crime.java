@@ -1,6 +1,6 @@
 package test.model;
 
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.GenericType;
 
 import java.util.Date;
 import java.util.List;

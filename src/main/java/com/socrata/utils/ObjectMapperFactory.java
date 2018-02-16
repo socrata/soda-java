@@ -3,6 +3,7 @@ package com.socrata.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jaxrs.Jaxrs2TypesModule;
 
 import java.text.*;
 import java.util.Date;
@@ -26,6 +27,7 @@ public final class ObjectMapperFactory {
     public static ObjectMapper create() {
         return new ObjectMapper()
                 .registerModule(new JodaModule())
+                .registerModule(new Jaxrs2TypesModule())
                 .setDateFormat(new ObjectMapperFactory.SocrataDateFormat());
     }
 

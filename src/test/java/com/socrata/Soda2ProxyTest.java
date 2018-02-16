@@ -12,9 +12,9 @@ import com.socrata.model.importer.DatasetInfo;
 import com.socrata.model.soql.ConditionalExpression;
 import com.socrata.model.soql.SoqlQuery;
 import com.socrata.utils.GeneralUtils;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 import junit.framework.TestCase;
 import org.junit.Test;
 import test.model.Crime;
@@ -48,7 +48,7 @@ public class Soda2ProxyTest extends TestBase
         try {
             executeSimpleQuery(connection, "77tg-nbgd");
             TestCase.fail("webcache.mydomain.com does not exist, so this call should have failed if it was using the set proxy.");
-        } catch (ClientHandlerException e) {
+        } catch (ProcessingException e) {
             //Success
         } finally {
             System.clearProperty("https.proxyHost");
@@ -68,8 +68,8 @@ public class Soda2ProxyTest extends TestBase
 
         //
         //   Issue query as a full query
-        final ClientResponse responseFullQuery = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
-        final List<ToxinData> resultsFullQuery = responseFullQuery.getEntity(new GenericType<List<ToxinData>>() {});
+        final Response responseFullQuery = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE, query.toString());
+        final List<ToxinData> resultsFullQuery = responseFullQuery.readEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, resultsFullQuery.size());
         for (ToxinData toxinData : resultsFullQuery) {
             TestCase.assertEquals(325510L, toxinData.getPrimaryNAICS());
@@ -79,8 +79,8 @@ public class Soda2ProxyTest extends TestBase
         //
         //   Issue query as a through $where, etc.
 
-        final ClientResponse response = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE,query);
-        final List<ToxinData> results = response.getEntity(new GenericType<List<ToxinData>>() {});
+        final Response response = soda2Consumer.query(dataset, HttpLowLevel.JSON_TYPE,query);
+        final List<ToxinData> results = response.readEntity(new GenericType<List<ToxinData>>() {});
         TestCase.assertEquals(6, results.size());
         for (ToxinData toxinData : results) {
             TestCase.assertEquals(325510L, toxinData.getPrimaryNAICS());

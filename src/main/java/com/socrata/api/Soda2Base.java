@@ -5,8 +5,8 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.Meta;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.soql.SoqlQuery;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -53,7 +53,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse query(String resourceId, MediaType mediaType, SoqlQuery query) throws LongRunningQueryException, SodaError
+    public Response query(String resourceId, MediaType mediaType, SoqlQuery query) throws LongRunningQueryException, SodaError
     {
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
@@ -74,7 +74,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse query(String resourceId, MediaType mediaType, String query) throws LongRunningQueryException, SodaError
+    public Response query(String resourceId, MediaType mediaType, String query) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -98,7 +98,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse getById(String resourceId,  MediaType mediaType, String uniqueId) throws LongRunningQueryException, SodaError
+    public Response getById(String resourceId,  MediaType mediaType, String uniqueId) throws LongRunningQueryException, SodaError
     {
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
@@ -116,7 +116,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse doTruncate(String resourceId) throws LongRunningQueryException, SodaError
+    public Response doTruncate(String resourceId) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -142,7 +142,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse doDelete(String resourceId, String uniqueId) throws LongRunningQueryException, SodaError
+    public Response doDelete(String resourceId, String uniqueId) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -166,7 +166,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> ClientResponse doAdd(String resourceId, T object) throws LongRunningQueryException, SodaError
+    public <T> Response doAdd(String resourceId, T object) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -189,7 +189,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public <T> ClientResponse doAddObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
+    public <T> Response doAddObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -213,7 +213,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse doAddStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
+    public Response doAddStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -240,7 +240,7 @@ public class Soda2Base
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public ClientResponse doUpdate(String resourceId, Object uniqueId, Object object) throws LongRunningQueryException, SodaError
+    public Response doUpdate(String resourceId, Object uniqueId, Object object) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -253,7 +253,7 @@ public class Soda2Base
     }
 
 
-    public <T> ClientResponse doReplaceObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
+    public <T> Response doReplaceObjects(String resourceId, Collection<T> objects) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()
@@ -263,7 +263,7 @@ public class Soda2Base
         return httpLowLevel.putRaw(builder.build(), httpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, objects);
     }
 
-    public ClientResponse doReplaceStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
+    public Response doReplaceStream(String resourceId, MediaType mediaType, InputStream stream) throws LongRunningQueryException, SodaError
     {
 
         final UriBuilder builder = httpLowLevel.uriBuilder()

@@ -26,6 +26,11 @@ public class SodaError extends Exception
     }
 
 
+   public SodaError(String error, Throwable throwable) {
+       super(error, throwable);
+       this.sodaErrorResponse = new SodaErrorResponse("", error, "", null);
+   }
+
    public SodaError(String error)
     {
         super(error);

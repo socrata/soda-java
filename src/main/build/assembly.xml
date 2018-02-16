@@ -23,9 +23,9 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <excludes>
-                    <exclude>**/com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchProvider</exclude>
-                    <exclude>**/com.sun.jersey.spi.container.ResourceMethodDispatchProvider</exclude>
-                    <exclude>**/com.sun.jersey.spi.inject.InjectableProvider</exclude>
+                    <exclude>**/org.glassfish.jersey.spi.container.ResourceMethodCustomInvokerDispatchProvider</exclude>
+                    <exclude>**/org.glassfish.jersey.spi.container.ResourceMethodDispatchProvider</exclude>
+                    <exclude>**/org.glassfish.jersey.spi.inject.InjectableProvider</exclude>
                     <exclude>**/javax.ws.rs.ext.MessageBodyReader</exclude>
                     <exclude>**/javax.ws.rs.ext.MessageBodyWriter</exclude>
                 </excludes>

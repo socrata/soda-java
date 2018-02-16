@@ -2,7 +2,7 @@ package com.socrata.model.importer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Collections2;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.GenericType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ public class Dataset extends DatasetInfo
     private Integer rowIdentifierColumnId;
     private final List<String> flags = new ArrayList<String>();
     private final List<Column> columns = new ArrayList<Column>();
+    private boolean isNewBackend;
 
 
     public Dataset()
@@ -158,5 +159,13 @@ public class Dataset extends DatasetInfo
     public void setRowIdentifierColumnId(final Integer rowIdentifierColumnId)
     {
         this.rowIdentifierColumnId = rowIdentifierColumnId;
+    }
+
+    public boolean isNewBackend() {
+        return isNewBackend;
+    }
+
+    public void setNewBackend(boolean isNewBackend) {
+        this.isNewBackend = isNewBackend;
     }
 }

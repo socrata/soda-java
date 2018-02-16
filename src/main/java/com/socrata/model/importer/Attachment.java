@@ -1,34 +1,51 @@
 package com.socrata.model.importer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * */
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Attachment
 {
-    private String blobId;
+    private String assetId;
     private String name;
     private String filename;
 
     public Attachment() {
     }
 
-    public Attachment(String blobId, String name, String filename)
+    public Attachment(String assetId, String name, String filename)
     {
-        this.blobId = blobId;
+        this.assetId = assetId;
         this.name = name;
         this.filename = filename;
     }
 
-    public String getBlobId()
+    public String getAssetId()
     {
-        return blobId;
+        return assetId;
     }
 
+    public void setAssetId(String assetId)
+    {
+        this.assetId = assetId;
+    }
+
+    /** Use getAssetId instead. */
+    @Deprecated
+    @JsonIgnore
+    public String getBlobId()
+    {
+        return assetId;
+    }
+
+    /** Use setAssetId instead. */
+    @Deprecated
+    @JsonIgnore
     public void setBlobId(String blobId)
     {
-        this.blobId = blobId;
+        this.assetId = blobId;
     }
 
     public String getName()

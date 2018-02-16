@@ -1,6 +1,6 @@
-com.sun.jersey.server.impl.model.method.dispatch.VoidVoidDispatchProvider
-com.sun.jersey.server.impl.model.method.dispatch.HttpReqResDispatchProvider
-com.sun.jersey.server.impl.model.method.dispatch.MultipartFormDispatchProvider
-com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider
-com.sun.jersey.server.impl.model.method.dispatch.EntityParamDispatchProvider
-com.sun.jersey.multipart.impl.FormDataMultiPartDispatchProvider
+org.glassfish.jersey.server.impl.model.method.dispatch.VoidVoidDispatchProvider
+org.glassfish.jersey.server.impl.model.method.dispatch.HttpReqResDispatchProvider
+org.glassfish.jersey.server.impl.model.method.dispatch.MultipartFormDispatchProvider
+org.glassfish.jersey.server.impl.model.method.dispatch.FormDispatchProvider
+org.glassfish.jersey.server.impl.model.method.dispatch.EntityParamDispatchProvider
+org.glassfish.jersey.multipart.impl.FormDataMultiPartDispatchProvider

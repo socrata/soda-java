@@ -1,17 +1,19 @@
 package com.socrata.api;
 
+import java.io.IOException;
+
 import com.google.common.base.Preconditions;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.ClientFilter;
+import org.glassfish.jersey.client.ClientRequest;
+import org.glassfish.jersey.client.ClientResponse;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
 
 import javax.annotation.Nonnull;
 
 /**
  * A client filter for Jersey that will add the SODA2 request ID to the responses.
  */
-public class SodaRequestIdFilter extends ClientFilter {
+public class SodaRequestIdFilter implements ClientRequestFilter {
     private final String requestId;
 
     /**
@@ -25,11 +27,10 @@ public class SodaRequestIdFilter extends ClientFilter {
     }
 
     @Override
-    public ClientResponse handle(ClientRequest cr) throws ClientHandlerException
+    public void filter(ClientRequestContext cr) throws IOException
     {
-        if (!cr.getMetadata().containsKey(HttpLowLevel.SOCRATA_REQUEST_ID_HEADER)) {
-            cr.getMetadata().add(HttpLowLevel.SOCRATA_REQUEST_ID_HEADER, requestId);
+        if (!cr.getHeaders().containsKey(HttpLowLevel.SOCRATA_REQUEST_ID_HEADER)) {
+            cr.getHeaders().add(HttpLowLevel.SOCRATA_REQUEST_ID_HEADER, requestId);
         }
-        return getNext().handle(cr);
     }
 }

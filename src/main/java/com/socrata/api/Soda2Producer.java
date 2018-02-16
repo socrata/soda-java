@@ -15,8 +15,8 @@ import com.socrata.model.requests.SodaModRequest;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.requests.SodaTypedRequest;
 import com.socrata.utils.GeneralUtils;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -94,12 +94,12 @@ public class Soda2Producer extends Soda2Consumer
 
         SodaRequest requester = new SodaRequest<String>(resourceId, null)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doTruncate(resourceId); }
         };
 
         try {
-            requester.issueRequest();
+            requester.issueRequest().close();
         } catch (LongRunningQueryException e) {
             getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<String>(String.class), requester);
         }
@@ -119,12 +119,12 @@ public class Soda2Producer extends Soda2Consumer
 
         SodaRequest requester = new SodaRequest<String>(resourceId, id)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doDelete(resourceId, payload); }
         };
 
         try {
-            requester.issueRequest();
+            requester.issueRequest().close();
         } catch (LongRunningQueryException e) {
             getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<String>(String.class), requester);
         }
@@ -145,13 +145,17 @@ public class Soda2Producer extends Soda2Consumer
     {
         SodaRequest requester = new SodaRequest<T>(resourceId, object)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doAdd(resourceId, payload); }
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return response.getEntity(Meta.class);
+            Response response = requester.issueRequest();
+            try {
+                return response.readEntity(Meta.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return (Meta) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), Meta.class, requester);
         }
@@ -173,13 +177,17 @@ public class Soda2Producer extends Soda2Consumer
 
         SodaRequest requester = new SodaRequest<T>(resourceId, object)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doAdd(resourceId, payload); }
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return response.getEntity(retType);
+            Response response = requester.issueRequest();
+            try {
+                 return response.readEntity(retType);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return (T) getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), retType, requester);
         }
@@ -204,18 +212,22 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    public UpsertResult upsert(String resourceId, List objects) throws SodaError, InterruptedException
+    public <T> UpsertResult upsert(String resourceId, List<T> objects) throws SodaError, InterruptedException
     {
 
-        SodaRequest requester = new SodaRequest<List>(resourceId, objects)
+        SodaRequest requester = new SodaRequest<List<T>>(resourceId, objects)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doAddObjects(resourceId, payload); }
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response.getEntityInputStream());
+            Response response = requester.issueRequest();
+            try {
+                return deserializeUpsertResult(response);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
         } catch (IOException ioe) {
@@ -234,18 +246,22 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError
      * @throws InterruptedException
      */
-    public UpsertResult replace(String resourceId, List objects) throws SodaError, InterruptedException
+    public <T> UpsertResult replace(String resourceId, List<T> objects) throws SodaError, InterruptedException
     {
 
-        SodaRequest requester = new SodaRequest<List>(resourceId, objects)
+        SodaRequest requester = new SodaRequest<List<T>>(resourceId, objects)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doReplaceObjects(resourceId, payload); }
         };
 
         try {
-            ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response.getEntityInputStream());
+            Response response = requester.issueRequest();
+            try {
+                return deserializeUpsertResult(response);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
         } catch (IOException ioe) {
@@ -277,15 +293,18 @@ public class Soda2Producer extends Soda2Consumer
 
         SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doAddStream(resourceId, mediaType, payload); }
         };
 
         try {
 
-            ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response.getEntityInputStream());
-
+            Response response = requester.issueRequest();
+            try {
+                return deserializeUpsertResult(response);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
         } catch (IOException ioe) {
@@ -311,15 +330,17 @@ public class Soda2Producer extends Soda2Consumer
 
         SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doReplaceStream(resourceId, mediaType, payload); }
         };
 
         try {
-
-            ClientResponse response = requester.issueRequest();
-            return deserializeUpsertResult(response.getEntityInputStream());
-
+            Response response = requester.issueRequest();
+            try {
+                return deserializeUpsertResult(response);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
         } catch (IOException ioe) {
@@ -352,13 +373,17 @@ public class Soda2Producer extends Soda2Consumer
 
             SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, is, HttpLowLevel.CSV_TYPE)
             {
-                public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+                public Response issueRequest() throws LongRunningQueryException, SodaError
                 { return doAddStream(resourceId, mediaType, payload); }
             };
 
             try {
-                ClientResponse response = requester.issueRequest();
-                return deserializeUpsertResult(response.getEntityInputStream());
+                Response response = requester.issueRequest();
+                try {
+                    return deserializeUpsertResult(response);
+                } finally {
+                    response.close();
+                }
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -388,13 +413,17 @@ public class Soda2Producer extends Soda2Consumer
 
             SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, is, HttpLowLevel.CSV_TYPE)
             {
-                public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+                public Response issueRequest() throws LongRunningQueryException, SodaError
                 { return doReplaceStream(resourceId, mediaType, payload); }
             };
 
             try {
-                ClientResponse response = requester.issueRequest();
-                return deserializeUpsertResult(response.getEntityInputStream());
+                Response response = requester.issueRequest();
+                try {
+                    return deserializeUpsertResult(response);
+                } finally {
+                    response.close();
+                }
             } catch (LongRunningQueryException e) {
                 return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
             } finally {
@@ -421,14 +450,17 @@ public class Soda2Producer extends Soda2Consumer
     {
         SodaRequest requester = new SodaModRequest<T>(resourceId, object, id)
         {
-            public ClientResponse issueRequest() throws LongRunningQueryException, SodaError
+            public Response issueRequest() throws LongRunningQueryException, SodaError
             { return doUpdate(resourceId, id, payload); }
         };
 
         try {
-
-            ClientResponse response = requester.issueRequest();
-            return response.getEntity(Meta.class);
+            Response response = requester.issueRequest();
+            try {
+                return response.readEntity(Meta.class);
+            } finally {
+                response.close();
+            }
         } catch (LongRunningQueryException e) {
             return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.JSON_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<Meta>(Meta.class), requester);
         }
@@ -486,6 +518,10 @@ public class Soda2Producer extends Soda2Consumer
         }
 
         return parser.readValueAs(UpsertResult.class);
+    }
+
+    UpsertResult deserializeUpsertResult(Response response) throws IOException {
+        return deserializeUpsertResult(response.readEntity(InputStream.class));
     }
 
     /**
