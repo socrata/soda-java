@@ -3,6 +3,7 @@ package com.socrata.api;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Preconditions;
+import com.socrata.api.DatasetDestination;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.SearchResults;
@@ -135,19 +136,38 @@ public class SodaDdl extends SodaWorkflow
      *
      * The new dataset will be unpublished.
      *
+     * Prefer to use the createDataset(DatasetInfo, DatasetDestination) method, as this
+     * one has surprising behavior when useNewBackend is false.
+     *
      * @param dataset dataset to create the new dataset on.  The ID should NOT be set.
-     * @param useNewBackend iff true create dataset on the New Backend
+     * @param useNewBackend if true create dataset on the New Backend, otherwise use the default.
      * @return the created dataset, the ID will be set on this.
      * @throws SodaError
      * @throws InterruptedException
      */
     public DatasetInfo createDataset(final DatasetInfo dataset, final boolean useNewBackend) throws SodaError, InterruptedException
     {
+        return createDataset(dataset, useNewBackend ? DatasetDestination.NBE : null);
+    }
+
+    /**
+     * Creates an empty dataset, based on the dataset passed in.
+     *
+     * The new dataset will be unpublished.
+     *
+     * @param dataset dataset to create the new dataset on.  The ID should NOT be set.
+     * @param destination Specify the backend for the new dataset, or null for the default.
+     * @return the created dataset, the ID will be set on this.
+     * @throws SodaError
+     * @throws InterruptedException
+     */
+    public DatasetInfo createDataset(final DatasetInfo dataset, final DatasetDestination destination) throws SodaError, InterruptedException
+    {
         SodaRequest requester = new SodaRequest<DatasetInfo>(null, dataset)
         {
             public Response issueRequest() throws LongRunningQueryException, SodaError
             {
-                httpLowLevel.setUseNewBackend(useNewBackend);
+                httpLowLevel.setDatasetDestination(destination);
                 return httpLowLevel.postRaw(viewUri, HttpLowLevel.JSON_TYPE, ContentEncoding.IDENTITY, payload);
             }
         };

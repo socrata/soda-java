@@ -490,13 +490,24 @@ public final class HttpLowLevel
     /**
      * If true adds ?nbe=true flag to all URIs (to enable creating datasets on New Backend)
      *
-     * @param useNbe iff true use New Backend, otherwise use old
+     * Prefer to use the setDatasetDestination method, as this one has surprising behavior
+     * when its parameter is false.
+     *
+     * @param useNbe if true use New Backend, otherwise use the default
      */
     public void setUseNewBackend(boolean useNbe) {
-        if(useNbe)
-            additionalParams.put(NBE_FLAG, "true");
-        else
-            additionalParams.remove(NBE_FLAG);
+        if(useNbe) setDatasetDestination(DatasetDestination.NBE);
+        else setDatasetDestination(null);
+    }
+
+    /**
+     * Specify (or reset to the default) the backend on which datasets will be created.
+     *
+     * @param destination The target backend, or null for the default.
+     */
+    public void setDatasetDestination(DatasetDestination destination) {
+        if(destination == null) additionalParams.remove(NBE_FLAG);
+        else additionalParams.put(NBE_FLAG, Boolean.toString(destination == DatasetDestination.NBE));
     }
 
     private Object encodeContents(final ContentEncoding contentEncoding,
