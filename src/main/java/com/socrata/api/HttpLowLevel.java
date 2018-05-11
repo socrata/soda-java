@@ -630,7 +630,7 @@ public final class HttpLowLevel
      */
     private URI soda2ifyUri(final URI uri) {
 
-        final UriBuilder    builder = UriBuilder.fromUri(uri).queryParam(SODA_VERSION, "2.0");
+        final UriBuilder    builder = UriBuilder.fromUri(uri);
 
         for (String key : additionalParams.keySet()) {
             builder.queryParam(key, additionalParams.get(key));
