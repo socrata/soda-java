@@ -15,6 +15,7 @@ import com.socrata.model.requests.SodaModRequest;
 import com.socrata.model.requests.SodaRequest;
 import com.socrata.model.requests.SodaTypedRequest;
 import com.socrata.utils.GeneralUtils;
+import com.socrata.utils.RowUpdateOption;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.GenericType;
 
@@ -289,6 +290,11 @@ public class Soda2Producer extends Soda2Consumer
      * @throws InterruptedException throws is the thread is interrupted.
      */
     public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream) throws SodaError, InterruptedException
+    {
+      return upsertStream(resourceId, mediaType, stream, new RowUpdateOption());
+    }
+
+    public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption rowUpdateOption) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
