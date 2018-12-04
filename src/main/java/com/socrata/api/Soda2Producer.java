@@ -297,10 +297,10 @@ public class Soda2Producer extends Soda2Consumer
     public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption rowUpdateOption) throws SodaError, InterruptedException
     {
 
-        SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
+        SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType, rowUpdateOption)
         {
             public Response issueRequest() throws LongRunningQueryException, SodaError
-            { return doAddStream(resourceId, mediaType, payload); }
+            { return doAddStream(resourceId, mediaType, payload, rowUpdateOption); }
         };
 
         try {
