@@ -243,13 +243,9 @@ public class Soda2Base
     public Response doAddStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption options) throws LongRunningQueryException, SodaError
     {
 
-        final UriBuilder builder = httpLowLevel.uriBuilder()
+        final UriBuilder builder = options.addToRequest(httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
-                                             .path(resourceId)
-                                             .queryParam("truncate", options.truncate)
-                                             .queryParam("mergeInsteadOfReplace", options.mergeInsteadOfReplace)
-                                             .queryParam("errorsAreFatal", options.errorsAreFatal)
-                                             .queryParam("nonFatalRowErrors", options.nonFatalRowErrors);
+                                             .path(resourceId));
 
         return httpLowLevel.postRaw(builder.build(), mediaType, httpLowLevel.getContentEncodingForUpserts(), stream);
 

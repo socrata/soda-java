@@ -1,9 +1,10 @@
 package com.socrata.utils;
 
 import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 
-// NOTE: If this class is changed, you may want to make similar changes to
-// RowUpdate.scala of the soda-fountain project
+// NOTE: If this class is changed, you may want to consider making changes to
+// RowUpdate.scala of the soda-fountain project as well.
 public class RowUpdateOption
 {
   public Boolean truncate;
@@ -12,10 +13,10 @@ public class RowUpdateOption
   public String[] nonFatalRowErrors;
 
   public RowUpdateOption() {
-    this.truncate = false;
-    this.mergeInsteadOfReplace = true;
-    this.errorsAreFatal = true;
-    this.nonFatalRowErrors = new String[]{};
+    this.truncate = null;
+    this.mergeInsteadOfReplace = null;
+    this.errorsAreFatal = null;
+    this.nonFatalRowErrors = null;
   }
 
   public void fromMap(Map<String,String[]> parameterMap) {
@@ -39,7 +40,19 @@ public class RowUpdateOption
     return;
   }
 
-  public String toQueryParams() {
-    return "";
+  public UriBuilder addToRequest(UriBuilder uribuilder) {
+    if (this.truncate != null) {
+      uribuilder = uribuilder.queryParam("truncate", this.truncate);
+    }
+    if (this.mergeInsteadOfReplace != null) {
+      uribuilder = uribuilder.queryParam("mergeInsteadOfReplace", this.mergeInsteadOfReplace);
+    }
+    if (this.errorsAreFatal != null) {
+      uribuilder = uribuilder.queryParam("errorsAreFatal", this.errorsAreFatal);
+    }
+    if (this.nonFatalRowErrors != null) {
+      uribuilder = uribuilder.queryParam("nonFatalRowErrors[]", this.nonFatalRowErrors);
+    }
+    return uribuilder;
   }
 }
