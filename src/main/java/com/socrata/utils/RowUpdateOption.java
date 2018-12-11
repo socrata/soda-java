@@ -51,7 +51,7 @@ public class RowUpdateOption
       uribuilder = uribuilder.queryParam("errorsAreFatal", this.errorsAreFatal);
     }
     if (this.nonFatalRowErrors != null) {
-      uribuilder = uribuilder.queryParam("nonFatalRowErrors[]", this.nonFatalRowErrors);
+      uribuilder = uribuilder.queryParam("nonFatalRowErrors[]", (Object[]) this.nonFatalRowErrors);
     }
     return uribuilder;
   }
