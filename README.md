@@ -34,7 +34,7 @@ soda-java is published to Maven Central.  The dependency is
 <dependency>
   <groupId>com.socrata</groupId>
   <artifactId>soda-api-java</artifactId>
-  <version>0.9.13</version>
+  <version>0.10.2</version>
 </dependency>
 ```
 
@@ -62,7 +62,7 @@ Tests are also run for all branches and PRs via [Travis-CI](https://travis-ci.or
 
 Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.
 
-# Examples 
+# Examples
 
 ## Consumer
 
@@ -257,7 +257,7 @@ UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV
 
 ### Import or Replace GeoSpatial Files
 
-You can import geospatial data files as new datasets or replace the data in existing 
+You can import geospatial data files as new datasets or replace the data in existing
 datasets. Supported formats are .kml, .kmz, and .zip (ESRI Shapefile).
 
 ```java
@@ -283,8 +283,8 @@ final SodaImporter importer = SodaImporter.newImporter("https://sandbox.demo.soc
 // Load the dataset you wish to update metadata (EXISTING_DATASET_ID might be something like 'abcd-1234')
 // NOTE: requires creating a working copy of the dataset
 DatasetInfo loadedView = importer.createWorkingCopy(EXISTING_DATASET_ID);
-                                                       
-// To update primary metadata use these methods 
+
+// To update primary metadata use these methods
 loadedView.setName("New title");
 loadedView.setDescription("New description");
 // ...

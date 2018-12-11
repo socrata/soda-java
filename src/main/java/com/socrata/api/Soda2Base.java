@@ -5,6 +5,7 @@ import com.socrata.exceptions.SodaError;
 import com.socrata.model.Meta;
 import com.socrata.model.UpsertResult;
 import com.socrata.model.soql.SoqlQuery;
+import com.socrata.utils.RowUpdateOption;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.GenericType;
 
@@ -219,6 +220,32 @@ public class Soda2Base
         final UriBuilder builder = httpLowLevel.uriBuilder()
                                              .path(SODA_BASE_PATH)
                                              .path(resourceId);
+
+        return httpLowLevel.postRaw(builder.build(), mediaType, httpLowLevel.getContentEncodingForUpserts(), stream);
+
+    }
+
+    /**
+     * Adds a collection of rows to a dataset, but does so by simply streaming a datastream to the SODA2 server.  Whether
+     * the stream is JSON or CSV is set by the mediaType
+     *
+     * @param resourceId  The id of the resource to query.  This can either be the resource endpoint name
+     *                    set in the metadata, or the unique ID given to the resource.
+     * @param mediaType The media type for the stream (normally JSON or CSV)
+     * @param stream The objects to add, already serialized in a stream.
+     * @param options The options to be passed as query params
+     *
+     * @return The results from the operation
+     * @throws LongRunningQueryException thrown if this query is long running and a 202 is returned.  In this case,
+     * the caller likely wants to call follow202.
+     * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
+     */
+    public Response doAddStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption options) throws LongRunningQueryException, SodaError
+    {
+
+        final UriBuilder builder = options.addToRequest(httpLowLevel.uriBuilder()
+                                             .path(SODA_BASE_PATH)
+                                             .path(resourceId));
 
         return httpLowLevel.postRaw(builder.build(), mediaType, httpLowLevel.getContentEncodingForUpserts(), stream);
 
