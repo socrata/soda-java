@@ -35,9 +35,11 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
 import java.util.List;
 import java.util.Locale;
@@ -481,7 +483,7 @@ public final class HttpLowLevel
     {
         final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
             accept("application/json");
-        final Object encodedObject = encodeContents(contentEncoding, builder, object);
+        final Object encodedObject = streamContents(encodeContents(contentEncoding, builder, object));
         final Response response = builder.post(Entity.entity(encodedObject, mediaType), Response.class);
 
         return processErrors(response);
@@ -508,6 +510,26 @@ public final class HttpLowLevel
     public void setDatasetDestination(DatasetDestination destination) {
         if(destination == null) additionalParams.remove(NBE_FLAG);
         else additionalParams.put(NBE_FLAG, Boolean.toString(destination == DatasetDestination.NBE));
+    }
+
+    private Object streamContents(final Object object) {
+        if (object instanceof InputStream) {
+            return new StreamingOutput() {
+                final InputStream stream = (InputStream) object;
+
+                @Override
+                public void write(OutputStream outputStream) throws IOException {
+                    byte[] buf = new byte[10240];
+                    int count;
+
+                    while((count = stream.read(buf)) > 0) {
+                        outputStream.write(buf, 0, count);
+                    }
+                }
+            };
+        } else {
+            return object;
+        }
     }
 
     private Object encodeContents(final ContentEncoding contentEncoding,
@@ -580,7 +602,7 @@ public final class HttpLowLevel
         final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
             accept("application/json");
 
-        final Object encodedObject = encodeContents(contentEncoding, builder, object);
+        final Object encodedObject = streamContents(encodeContents(contentEncoding, builder, object));
         final Response response = builder.put(Entity.entity(encodedObject, mediaType), Response.class);
         return processErrors(response);
     }
