@@ -34,7 +34,7 @@ soda-java is published to Maven Central.  The dependency is
 <dependency>
   <groupId>com.socrata</groupId>
   <artifactId>soda-api-java</artifactId>
-  <version>0.10.2</version>
+  <version>0.10.3</version>
 </dependency>
 ```
 
