@@ -182,9 +182,6 @@ public final class HttpLowLevel
      */
     public static final HttpLowLevel instantiateBasic(@Nonnull final String url, @Nonnull final String userName, @Nonnull final String password, @Nullable final String token, @Nullable final String requestId)
     {
-        // I think this isn't necessary with jersey 2; in any event it's not done this way.
-        //client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
-
         return new HttpLowLevel(createClientBasic(false, userName, password, token, requestId),
                                 createClientBasic(true, userName, password, token, requestId),
                                 url);
