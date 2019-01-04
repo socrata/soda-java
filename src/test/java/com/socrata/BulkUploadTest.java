@@ -13,8 +13,13 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,6 +67,77 @@ public class BulkUploadTest extends TestBase
         TestCase.assertNotNull(dataset.getId());
 
         UpsertResult result = producer.upsertCsv(dataset.getId(), CRIMES_CSV_UPSERT);
+        TestCase.assertNotNull(result);
+        TestCase.assertEquals(0, result.errorCount());
+        TestCase.assertEquals(4999, result.getRowsCreated());
+        TestCase.assertEquals(0, result.getRowsUpdated());
+    }
+
+    @Test
+    public void testGiantUpsert() throws IOException, SodaError, InterruptedException
+    {
+
+        final Soda2Producer producer = createProducer();
+        final SodaImporter importer = createImporter();
+
+        final String name = "LongUpsertName" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+
+        final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER);
+        TestCase.assertNotNull(dataset);
+        TestCase.assertNotNull(dataset.getId());
+
+        InputStream stream = new InputStream() {
+            boolean headerRead = false;
+            File file = CRIMES_CSV_UPSERT;
+            BufferedReader reader;
+            ByteArrayInputStream buffer;
+            int count = 0;
+
+            public int read() throws IOException {
+                byte[] b = new byte[1];
+                int count = read(b);
+                return (count <= 0) ? -1 : (b[0] & 0xff);
+            }
+
+            @Override
+            public int read(byte[] b) throws IOException {
+                return read(b, 0, b.length);
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                if(!refill()) {
+                    return -1;
+                }
+                return buffer.read(b, off, len);
+            }
+
+            @Override
+            public void close() throws IOException {
+                if(reader != null) reader.close();
+            }
+
+            private boolean refill() throws IOException {
+                if(buffer == null || buffer.available() == 0) {
+                    if(reader == null) {
+                        if(count++ > 1000) {
+                            return false;
+                        }
+                        System.out.println("Producing copy " + count);
+                        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+                        if(headerRead) reader.readLine();
+                        else headerRead = true;
+                    }
+                    String line = reader.readLine();
+                    if(line == null) { reader.close(); reader = null; return refill(); }
+                    buffer = new ByteArrayInputStream((line + "\n").getBytes(StandardCharsets.UTF_8));
+                }
+                return true;
+            }
+        };
+        UpsertResult result = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, stream);
         TestCase.assertNotNull(result);
         TestCase.assertEquals(0, result.errorCount());
         TestCase.assertEquals(4999, result.getRowsCreated());

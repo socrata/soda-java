@@ -183,7 +183,11 @@ public class SodaImporter extends SodaDdl
                                               .queryParam("method", method)
                                               .build();
 
-                return httpLowLevel.postFileRaw(scanUri, mediaType, payload);
+                try(InputStream is = new FileInputStream(payload)) {
+                    return httpLowLevel.postRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, ContentEncoding.IDENTITY, is, file.getName());
+                } catch(IOException e) {
+                    throw new SodaError("Unable to load file: " + file.getAbsolutePath(), e);
+                }
             }
         };
 
@@ -575,16 +579,11 @@ public class SodaImporter extends SodaDdl
                                               .queryParam("fileUploaderfile", file.getName())
                                               .build();
 
-                try {
-                    final InputStream   is = new FileInputStream(file);
-                    try {
-                        // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
-                        // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
-                        // is a bug on the core server side to fix this.
-                        return httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
-                    } finally {
-                        is.close();
-                    }
+                try(final InputStream is = new FileInputStream(file)) {
+                    // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                    // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
+                    // is a bug on the core server side to fix this.
+                    return httpLowLevel.postRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, ContentEncoding.IDENTITY, is, file.getName());
                 } catch (IOException ioe) {
                     throw new SodaError("Unable to load file: " + file.getAbsolutePath(), ioe);
                 }
@@ -632,17 +631,11 @@ public class SodaImporter extends SodaDdl
                                               .queryParam("fileUploaderfile", file.getName())
                                               .build();
 
-                try {
-                    final InputStream   is = new FileInputStream(file);
-                    try {
-                        // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
-                        // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
-                        // is a bug on the core server side to fix this.
-                        return httpLowLevel.postFileRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, file);
-
-                    } finally {
-                        is.close();
-                    }
+                try(final InputStream is = new FileInputStream(file)) {
+                    // Funny issue with service, currently only returns MediaType.TEXT_PLAIN_TYPE, but the
+                    // response needs to be processed as JSON.  So, do the JSON decoding ourselves. There
+                    // is a bug on the core server side to fix this.
+                    return httpLowLevel.postRaw(scanUri, MediaType.APPLICATION_OCTET_STREAM_TYPE, MediaType.TEXT_PLAIN_TYPE, ContentEncoding.IDENTITY, is, file.getName());
                 } catch (IOException ioe) {
                     throw new SodaError("Unable to load file: " + file.getAbsolutePath(), ioe);
                 }
