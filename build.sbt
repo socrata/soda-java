@@ -11,7 +11,7 @@ organization := "com.socrata"
 name := "soda-api-java"
 
 // remember to update the README when you change this to a new release
-version := "0.10.3"
+version := "0.10.4"
 
 previousArtifact := Some("com.socrata" % "soda-api-java" % "0.9.13")
 
@@ -24,6 +24,7 @@ crossPaths := false
 libraryDependencies ++= Seq(
   "net.sf.opencsv" % "opencsv" % "2.0",
   "joda-time" % "joda-time" % "2.1",
+  "org.glassfish.jersey.connectors" % "jersey-apache-connector" % "2.26",
   "org.glassfish.jersey.core" % "jersey-client" % "2.26",
   "org.glassfish.jersey.media" % "jersey-media-multipart" % "2.26",
   "org.glassfish.jersey.media" % "jersey-media-json-jackson" % "2.26",

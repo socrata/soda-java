@@ -18,8 +18,10 @@ import org.glassfish.jersey.client.JerseyWebTarget;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -89,7 +91,8 @@ public final class HttpLowLevel
 
     private final ObjectMapper mapper;
 
-    private final JerseyClient client;
+    private final JerseyClient httpClient;
+    private final JerseyClient apacheClient;
     private final String url;
 
     private long retryTime = DEFAULT_RETRY_TIME;
@@ -109,8 +112,7 @@ public final class HttpLowLevel
      *
      * @return the Client that was created.
      */
-    private static JerseyClient createClient() {
-
+    private static JerseyClient createClient(boolean apache) {
         String  proxyHost = System.getProperty("https.proxyHost");
         Integer proxyPort = null;
         if (StringUtils.isNotEmpty(proxyHost)) {
@@ -120,7 +122,7 @@ public final class HttpLowLevel
             }
         }
 
-        return createClient(proxyHost, proxyPort);
+        return createClient(proxyHost, proxyPort, apache);
     }
 
     /**
@@ -132,18 +134,29 @@ public final class HttpLowLevel
      *
      * @return the Client that was created.
      */
-    private static JerseyClient createClient(@Nullable final String proxyHost, @Nullable final Integer proxyPort) {
+    private static JerseyClient createClient(@Nullable final String proxyHost, @Nullable final Integer proxyPort, boolean apache) {
         final ClientConfig clientConfig = new ClientConfig();
         clientConfig.register(JacksonObjectMapperProvider.class);
         clientConfig.register(JacksonFeature.class);
         clientConfig.register(MultiPartFeature.class);
 
-        if (StringUtils.isNotEmpty(proxyHost)) {
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort == null ? 443 : proxyPort));
-            HttpUrlConnectorProvider cp = new HttpUrlConnectorProvider();
-            cp.connectionFactory(new ProxyHandler(proxy));
+        if(apache) {
+            ApacheConnectorProvider cp = new ApacheConnectorProvider();
+            if (StringUtils.isNotEmpty(proxyHost)) {
+                String proxyUri = "https://" + proxyHost + ":" + (proxyPort == null ? 443 : proxyPort);
+                System.out.println("SETTING PROXY URI to " + proxyUri);
+                clientConfig.property(ClientProperties.PROXY_URI, proxyUri);
+            }
             clientConfig.connectorProvider(cp);
+        } else {
+            HttpUrlConnectorProvider cp = new HttpUrlConnectorProvider();
+            clientConfig.connectorProvider(cp);
+            if (StringUtils.isNotEmpty(proxyHost)) {
+                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort == null ? 443 : proxyPort));
+                cp.connectionFactory(new ProxyHandler(proxy));
+            }
         }
+
         return new JerseyClientBuilder().withConfig(clientConfig).build();
     }
 
@@ -155,7 +168,7 @@ public final class HttpLowLevel
      */
     public static final HttpLowLevel instantiate(@Nonnull final String url)
     {
-        return new HttpLowLevel(createClient(), url);
+        return new HttpLowLevel(createClient(false), createClient(true), url);
     }
 
     /**
@@ -169,7 +182,16 @@ public final class HttpLowLevel
      */
     public static final HttpLowLevel instantiateBasic(@Nonnull final String url, @Nonnull final String userName, @Nonnull final String password, @Nullable final String token, @Nullable final String requestId)
     {
-        final JerseyClient client = createClient();
+        // I think this isn't necessary with jersey 2; in any event it's not done this way.
+        //client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
+
+        return new HttpLowLevel(createClientBasic(false, userName, password, token, requestId),
+                                createClientBasic(true, userName, password, token, requestId),
+                                url);
+    }
+
+    private static JerseyClient createClientBasic(boolean apache, @Nonnull String userName, @Nonnull String password, @Nullable String token, @Nullable String requestId) {
+        final JerseyClient client = createClient(apache);
         client.register(HttpAuthenticationFeature.basic(userName, password));
         if (token != null) {
             client.register(new SodaTokenFilter(token));
@@ -178,16 +200,18 @@ public final class HttpLowLevel
             client.register(new SodaRequestIdFilter(requestId));
         }
         client.register(new UserAgentFilter());
-
-        // I think this isn't necessary with jersey 2; in any event it's not done this way.
-        //client.setChunkedEncodingSize(10240); // enable streaming and not put whole inputstream in memory
-
-        //client.setConnectTimeout(1000 * 60);
-        return new HttpLowLevel(client, url);
+        client.property(ClientProperties.CONNECT_TIMEOUT, 1000);
+        client.property(ClientProperties.READ_TIMEOUT, 6000000);
+        return client;
     }
 
+    @Deprecated
     public HttpLowLevel(final JerseyClient client, final String url) {
-        this(client, url, ObjectMapperFactory.create());
+        this(client, client, url, ObjectMapperFactory.create());
+    }
+
+    private HttpLowLevel(final JerseyClient httpClient, final JerseyClient apacheClient, final String url) {
+        this(httpClient, apacheClient, url, ObjectMapperFactory.create());
     }
 
 
@@ -197,9 +221,15 @@ public final class HttpLowLevel
      * @param client the Jersey Client class that will be used for actually issuing requests
      * @param url the base URL for the SODA2 domain to access.
      */
+    @Deprecated
     public HttpLowLevel(final JerseyClient client, final String url, final ObjectMapper mapper)
     {
-        this.client = client;
+        this(client, client, url, mapper);
+    }
+
+    private HttpLowLevel(final JerseyClient httpClient, final JerseyClient apacheClient, final String url, final ObjectMapper mapper) {
+        this.httpClient = httpClient;
+        this.apacheClient = apacheClient;
         this.url = url;
         this.mapper = mapper;
     }
@@ -211,7 +241,7 @@ public final class HttpLowLevel
      */
     public JerseyClient getClient()
     {
-        return client;
+        return apacheClient;
     }
 
     /**
@@ -437,7 +467,7 @@ public final class HttpLowLevel
      */
     public Response deleteRaw(final URI uri) throws LongRunningQueryException, SodaError
     {
-        final Response response = client.target(soda2ifyUri(uri)).request().
+        final Response response = apacheClient.target(soda2ifyUri(uri)).request().
             accept("application/json").
             delete(Response.class);
 
@@ -458,7 +488,7 @@ public final class HttpLowLevel
      */
     public Response queryRaw(final URI uri, final MediaType acceptType) throws LongRunningQueryException, SodaError
     {
-        final Response response = client.target(soda2ifyUri(uri)).request().
+        final Response response = apacheClient.target(soda2ifyUri(uri)).request().
             accept(acceptType).
             get(Response.class);
 
@@ -479,10 +509,23 @@ public final class HttpLowLevel
      * the caller likely wants to call follow202.
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      */
-    public Response postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError
+    public Response postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError {
+        return postRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, contentEncoding, object, null);
+    }
+
+    public Response postRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, Object object, String filename) throws LongRunningQueryException, SodaError {
+        return postRaw(uri, mediaType, MediaType.APPLICATION_JSON_TYPE, contentEncoding, object, filename);
+    }
+
+    public Response postRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final ContentEncoding contentEncoding, Object object) throws LongRunningQueryException, SodaError
     {
-        final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
-            accept("application/json");
+        return postRaw(uri, mediaType, acceptType, contentEncoding, object, null);
+    }
+
+    public Response postRaw(final URI uri, final MediaType mediaType, final MediaType acceptType, final ContentEncoding contentEncoding, Object object, String filename) throws LongRunningQueryException, SodaError {
+        JerseyInvocation.Builder builder = apacheClient.target(soda2ifyUri(uri)).request().
+            accept(acceptType);
+        if(filename != null) builder = builder.header("X-File-Name", filename);
         final Object encodedObject = streamContents(encodeContents(contentEncoding, builder, object));
         final Response response = builder.post(Entity.entity(encodedObject, mediaType), Response.class);
 
@@ -573,7 +616,7 @@ public final class HttpLowLevel
 
         try(FormDataMultiPart form = new FormDataMultiPart()) {
             form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
-            response = client.target(soda2ifyUri(uri)).request().
+            response = httpClient.target(soda2ifyUri(uri)).request().
                 accept(acceptType).
                 post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
         } catch (IOException e) {
@@ -599,7 +642,7 @@ public final class HttpLowLevel
      */
     public <T> Response putRaw(final URI uri, final MediaType mediaType, final ContentEncoding contentEncoding, final Object object) throws LongRunningQueryException, SodaError
     {
-        final JerseyInvocation.Builder builder = client.target(soda2ifyUri(uri)).request().
+        final JerseyInvocation.Builder builder = apacheClient.target(soda2ifyUri(uri)).request().
             accept("application/json");
 
         final Object encodedObject = streamContents(encodeContents(contentEncoding, builder, object));
@@ -618,7 +661,7 @@ public final class HttpLowLevel
 
         try(FormDataMultiPart form = new FormDataMultiPart()) {
             form.bodyPart(new FileDataBodyPart(file.getName(), file, mediaType));
-            response = client.target(soda2ifyUri(uri)).request().
+            response = httpClient.target(soda2ifyUri(uri)).request().
                 accept(acceptType).
                 put(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE), Response.class);
         } catch (IOException e) {
@@ -629,8 +672,11 @@ public final class HttpLowLevel
     }
 
     public void close() {
-        if (client != null) {
-            client.close();
+        if (httpClient != null) {
+            httpClient.close();
+        }
+        if (apacheClient != null) {
+            apacheClient.close();
         }
     }
 
