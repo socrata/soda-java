@@ -481,7 +481,7 @@ public class Soda2Producer extends Soda2Consumer
      * @param is
      * @return
      */
-    UpsertResult deserializeUpsertResult(InputStream is) throws IOException
+    UpsertResult deserializeUpsertResult(InputStream is, Long truthDataVersion) throws IOException
     {
         JsonParser parser = factory.createParser(is);
 
@@ -520,14 +520,20 @@ public class Soda2Producer extends Soda2Consumer
                 currToken = parser.nextToken();
             }
 
-            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null);
+            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null, truthDataVersion);
         }
 
         return parser.readValueAs(UpsertResult.class);
     }
 
     UpsertResult deserializeUpsertResult(Response response) throws IOException {
-        return deserializeUpsertResult(response.readEntity(InputStream.class));
+        Long truthDataVersion = null;
+        try {
+            truthDataVersion = Long.parseLong(response.getHeaders().getFirst("X-SODA2-Truth-Version").toString());
+        } catch (ClassCastException cce) {
+            // ok, fine
+        }
+        return deserializeUpsertResult(response.readEntity(InputStream.class), truthDataVersion);
     }
 
     /**
