@@ -529,8 +529,11 @@ public class Soda2Producer extends Soda2Consumer
     UpsertResult deserializeUpsertResult(Response response) throws IOException {
         Long truthDataVersion = null;
         try {
-            truthDataVersion = Long.parseLong(response.getHeaders().getFirst("X-SODA2-Truth-Version").toString());
-        } catch (ClassCastException cce) {
+            Object header = response.getHeaders().getFirst("X-SODA2-Truth-Version");
+            if (header != null) {
+                truthDataVersion = Long.parseLong(header.toString());
+            }
+        } catch (NumberFormatException nfe) {
             // ok, fine
         }
         return deserializeUpsertResult(response.readEntity(InputStream.class), truthDataVersion);
