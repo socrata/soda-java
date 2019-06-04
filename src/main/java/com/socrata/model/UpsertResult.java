@@ -32,6 +32,14 @@ public class UpsertResult
         this.errors = errors;
     }
 
+    public UpsertResult(final long rowsCreated,
+                        final long rowsUpdated,
+                        final long rowsDeleted,
+                        final List<UpsertError> errors)
+    {
+        this(rowsCreated, rowsUpdated, rowsDeleted, errors, null);
+    }
+
 
     public long getRowsCreated()
     {
