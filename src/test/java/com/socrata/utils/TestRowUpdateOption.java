@@ -23,6 +23,7 @@ public class TestRowUpdateOption {
     parameterMap.put("mergeInsteadOfReplace", new String[]{"true"});
     parameterMap.put("errorsAreFatal", new String[]{"true"});
     parameterMap.put("nonFataRowErrors[]", new String[]{"no_such_row_to_delete", "no_such_row_to_replace"});
+    parameterMap.put("expectedDataVersion", new String[]{"15"});
   }
 
   @Test
@@ -35,11 +36,13 @@ public class TestRowUpdateOption {
     TestCase.assertNull(options.mergeInsteadOfReplace);
     TestCase.assertNull(options.errorsAreFatal);
     TestCase.assertNull(options.nonFatalRowErrors);
+    TestCase.assertNull(options.expectedDataVersion);
     // Test they are no longer null and have the correct values
     options.fromMap(parameterMap);
     TestCase.assertFalse(options.truncate);
     TestCase.assertTrue(options.mergeInsteadOfReplace);
     TestCase.assertTrue(options.errorsAreFatal);
     TestCase.assertEquals(parameterMap.get("nonFatalRowErrors[]"), options.nonFatalRowErrors);
+    TestCase.assertEquals(Long.valueOf(15), options.expectedDataVersion);
   }
 }

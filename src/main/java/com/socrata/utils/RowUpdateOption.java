@@ -11,6 +11,7 @@ public class RowUpdateOption
   public Boolean mergeInsteadOfReplace;
   public Boolean errorsAreFatal;
   public String[] nonFatalRowErrors;
+  public Long expectedDataVersion;
 
   public RowUpdateOption() {
     this.truncate = null;
@@ -24,6 +25,7 @@ public class RowUpdateOption
     String[] mior = parameterMap.get("mergeInsteadOfReplace");
     String[] eaf = parameterMap.get("errorsAreFatal");
     String[] nfre = parameterMap.get("nonFatalRowErrors[]");
+    String[] edv = parameterMap.get("expectedDataVersion");
 
     if (trunc != null) {
       this.truncate = Boolean.valueOf(trunc[0]);
@@ -36,6 +38,13 @@ public class RowUpdateOption
     }
     if (nfre != null) {
       this.nonFatalRowErrors = nfre;
+    }
+    if (edv != null) {
+      try {
+        this.expectedDataVersion = Long.valueOf(edv[0]);
+      } catch (NumberFormatException e) {
+        // ok
+      }
     }
     return;
   }
@@ -52,6 +61,9 @@ public class RowUpdateOption
     }
     if (this.nonFatalRowErrors != null) {
       uribuilder = uribuilder.queryParam("nonFatalRowErrors[]", (Object[]) this.nonFatalRowErrors);
+    }
+    if (this.expectedDataVersion != null) {
+      uribuilder = uribuilder.queryParam("expectedDataVersion", this.expectedDataVersion.toString());
     }
     return uribuilder;
   }
