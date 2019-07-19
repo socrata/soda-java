@@ -3,6 +3,7 @@ package com.socrata.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This represents an error with some of the data being added through
@@ -13,12 +14,12 @@ public class UpsertError
 {
     final String error;
     final int    index;
-    final String primaryKey;
+    final JsonNode primaryKey;
 
     @JsonCreator
     public UpsertError(@JsonProperty(value="error") String error,
                        @JsonProperty(value="input_index") int index,
-                       @JsonProperty(value="primary_key") String primaryKey)
+                       @JsonProperty(value="primary_key") JsonNode primaryKey)
     {
         this.error = error;
         this.index = index;
@@ -52,7 +53,7 @@ public class UpsertError
      * @return The primary key of the row that had an error getting upserted.
      */
     @JsonProperty(value="primary_key")
-    public String getPrimaryKey()
+    public JsonNode getPrimaryKey()
     {
         return primaryKey;
     }

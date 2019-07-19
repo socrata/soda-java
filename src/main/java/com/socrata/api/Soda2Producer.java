@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.socrata.exceptions.LongRunningQueryException;
 import com.socrata.exceptions.SodaError;
 import com.socrata.model.Meta;
@@ -545,13 +546,13 @@ public class Soda2Producer extends Soda2Consumer
     @JsonIgnoreProperties(ignoreUnknown=true)
     static public class NewUpsertRow {
         public final String typ;
-        public final String id;
+        public final JsonNode id;
         public final String ver;
         public final String err;
 
         @JsonCreator
         public NewUpsertRow(final @JsonProperty("typ") String typ,
-                            final @JsonProperty("id") String id,
+                            final @JsonProperty("id") JsonNode id,
                             final @JsonProperty("ver") String ver,
                             final @JsonProperty("err") String err)
         {
