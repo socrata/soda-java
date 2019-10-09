@@ -97,7 +97,7 @@ public class TestJacksonObjectMapperProvider {
     }
 
     private static Date parse(final String str) throws ParseException {
-        return format.parseAsISO8601(str, new ParsePosition(0), false);
+        return format.parseAsISO8601(str, new ParsePosition(0));
     }
 
     private static BeforeDateMatcher before(final Date base) {
