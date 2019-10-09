@@ -63,12 +63,12 @@ public final class ObjectMapperFactory {
          * @return the Date returned.
          */
         @Override
-        protected Date parseAsISO8601(String dateStr, ParsePosition pos, boolean throwErrors) throws ParseException {
+        protected Date parseAsISO8601(String dateStr, ParsePosition pos) throws ParseException {
             final Date retVal = parseAsFloatingISO8601(dateStr, pos);
             if (retVal != null) {
                 return retVal;
             }
-            return super.parseAsISO8601(dateStr, pos, throwErrors);
+            return super.parseAsISO8601(dateStr, pos);
         }
 
         @Override
