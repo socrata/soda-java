@@ -1,6 +1,6 @@
 language: scala
 jdk:
-- oraclejdk8
+- openjdk8
 script:
 - echo "baseurl=https://sandbox.demo.socrata.com" > src/test/resources/TestConfig.properties
 - echo "token=${SOCRATA_APP_TOKEN}"  >> src/test/resources/TestConfig.properties
