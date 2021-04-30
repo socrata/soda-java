@@ -15,19 +15,20 @@ import test.model.LocationTestClass;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import org.junit.Ignore;
 
 /**
  * This runs through a number of tests with Locations
  */
 public class LocationTests extends TestBase
 {
-
     private static final File LOCATION_TEST_CSV = Resources.file("/locationImports.csv");
-
 
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.
+     * TODO: EN-45878
      */
+    @Ignore
     @Test
     public void createLocationTable() throws IOException, InterruptedException, SodaError
     {
@@ -75,11 +76,12 @@ public class LocationTests extends TestBase
 
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.
+     * TODO: EN-45878
      */
+    @Ignore
     @Test
     public void createLocationTableWithAppend() throws IOException, InterruptedException, SodaError
     {
-
         final String name = "Name" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
@@ -126,7 +128,9 @@ public class LocationTests extends TestBase
 
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.
+     * TODO: EN-45878
      */
+    @Ignore
     @Test
     public void importLocationTable() throws IOException, InterruptedException, SodaError
     {

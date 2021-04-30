@@ -10,16 +10,15 @@ import com.socrata.model.importer.*;
 import com.socrata.model.search.SearchClause;
 import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
 
-/**
- * */
+/** Tests for SodaDdl **/
 public class SodaDdlTest  extends TestBase
 {
-
     @Test
     public void testBasicColumnCrud() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
@@ -113,7 +112,6 @@ public class SodaDdlTest  extends TestBase
     @Test
     public void testMetadataCrud() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-
         final String name = "Name" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
@@ -156,18 +154,17 @@ public class SodaDdlTest  extends TestBase
         importer.deleteDataset(loadedDataset.getId());
     }
 
-
+    /* The dataset that is being searched for does not exist on staging or rc. TODO: EN-45878 */
+    @Ignore
     @Test
     public void testSearch() throws SodaError, InterruptedException, IOException
     {
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
 
-
-        final SearchClause    nameClause = new SearchClause.NameSearch("TestUpdate");
-        final SearchClause    tagClause = new SearchClause.TagSearch("test");
-        final SearchClause    metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata");
-
+        final SearchClause nameClause = new SearchClause.NameSearch("TestUpdate");
+        final SearchClause tagClause = new SearchClause.TagSearch("test");
+        final SearchClause metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata");
 
         final SearchResults results1 =  importer.searchViews(nameClause);
         TestCase.assertEquals(1, results1.getCount());
@@ -179,7 +176,6 @@ public class SodaDdlTest  extends TestBase
         final SearchResults results2a =  importer.searchViews(tagClause, nameClause);
         TestCase.assertEquals(1, results2a.getCount());
         TestCase.assertEquals("TestUpdate", results2a.getResults().get(0).getDataset().getName());
-
 
         final SearchResults results3 =  importer.searchViews(metadataClause);
         TestCase.assertEquals(1, results3.getCount());
@@ -195,7 +191,6 @@ public class SodaDdlTest  extends TestBase
 
         final SearchResults results6 =  importer.searchViews(metadataClause, new SearchClause.ViewTypeSearch(SearchClause.ViewType.view));
         TestCase.assertEquals(0, results6.getCount());
-
     }
 
     @Test
@@ -226,6 +221,11 @@ public class SodaDdlTest  extends TestBase
             importer.publish(createdView.getId());
 
             producer.addObject(resourceName, ImmutableMap.of("col1", "hello", "col2", "kitty"));
+
+            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
+             * If this is consistently failing, we may want to increase the sleep or find a new way of
+             * testing that the row count has been updated. */
+            Thread.sleep(5000);
             List queryResults = producer.query(resourceName, SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
             TestCase.assertEquals(1, queryResults.size());
 
