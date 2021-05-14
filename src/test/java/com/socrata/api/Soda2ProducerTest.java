@@ -52,10 +52,7 @@ public class Soda2ProducerTest extends TestBase
             TestCase.assertEquals(2, replaceResult.getRowsCreated());
             TestCase.assertEquals(0, replaceResult.errorCount());
 
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
@@ -63,10 +60,7 @@ public class Soda2ProducerTest extends TestBase
             TestCase.assertEquals(1, replaceResult.getRowsCreated());
             TestCase.assertEquals(0, replaceResult.errorCount());
 
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
@@ -101,18 +95,12 @@ public class Soda2ProducerTest extends TestBase
             TestCase.assertEquals(3, results.size());
 
             UpsertResult replaceResult = producer.replaceStream(datasetPublished.getId(), HttpLowLevel.CSV_TYPE, fisCrimes1);
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
         } finally {
@@ -141,18 +129,12 @@ public class Soda2ProducerTest extends TestBase
 
 
             UpsertResult replaceResult = producer.replaceCsv(datasetWorkingCopy.getId(), CRIMES_HEADER_CSV);
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_HEADER2_CSV);
-            /* There is a delay between writing and reading the datase so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
@@ -165,10 +147,7 @@ public class Soda2ProducerTest extends TestBase
             * TestCase.assertEquals(1000, results.size()); */
 
             replaceResult = producer.replace(datasetWorkingCopy.getId(), Lists.newArrayList(results.get(0)));
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
@@ -200,18 +179,12 @@ public class Soda2ProducerTest extends TestBase
 
             //Delete two crimes using upsert
             UpsertResult replaceResult = producer.upsertCsv(datasetPublished.getId(), DELETE_CRIMES_CSV);
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
             producer.delete(datasetPublished.getId(), results.get(0).getId().toString());
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-            * If this is consistently failing, we may want to increase the sleep or find a new way of
-            * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(0, results.size());
         } finally {

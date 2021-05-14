@@ -105,10 +105,7 @@ public class SodaImporterTest extends TestBase
             SoqlQuery   sortQuery = new SoqlQueryBuilder()
                     .addOrderByPhrase(new OrderByClause(SortOrder.Ascending, "name"))
                     .build();
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             List<NominationsWText> nominations = consumer.query(createdView.getId(), sortQuery, NominationsWText.LIST_TYPE);
             TestCase.assertEquals(2, nominations.size());
             TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());
@@ -180,10 +177,7 @@ public class SodaImporterTest extends TestBase
             final SoqlQuery   sortQuery = new SoqlQueryBuilder()
                     .addOrderByPhrase(new OrderByClause(SortOrder.Ascending, "name"))
                     .build();
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             List<Nomination> nominations = consumer.query(createdView.getId(), sortQuery, Nomination.LIST_TYPE);
             TestCase.assertEquals(2, nominations.size());
             TestCase.assertEquals("Kitty, Hello", nominations.get(0).getName());

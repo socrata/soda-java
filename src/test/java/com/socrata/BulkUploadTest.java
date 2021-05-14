@@ -164,10 +164,7 @@ public class BulkUploadTest extends TestBase
             final SoqlQuery lookupTestRow = new SoqlQueryBuilder()
                         .setWhereClause("id='8880962'")
                         .build();
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             final List queryResults = producer.query(dataset.getId(), lookupTestRow, Soda2Producer.HASH_RETURN_TYPE);
             TestCase.assertEquals(1, queryResults.size());
 
@@ -184,10 +181,7 @@ public class BulkUploadTest extends TestBase
             TestCase.assertEquals(2, results.getRowsUpdated());
 
             // Verify an overwrite happened, and not just an append.
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             final List queryResults2 = producer.query(dataset.getId(), lookupTestRow, Soda2Producer.HASH_RETURN_TYPE);
             TestCase.assertEquals(1, queryResults.size());
 

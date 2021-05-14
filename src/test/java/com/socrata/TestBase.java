@@ -13,6 +13,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -57,7 +58,9 @@ public class TestBase
      */
     protected HttpLowLevel connect() throws IOException
     {
-        return connect(null);
+        Map<String, String> env = System.getenv();
+        String url = env.getOrDefault("URL", null);
+        return connect(url);
     }
 
     /**
@@ -70,11 +73,15 @@ public class TestBase
     {
         final Properties testProperties = new Properties();
         testProperties.load(getClass().getClassLoader().getResourceAsStream("TestConfig.properties"));
+        Map<String, String> env = System.getenv();
+        String username = env.getOrDefault("USERNAME", null);
+        String password = env.getOrDefault("PASSWORD", null);
+        String token = env.getOrDefault("TOKEN", null);
 
         final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(url == null ? testProperties.getProperty(URL_PROP) : url,
-                                                                        testProperties.getProperty(USER_NAME_PROP),
-                                                                        testProperties.getProperty(PASSWORD_PROP),
-                                                                        testProperties.getProperty(API_KEY_PROP),
+                                                                        username == null ? testProperties.getProperty(USER_NAME_PROP) : username,
+                                                                        password == null ? testProperties.getProperty(PASSWORD_PROP) : password,
+                                                                        token == null ? testProperties.getProperty(API_KEY_PROP) : token,
                                                                         null);
         return httpLowLevel;
     }

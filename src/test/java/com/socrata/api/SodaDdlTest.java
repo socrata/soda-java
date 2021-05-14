@@ -219,16 +219,10 @@ public class SodaDdlTest  extends TestBase
 
         try {
             importer.publish(createdView.getId());
-
             producer.addObject(resourceName, ImmutableMap.of("col1", "hello", "col2", "kitty"));
-
-            /* There is a delay between writing and reading the dataset so we should wait up to 5 seconds.
-             * If this is consistently failing, we may want to increase the sleep or find a new way of
-             * testing that the row count has been updated. */
-            Thread.sleep(5000);
+            Thread.sleep(5000); // EN-45880
             List queryResults = producer.query(resourceName, SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
             TestCase.assertEquals(1, queryResults.size());
-
         } finally {
             importer.deleteDataset(createdView.getId());
         }
