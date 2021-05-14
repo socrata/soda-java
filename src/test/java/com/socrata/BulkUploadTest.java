@@ -35,10 +35,9 @@ public class BulkUploadTest extends TestBase
 
     /**
      * Tests uploading some records via CSV
-     *
      * Will issue a simple query, and do spot validation.
+     * TODO: EN-45878
      */
-    // UPDATE_DATA_SET does not exist on rc or staging. TODO: EN-45878
     @Ignore
     @Test
     public void testCsvUpload() throws LongRunningQueryException, SodaError, InterruptedException, IOException
@@ -190,7 +189,7 @@ public class BulkUploadTest extends TestBase
             TestCase.assertEquals("BATTERY", result2.get("primary_type"));
 
             /*
-            // Investigate and update. TODO: EN-45878
+            // TODO: EN-45878
             // Test adding a stream that has an invalid row in it
             final InputStream  csvStreamInvalid = getClass().getResourceAsStream("/testCrimesWithInvalidCrime.csv");
 

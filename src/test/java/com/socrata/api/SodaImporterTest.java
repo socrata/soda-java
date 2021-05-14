@@ -214,8 +214,8 @@ public class SodaImporterTest extends TestBase
         TestCase.assertEquals("New Description", updatedView.getDescription());
         TestCase.assertEquals("published", updatedView.getPublicationStage());
 
-        // This was working before, and now it doesn't. TODO: EN-45878
-        // Soda2Producer   producer = new Soda2Producer(connection);
+        // TODO: EN-45878
+        // Soda2Producer producer = new Soda2Producer(connection);
         // FileInputStream fis = new FileInputStream(NOMINATIONS_CSV);
         // producer.upsertStream(updatedView.getId(), HttpLowLevel.CSV_TYPE, fis);
         // fis.close();
@@ -367,7 +367,7 @@ public class SodaImporterTest extends TestBase
 
     }
 
-    /* Looks like boolean columns in the CSV are imported as text columns rather than boolean-type columns. TODO: EN-45878 */
+    /* TODO: EN-45878 */
     @Ignore
     @Test
     public void testImportWithPK() throws InterruptedException, SodaError, IOException
@@ -436,7 +436,7 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals(NOMINATIONS_CSV.length(), fileDatasetLoaded.getBlobFileSize());
             TestCase.assertEquals("published", fileDatasetLoaded.getPublicationStage());
 
-            // This worked before, no longer does. Looks like there are some permission issues with getFileBlob. TODO: EN-45878
+            // TODO: EN-45878
             // String fileUploadContent = IOUtils.toString(importer.getFileBlob(fileDatasetLoaded));
             // String fileContent = FileUtils.readFileToString(NOMINATIONS_CSV);
             // TestCase.assertEquals(fileContent, fileUploadContent);
@@ -459,7 +459,7 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals("https://www.socrata.com", newUploadedFile.getAttributionLink());
             TestCase.assertFalse(fileDatasetLoaded2.getBlobId().equals(newUploadedFile.getBlobId()));
 
-            // This worked before, no longer does. Looks like there are some permission issues with getFileBlob. TODO: EN-45878
+            // TODO: EN-45878
             // String newFileUploadContent = IOUtils.toString(importer.getFileBlob(newUploadedFile));
             // String newFileContent = FileUtils.readFileToString(BABY_NAMES_LOC);
             // TestCase.assertEquals(newFileContent, newFileUploadContent);

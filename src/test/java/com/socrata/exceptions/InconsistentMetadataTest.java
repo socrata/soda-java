@@ -35,10 +35,8 @@ public class InconsistentMetadataTest  extends TestBase
             int columnId = ((Dataset)datasetCreated).getRowIdentifierColumnId();
             sodaImporter.removeColumn(datasetCreated.getId(), columnId);
 
-            /* Investigate whether this is still needed. A similar test case below already commented
-             * this out by the time I looked at this, which implies this may not be relevant anymore.
-             * TODO: EN-45878 */
             /*
+            // TODO: EN-45878
             try {
                 sodaImporter.append(datasetCreated.getId(), TEST_NOMINATIONS_CSV, 1, null);
                 TestCase.fail("Expected failure after updating a non-existing column as a rowidentifier");

@@ -15,7 +15,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * A Base class that pulls the config information for running the "unit" tests
@@ -29,9 +28,6 @@ public class TestBase
 
     public static final String NOMINATION_DATA_SET = "nominationsCopy";
     public static final String UPDATE_DATA_SET = "testupdate";
-    private static Logger log = Logger.getLogger("TestBase");
-
-
 
     static {
         // Create a trust manager that does not validate certificate chains.  This is only
@@ -79,10 +75,6 @@ public class TestBase
         String username = env.getOrDefault("USERNAME", null);
         String password = env.getOrDefault("PASSWORD", null);
         String token = env.getOrDefault("TOKEN", null);
-        log.info("HIIIIIIII");
-        log.info(username);
-        log.info(token);
-        log.info(url);
 
         final HttpLowLevel httpLowLevel = HttpLowLevel.instantiateBasic(url == null ? testProperties.getProperty(URL_PROP) : url,
                                                                         username == null ? testProperties.getProperty(USER_NAME_PROP) : username,

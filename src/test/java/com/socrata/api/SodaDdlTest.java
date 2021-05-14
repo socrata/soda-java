@@ -10,7 +10,6 @@ import com.socrata.model.importer.*;
 import com.socrata.model.search.SearchClause;
 import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -154,8 +153,6 @@ public class SodaDdlTest  extends TestBase
         importer.deleteDataset(loadedDataset.getId());
     }
 
-    /* The dataset that is being searched for does not exist on staging or rc. TODO: EN-45878 */
-    @Ignore
     @Test
     public void testSearch() throws SodaError, InterruptedException, IOException
     {
@@ -164,14 +161,14 @@ public class SodaDdlTest  extends TestBase
 
         final SearchClause nameClause = new SearchClause.NameSearch("TestUpdate");
         final SearchClause tagClause = new SearchClause.TagSearch("test");
-        final SearchClause metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata");
+        final SearchClause metadataClause = new SearchClause.MetadataSearch("Tests", "value", "testUpdateMetadata"); // domain_metadata
 
         final SearchResults results1 =  importer.searchViews(nameClause);
         TestCase.assertEquals(1, results1.getCount());
         TestCase.assertEquals("TestUpdate", results1.getResults().get(0).getDataset().getName());
 
         final SearchResults results2 =  importer.searchViews(tagClause);
-        TestCase.assertTrue(3 >= results2.getCount());
+        TestCase.assertTrue(results2.getCount() >= 1);
 
         final SearchResults results2a =  importer.searchViews(tagClause, nameClause);
         TestCase.assertEquals(1, results2a.getCount());

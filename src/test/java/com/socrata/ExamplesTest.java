@@ -25,7 +25,7 @@ public class ExamplesTest extends TestBase
 
     public static final File  NOMINATIONS_CSV = Resources.file("/testNominations.csv");
 
-    /* nominationCopy does not exist on staging or rc domains. TODO: EN-45878 */
+    /* TODO: EN-45878 */
     @Ignore
     @Test
     public void readmeConsumerExamples() throws Exception {
