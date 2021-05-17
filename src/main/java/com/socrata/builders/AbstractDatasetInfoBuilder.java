@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A DatasetInfoBuilder that can be used by builders of all the sub-classes.
+ * A DatasetInfoBuilder which can be used by builders of all the sub-classes.
  *
  * Handles all the common properties.
  */
