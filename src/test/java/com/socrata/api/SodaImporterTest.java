@@ -74,6 +74,7 @@ public class SodaImporterTest extends TestBase
             DatasetInfo loadedView = importer.loadDatasetInfo(createdView.getId());
             TestCase.assertNotNull(loadedView);
             TestCase.assertEquals("published", loadedView.getPublicationStage());
+            Thread.sleep(5000); // EN-45880
 
             final Soda2Consumer consumer = new Soda2Consumer(connection);
             final SoqlQuery   sortQuery = new SoqlQueryBuilder()
