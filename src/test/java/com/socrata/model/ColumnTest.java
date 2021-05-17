@@ -15,6 +15,7 @@ public class ColumnTest
     private final ObjectWriter writer;
 
     public static final String JSON_COMPLETE = "{" +
+            "\"computationStrategy\":null," +
             "\"dataTypeName\":\"number\"," +
             "\"description\":\"a column\"," +
             "\"fieldName\":\"col1\"," +

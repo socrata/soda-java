@@ -20,15 +20,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-/**
- */
+/** Tests for Soda2Producer */
 public class Soda2ProducerTest extends TestBase
 {
-
     private static final File  CRIMES_HEADER_CSV = Resources.file("/testCrimesHeader.csv");
     private static final File  CRIMES_HEADER2_CSV = Resources.file("/testCrimesHeader2.csv");
     private static final File  DELETE_CRIMES_CSV = Resources.file("/testDeletingCrimes.csv");
-
 
     /**
      * Tests a number of ways to connect using dataset name
@@ -42,38 +39,38 @@ public class Soda2ProducerTest extends TestBase
         final HttpLowLevel  connection = connect();
         final Soda2Producer producer = new Soda2Producer(connection);
         final SodaImporter  sodaImporter = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
 
         DatasetInfo datasetCreated = sodaImporter.createViewFromCsv(name, description, CRIMES_HEADER2_CSV, "ID");
         DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
 
         try {
-
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
-
 
             UpsertResult replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_HEADER_CSV);
             TestCase.assertEquals(2, replaceResult.getRowsCreated());
             TestCase.assertEquals(0, replaceResult.errorCount());
-            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+
+            Thread.sleep(5000); // EN-45880
+            results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
-            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            TestCase.assertEquals(1, replaceResult.getRowsCreated());
+            TestCase.assertEquals(0, replaceResult.errorCount());
+
+            Thread.sleep(5000); // EN-45880
+            results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
-
-            //Try it with a larger file
-            /*
-            replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_APPEND_CSV);
-            results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
-            TestCase.assertEquals(1000, results.size());
-            */
-
+            /* Test with larger dataset.
+             * replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_APPEND_CSV);
+             * TestCase.assertEquals(1000, replaceResult.getRowsCreated());
+             * TestCase.assertEquals(0, replaceResult.errorCount()); */
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
         }
-
     }
 
     /**
@@ -94,31 +91,27 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
 
         try {
-
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-
             UpsertResult replaceResult = producer.replaceStream(datasetPublished.getId(), HttpLowLevel.CSV_TYPE, fisCrimes1);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
-
-
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
             GeneralUtils.closeQuietly(fisCrimes1);
         }
-
     }
 
     @Test
     public void testSoda2OnWorkingCopy() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-
         final String name = "Name" + UUID.randomUUID();
         final String description = name + "-Description";
 
@@ -131,29 +124,30 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetWorkingCopy = sodaImporter.createWorkingCopy(datasetPublished.getId());
 
         try {
-
             List<Crime> results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
 
             UpsertResult replaceResult = producer.replaceCsv(datasetWorkingCopy.getId(), CRIMES_HEADER_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_HEADER2_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-            /*
-            replaceResult = producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_APPEND_CSV);
-            TestCase.assertEquals(3, replaceResult.getRowsUpdated());
-            TestCase.assertEquals(997, replaceResult.getRowsCreated());
+            /* Test with larger dataset.
+            * replaceResult = producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_APPEND_CSV);
+            * TestCase.assertEquals(3, replaceResult.getRowsUpdated());
+            * TestCase.assertEquals(997, replaceResult.getRowsCreated());
 
-            results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
-            TestCase.assertEquals(1000, results.size());
-            */
+            * results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+            * TestCase.assertEquals(1000, results.size()); */
 
             replaceResult = producer.replace(datasetWorkingCopy.getId(), Lists.newArrayList(results.get(0)));
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
@@ -161,7 +155,6 @@ public class Soda2ProducerTest extends TestBase
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
         }
-
     }
 
     /**
@@ -181,25 +174,22 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
 
         try {
-
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-
             //Delete two crimes using upsert
             UpsertResult replaceResult = producer.upsertCsv(datasetPublished.getId(), DELETE_CRIMES_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
             producer.delete(datasetPublished.getId(), results.get(0).getId().toString());
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(0, results.size());
-
-
         } finally {
-            sodaImporter.deleteDataset(datasetPublished.getId());
+             sodaImporter.deleteDataset(datasetPublished.getId());
         }
-
     }
 
 
@@ -222,7 +212,7 @@ public class Soda2ProducerTest extends TestBase
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals(1, errors1.getErrors().get(0).getIndex());
         TestCase.assertEquals("Error1", errors1.getErrors().get(0).getError());
-        TestCase.assertEquals("key1", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key1", errors1.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals(1, errors1.getRowsCreated());
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(3, errors1.getRowsDeleted());
@@ -231,10 +221,10 @@ public class Soda2ProducerTest extends TestBase
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals(1, errors2.getErrors().get(0).getIndex());
         TestCase.assertEquals("Error1", errors2.getErrors().get(0).getError());
-        TestCase.assertEquals("key1", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key1", errors2.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals(2, errors2.getErrors().get(1).getIndex());
         TestCase.assertEquals("Error2", errors2.getErrors().get(1).getError());
-        TestCase.assertEquals("key2", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals("key2", errors2.getErrors().get(1).getPrimaryKey().textValue());
         TestCase.assertEquals(1, errors2.getRowsCreated());
         TestCase.assertEquals(2, errors2.getRowsUpdated());
         TestCase.assertEquals(3, errors2.getRowsDeleted());
@@ -259,7 +249,7 @@ public class Soda2ProducerTest extends TestBase
         UpsertResult errors1 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1.getBytes("utf-8")), 4L);
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
-        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals(0, errors1.getRowsCreated());
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(0, errors1.getRowsDeleted());
@@ -267,9 +257,9 @@ public class Soda2ProducerTest extends TestBase
         UpsertResult errors2 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2.getBytes("utf-8")), 4L);
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
-        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals("error3", errors2.getErrors().get(1).getError());
-        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey().textValue());
         TestCase.assertEquals(0, errors2.getRowsCreated());
         TestCase.assertEquals(0, errors2.getRowsUpdated());
         TestCase.assertEquals(1, errors2.getRowsDeleted());
@@ -294,7 +284,7 @@ public class Soda2ProducerTest extends TestBase
         UpsertResult errors1 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_1_OLD.getBytes("utf-8")), 4L);
         TestCase.assertEquals(1, errors1.errorCount());
         TestCase.assertEquals("error3", errors1.getErrors().get(0).getError());
-        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key3", errors1.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals(0, errors1.getRowsCreated());
         TestCase.assertEquals(2, errors1.getRowsUpdated());
         TestCase.assertEquals(0, errors1.getRowsDeleted());
@@ -302,9 +292,9 @@ public class Soda2ProducerTest extends TestBase
         UpsertResult errors2 = producer.deserializeUpsertResult(new ByteArrayInputStream(SODA_SERVER_UPSERT_RESULT_2_OLD.getBytes("utf-8")), 4L);
         TestCase.assertEquals(2, errors2.errorCount());
         TestCase.assertEquals("error2", errors2.getErrors().get(0).getError());
-        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey());
+        TestCase.assertEquals("key2", errors2.getErrors().get(0).getPrimaryKey().textValue());
         TestCase.assertEquals("error3", errors2.getErrors().get(1).getError());
-        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey());
+        TestCase.assertEquals("key3", errors2.getErrors().get(1).getPrimaryKey().textValue());
         TestCase.assertEquals(0, errors2.getRowsCreated());
         TestCase.assertEquals(0, errors2.getRowsUpdated());
         TestCase.assertEquals(1, errors2.getRowsDeleted());

@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
 import java.util.TimeZone;
+import org.junit.Ignore;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -58,6 +59,8 @@ public class TestJacksonObjectMapperProvider {
                 );
     }
 
+    // TODO: EN-45878
+    @Ignore
     @Test
     public void testParseISONoSeconds() throws ParseException {
         assertThat(
@@ -66,6 +69,8 @@ public class TestJacksonObjectMapperProvider {
                 );
     }
 
+    // TODO: EN-45878
+    @Ignore
     @Test
     public void testParseISO() throws ParseException {
         assertThat(
@@ -74,6 +79,8 @@ public class TestJacksonObjectMapperProvider {
                 );
     }
 
+    // TODO: EN-45878
+    @Ignore
     @Test
     public void testParseISONoSecondsZulu() throws ParseException {
         assertThat(
@@ -82,6 +89,8 @@ public class TestJacksonObjectMapperProvider {
                 );
     }
 
+    // TODO: EN-45878
+    @Ignore
     @Test
     public void testParseISOZulu() throws ParseException {
         assertThat(

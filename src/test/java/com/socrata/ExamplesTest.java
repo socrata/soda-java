@@ -10,6 +10,7 @@ import com.socrata.model.soql.SoqlQuery;
 import com.socrata.model.soql.SortOrder;
 import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 import test.model.Nomination;
 
@@ -18,17 +19,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- */
+/** Various tests on Nomination object */
 public class ExamplesTest extends TestBase
 {
 
     public static final File  NOMINATIONS_CSV = Resources.file("/testNominations.csv");
 
-
+    /* TODO: EN-45878 */
+    @Ignore
     @Test
     public void readmeConsumerExamples() throws Exception {
-
         Soda2Consumer consumer = createConsumer();
 
         //To get a raw String of the results
@@ -39,7 +39,6 @@ public class ExamplesTest extends TestBase
         //Get get this automatcally serialized into a set of Java Beans annotated with Jackson JOSN annotations
         List<Nomination> nominations = consumer.query("nominationsCopy", SoqlQuery.SELECT_ALL, Nomination.LIST_TYPE);
         TestCase.assertTrue(nominations.size() > 0);
-
 
         //Create a SoQL query to find the nominations for the Department of State
         SoqlQuery   departmentOfStateQuery = new SoqlQueryBuilder()
@@ -70,9 +69,10 @@ public class ExamplesTest extends TestBase
             "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
     );
 
+    /* TODO: EN-45878 */
+    @Ignore
     @Test
     public void readmeProducerExamples() throws Exception {
-
         //This is the White Nomination Java Bean, that I want to add
         final Nomination NOMINATION_TO_ADD = new Nomination(
                 "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), null, null, null
@@ -82,7 +82,6 @@ public class ExamplesTest extends TestBase
         final Nomination NOMINATION_TO_UPDATE = new Nomination(
                 "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
         );
-
 
         //Get the producer class to allow updates of the data set.
         final Soda2Producer producer = createProducer();
@@ -97,6 +96,8 @@ public class ExamplesTest extends TestBase
         producer.delete("testupdate", nominationUpdatedMeta.getId());
     }
 
+    /* TODO: EN-45878 */
+    @Ignore
     @Test
     public void upsertExamples() throws Exception {
 
@@ -105,12 +106,10 @@ public class ExamplesTest extends TestBase
         InputStream inputStream = getClass().getResourceAsStream("/testNominations.csv");
         UpsertResult upsertResult = producer.upsertStream("testupdate", HttpLowLevel.CSV_TYPE, inputStream);
         TestCase.assertEquals(2, upsertResult.getRowsCreated());
-
     }
 
     @Test
     public void importExample() throws Exception {
-
         //Create a name with a GUID on the end so we know we are not conflicting with someone else running this.
         final String uniqueName = "Nominations-" + UUID.randomUUID().toString();
 
