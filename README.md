@@ -7,7 +7,7 @@ The API is broken into several logical parts:
 
 * The **Producer** api provides functions to add/update/delete objects for datasets that are updated frequently, or for updates
 that are small.  The advantage of this api is that the changes do NOT require a working copy or to use the publishing cycle
-at all, so there is no overhead of copying the dataset data around.
+at all, so there is no overhead of copying the dataset data around. The disadvantage of this api is that new data will not use the publishing cycle, including any on-platform data transforms you have set in your schema. (To support those transforms, use the [Data Management API](https://socratapublishing.docs.apiary.io/))
 * The **Consumer** api provides a rich, simple query language called SoQL.  SoQL is based off of SQL, and the Consumer
 api provides methods to build, execute and consume the results for these queries.
 * The **Workflow** api provides functions for creating and publishing working copies of datasets.  These are required for
