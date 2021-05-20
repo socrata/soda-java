@@ -11,6 +11,7 @@ import com.socrata.model.soql.SortOrder;
 import com.sun.jersey.api.client.ClientResponse;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.Ignore;
 import test.model.Nomination;
 
 import java.io.*;
@@ -25,7 +26,7 @@ public class ExamplesTest
 
     public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
 
-
+    @Ignore
     @Test
     public void readmeConsumerExamples() throws Exception {
 
@@ -72,6 +73,7 @@ public class ExamplesTest
             "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
     );
 
+    @Ignore
     @Test
     public void readmeProducerExamples() throws Exception {
 
@@ -99,6 +101,7 @@ public class ExamplesTest
         producer.delete("testupdate", nominationUpdatedMeta.getId());
     }
 
+    @Ignore
     @Test
     public void upsertExamples() throws Exception {
 
@@ -110,6 +113,7 @@ public class ExamplesTest
 
     }
 
+    @Ignore
     @Test
     public void importExample() throws Exception {
 

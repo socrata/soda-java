@@ -7,6 +7,7 @@ import com.socrata.model.importer.Dataset;
 import com.socrata.model.importer.DatasetInfo;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class InconsistentMetadataTest  extends TestBase
     public static final File  WIDE_CSV = new File("src/test/resources/wideDataset.csv");
     public static final File  TEST_NOMINATIONA_CSV = new File("src/test/resources/testNominations.csv");
 
-
+    @Ignore
     @Test
     public void testSyncMetadataMessup() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
@@ -79,6 +80,4 @@ public class InconsistentMetadataTest  extends TestBase
         }
 
     }
-
-
 }

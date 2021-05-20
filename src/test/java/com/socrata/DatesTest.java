@@ -19,6 +19,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
+import org.junit.Ignore;
 import test.model.Nomination;
 import test.model.NominationWithJoda;
 
@@ -37,6 +38,7 @@ public class DatesTest extends TestBase
     /**
      * Tests pulling out Floating Timestamps from SODA2, and surfacing them as Dates.
      */
+    @Ignore
     @Test
     public void testFloatingDateSoql() throws IOException, InterruptedException, SodaError
     {
@@ -104,6 +106,7 @@ public class DatesTest extends TestBase
         */
     }
 
+    @Ignore
     @Test
     public void testFloatingDateSoqlWJoda() throws IOException, InterruptedException, SodaError
     {
@@ -169,6 +172,7 @@ public class DatesTest extends TestBase
         */
     }
 
+    @Ignore
     @Test
     public void testDateCRUD() throws IOException, InterruptedException, SodaError
     {
@@ -218,6 +222,7 @@ public class DatesTest extends TestBase
     }
 
 
+    @Ignore
     @Test
     public void testFixedDateSoql() throws IOException, InterruptedException, SodaError
     {
@@ -291,6 +296,7 @@ public class DatesTest extends TestBase
 
     }
 
+    @Ignore
     @Test
     public void testFixedDateSoqlJoda() throws IOException, InterruptedException, SodaError
     {

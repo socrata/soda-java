@@ -1,0 +1,10 @@
+/target/
+/project/target/
+/project/project/target/
+/.idea/
+/.idea_modules/
+/credentials.sbt
+src/test/resources/TestConfig.properties
+.classpath
+.project
+.settings

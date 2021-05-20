@@ -18,12 +18,14 @@ public class SearchResult
 
     final int     totalRows;
     final DatasetInfo dataset;
+    final String[] rows;
 
     @JsonCreator
-    public SearchResult(@JsonProperty(value = "totalRows") int totalRows, @JsonProperty(value = "view") DatasetInfo dataset)
+    public SearchResult(@JsonProperty(value = "totalRows") int totalRows, @JsonProperty(value = "view") DatasetInfo dataset, @JsonProperty(value = "rows") String[] rows)
     {
         this.totalRows = totalRows;
         this.dataset = dataset;
+        this.rows = rows;
     }
 
     @JsonProperty(value = "view")

@@ -44,20 +44,19 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
 
         try {
-
+            Thread.sleep(5000); // EN-45880
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-
             UpsertResult replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_HEADER_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
-
-
         } finally {
             sodaImporter.deleteDataset(datasetPublished.getId());
         }
@@ -82,16 +81,18 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
 
         try {
-
+            Thread.sleep(5000); // EN-45880
             List<Crime> results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
 
             UpsertResult replaceResult = producer.replaceStream(datasetPublished.getId(), HttpLowLevel.CSV_TYPE, fisCrimes1);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
@@ -119,20 +120,22 @@ public class Soda2ProducerTest extends TestBase
         DatasetInfo datasetWorkingCopy = sodaImporter.createWorkingCopy(datasetPublished.getId());
 
         try {
-
+            Thread.sleep(5000); // EN-45880
             List<Crime> results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
-
             UpsertResult replaceResult = producer.replaceCsv(datasetWorkingCopy.getId(), CRIMES_HEADER_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(2, results.size());
 
             producer.upsertCsv(datasetWorkingCopy.getId(), CRIMES_HEADER2_CSV);
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(3, results.size());
 
             replaceResult = producer.replace(datasetWorkingCopy.getId(), Lists.newArrayList(results.get(0)));
+            Thread.sleep(5000); // EN-45880
             results = producer.query(datasetWorkingCopy.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
             TestCase.assertEquals(1, results.size());
 
