@@ -4,6 +4,7 @@ import com.socrata.model.importer.Dataset;
 import junit.framework.TestCase;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.File;
 import java.io.IOException;
