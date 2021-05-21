@@ -73,6 +73,7 @@ public class SodaImporterTest extends TestBase
             DatasetInfo loadedView = importer.loadDatasetInfo(createdView.getId());
             TestCase.assertNotNull(loadedView);
             TestCase.assertEquals("published", loadedView.getPublicationStage());
+            Thread.sleep(5000); // EN-45880
 
             final Soda2Consumer consumer = new Soda2Consumer(connection);
             final SoqlQuery   sortQuery = new SoqlQueryBuilder()
@@ -122,6 +123,7 @@ public class SodaImporterTest extends TestBase
             TestCase.assertEquals(name, createdView.getName());
             TestCase.assertEquals(description, createdView.getDescription());
             TestCase.assertEquals("unpublished", createdView.getPublicationStage());
+            Thread.sleep(5000); // EN-45880
 
             GeocodingResults results = importer.findPendingGeocodingResults(createdView.getId());
             TestCase.assertEquals(0, results.getView());
@@ -132,6 +134,7 @@ public class SodaImporterTest extends TestBase
             Dataset loadedView = (Dataset) importer.loadDatasetInfo(createdView.getId());
             TestCase.assertNotNull(loadedView);
             TestCase.assertEquals("published", loadedView.getPublicationStage());
+            Thread.sleep(5000); // EN-45880
 
             final Soda2Consumer consumer = new Soda2Consumer(connection);
             final SoqlQuery   sortQuery = new SoqlQueryBuilder()
