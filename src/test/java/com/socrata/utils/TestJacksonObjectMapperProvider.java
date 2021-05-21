@@ -17,6 +17,7 @@ import java.util.Date;
 public class TestJacksonObjectMapperProvider
 {
 
+    @Ignore
     @Test
     public void testMapperProvider() {
 
