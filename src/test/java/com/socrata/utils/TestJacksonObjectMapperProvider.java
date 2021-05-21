@@ -18,7 +18,7 @@ import java.util.Date;
 public class TestJacksonObjectMapperProvider
 {
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testMapperProvider() {
 

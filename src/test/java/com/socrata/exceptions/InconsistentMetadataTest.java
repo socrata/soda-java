@@ -21,7 +21,7 @@ public class InconsistentMetadataTest  extends TestBase
     public static final File  WIDE_CSV = new File("src/test/resources/wideDataset.csv");
     public static final File  TEST_NOMINATIONA_CSV = new File("src/test/resources/testNominations.csv");
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testSyncMetadataMessup() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {

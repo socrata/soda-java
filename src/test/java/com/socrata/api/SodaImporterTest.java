@@ -177,6 +177,7 @@ public class SodaImporterTest extends TestBase
         TestCase.assertEquals("New Description", updatedView.getDescription());
         TestCase.assertEquals("published", updatedView.getPublicationStage());
 
+        // EN-46321
         // Soda2Producer   producer = new Soda2Producer(connection);
         // FileInputStream fis = new FileInputStream(NOMINATIONS_CSV);
         // producer.upsertStream(updatedView.getId(), HttpLowLevel.CSV_TYPE, fis);
@@ -189,7 +190,7 @@ public class SodaImporterTest extends TestBase
         importer.deleteDataset(createdView.getId());
     }
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testSettingPrimaryKey() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
@@ -328,7 +329,7 @@ public class SodaImporterTest extends TestBase
 
     }
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testImportWithPK() throws InterruptedException, SodaError, IOException
     {
@@ -459,6 +460,7 @@ public class SodaImporterTest extends TestBase
         final ExternalDataset fileDataset = (ExternalDataset) importer.createDataset(dataset1);
 
         try {
+            // EN-46321
             // TestCase.assertNotNull(fileDataset);
             // TestCase.assertEquals(name, fileDataset.getName());
             // TestCase.assertEquals(description, fileDataset.getDescription());

@@ -26,7 +26,7 @@ public class ExamplesTest
 
     public static final File  NOMINATIONS_CSV = new File("src/test/resources/testNominations.csv");
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void readmeConsumerExamples() throws Exception {
 
@@ -73,7 +73,7 @@ public class ExamplesTest
             "New, User", "Imaginary Friend", "Department of Imagination", null, new Date(), new Date(), true, null
     );
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void readmeProducerExamples() throws Exception {
 
@@ -101,7 +101,7 @@ public class ExamplesTest
         producer.delete("testupdate", nominationUpdatedMeta.getId());
     }
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void upsertExamples() throws Exception {
 
@@ -113,7 +113,7 @@ public class ExamplesTest
 
     }
 
-    @Ignore
+    @Ignore // // EN-46321
     @Test
     public void importExample() throws Exception {
 

@@ -11,6 +11,7 @@ import com.socrata.model.search.SearchClause;
 import com.socrata.model.soql.SoqlQuery;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.IOException;
 import java.util.*;
@@ -141,6 +142,7 @@ public class SodaDdlTest  extends TestBase
     }
 
 
+    @Ignore // EN-46321 and EN-46235
     @Test
     public void testSearch() throws SodaError, InterruptedException, IOException
     {

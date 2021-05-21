@@ -33,7 +33,7 @@ public class BulkUploadTest extends TestBase
      *
      * Will issue a simple query, and do spot validation.
      */
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testCsvUpload() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
@@ -48,7 +48,7 @@ public class BulkUploadTest extends TestBase
 
     }
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testLongUpsert() throws IOException, SodaError, InterruptedException
     {
@@ -70,7 +70,7 @@ public class BulkUploadTest extends TestBase
         TestCase.assertEquals(0, result.getRowsUpdated());
     }
 
-    @Ignore
+    @Ignore // EN-46321
     @Test
     public void testUpsertWithRowIdentifier() throws IOException, SodaError, InterruptedException {
         final Soda2Producer producer = createProducer();
