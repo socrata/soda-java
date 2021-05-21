@@ -15,6 +15,7 @@ import com.socrata.model.search.SearchClause;
 import com.sun.jersey.api.client.GenericType;
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.Ignore;
 import test.model.PetsData;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -39,6 +40,7 @@ public class ApiTest extends TestBase
      *
      * Will issue a simple query, and do spot validation.
      */
+    @Ignore // EN-46321 and EN-46235
     @Test
     public void testSimpleQuery4x4() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
