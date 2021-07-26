@@ -1,9 +1,3 @@
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
-
-mimaDefaultSettings
-
 scalaVersion := "2.10.5"
 
 organization := "com.socrata"
@@ -13,9 +7,9 @@ name := "soda-api-java"
 // remember to update the README when you change this to a new release
 version := "0.10.8"
 
-previousArtifact := Some("com.socrata" % "soda-api-java" % "0.9.13")
+mimaPreviousArtifacts := Set("com.socrata" % "soda-api-java" % "0.9.13")
 
-javacOptions in compile ++= Seq("-g", "-Xlint:deprecation", "-Xlint:unchecked", "-target", "1.7", "-source", "1.7")
+compile/javacOptions ++= Seq("-g", "-Xlint:deprecation", "-Xlint:unchecked", "-target", "1.7", "-source", "1.7")
 
 autoScalaLibrary := false
 
@@ -42,15 +36,15 @@ libraryDependencies ++= Seq(
   "com.novocode" % "junit-interface" % "0.9" % "test"
 )
 
-parallelExecution in Test := false
+Test/parallelExecution := false
 
-logBuffered in Test := false
+Test/logBuffered := false
 
-testOptions in Test ++= Seq(
+Test/testOptions ++= Seq(
   Tests.Argument(TestFrameworks.JUnit, "-v")
 )
 
-sourceGenerators in Compile += Def.task {
+Compile/sourceGenerators += Def.task {
   val targetDir = (sourceManaged in Compile).value / "com" / "socrata" / "api"
   targetDir.mkdirs()
   val target = targetDir / "APIVersion.java"
@@ -66,4 +60,4 @@ class APIVersion {
     out.close()
   }
   Seq(target)
-}.taskValue
+}
