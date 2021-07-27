@@ -4,6 +4,7 @@
 /.idea/
 /.idea_modules/
 /credentials.sbt
+/.bsp/
 src/test/resources/TestConfig.properties
 .classpath
 .project

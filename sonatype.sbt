@@ -1,6 +1,6 @@
-publishTo <<= version { (v: String) =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+  if (version.value.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
   else Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
@@ -34,4 +34,4 @@ pomIncludeRepository := { _ => false }
 
 publishMavenStyle := true
 
-publishArtifact in Test := false
+Test/publishArtifact := false
