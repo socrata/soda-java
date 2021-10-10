@@ -33,7 +33,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testReplace() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testReplace-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel  connection = connect();
@@ -79,7 +79,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testReplaceStream() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testReplaceStream-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel  connection = connect();
@@ -112,7 +112,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testSoda2OnWorkingCopy() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testSoda2OnWorkingCopy-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel  connection = connect();
@@ -163,7 +163,7 @@ public class Soda2ProducerTest extends TestBase
     @Test
     public void testDelete() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testDelete-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel  connection = connect();
