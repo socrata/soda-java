@@ -51,7 +51,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testImport() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testImport-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel connection = connect();
@@ -92,7 +92,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testImportWithSetResourceName() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testImportWithSetResourceName-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel connection = connect();
@@ -133,7 +133,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testWithTypes() throws IOException, InterruptedException, SodaError
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testWithTypes-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel connection = connect();
@@ -191,7 +191,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testSimpleCreate() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testSimpleCreate-" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
@@ -232,7 +232,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testSettingPrimaryKey() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testSettingPrimaryKey-" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
@@ -251,72 +251,74 @@ public class SodaImporterTest extends TestBase
         view.setFlags(new ArrayList<String>());
 
         final Dataset createdView = (Dataset) importer.createDataset(view);
-        TestCase.assertNotNull(createdView);
-        TestCase.assertNotNull(createdView.getId());
-        TestCase.assertEquals("unpublished", createdView.getPublicationStage());
+        try {
+            TestCase.assertNotNull(createdView);
+            TestCase.assertNotNull(createdView.getId());
+            TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
 
-        final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
-        TestCase.assertEquals(name, loadView.getName());
-        TestCase.assertEquals(2, loadView.getColumns().size());
+            final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
+            TestCase.assertEquals(name, loadView.getName());
+            TestCase.assertEquals(2, loadView.getColumns().size());
 
 
-        //Set license
-        loadView.setLicenseId("CC_30_BY_NC");
-        loadView.setLicense(new License("Creative Commons Attribution | Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"));
-        loadView.setAttribution("Socrata Test");
-        loadView.setAttributionLink("https://www.socrata.com");
+            //Set license
+            loadView.setLicenseId("CC_30_BY_NC");
+            loadView.setLicense(new License("Creative Commons Attribution | Noncommercial 3.0 Unported", "images/licenses/cc30bync.png", "http://creativecommons.org/licenses/by-nc/3.0/legalcode"));
+            loadView.setAttribution("Socrata Test");
+            loadView.setAttributionLink("https://www.socrata.com");
 
-        //Set Metadata
-        loadView.setMetadata(new Metadata(ImmutableMap.<String, Map<String, String>>of("geostuff", ImmutableMap.<String, String>of("stuff", "bax")),
-                                                                          "col1", null, null, null, null));
-        loadView.setRowIdentifierColumnId(loadView.getColumns().get(0).getId());
+            //Set Metadata
+            loadView.setMetadata(new Metadata(ImmutableMap.<String, Map<String, String>>of("geostuff", ImmutableMap.<String, String>of("stuff", "bax")),
+                    "col1", null, null, null, null));
+            loadView.setRowIdentifierColumnId(loadView.getColumns().get(0).getId());
 
-        loadView.setCategory("Fun");
-        loadView.setExternalId("ExternalId_For_Me");
+            loadView.setCategory("Fun");
+            loadView.setExternalId("ExternalId_For_Me");
 
-        //Update dataset
-        final Dataset updateView2 = (Dataset) importer.updateDatasetInfo(loadView);
-        final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
+            //Update dataset
+            final Dataset updateView2 = (Dataset) importer.updateDatasetInfo(loadView);
+            final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
 
-        TestCase.assertEquals(loadView.getLicenseId(), loadView2.getLicenseId());
-        TestCase.assertEquals(loadView.getLicense().getName(), loadView2.getLicense().getName());
-        TestCase.assertEquals(loadView.getLicense().getLogoUrl(), loadView2.getLicense().getLogoUrl());
-        TestCase.assertEquals(loadView.getLicense().getTermsLink(), loadView2.getLicense().getTermsLink());
+            TestCase.assertEquals(loadView.getLicenseId(), loadView2.getLicenseId());
+            TestCase.assertEquals(loadView.getLicense().getName(), loadView2.getLicense().getName());
+            TestCase.assertEquals(loadView.getLicense().getLogoUrl(), loadView2.getLicense().getLogoUrl());
+            TestCase.assertEquals(loadView.getLicense().getTermsLink(), loadView2.getLicense().getTermsLink());
 
-        TestCase.assertEquals(loadView.getCategory(), loadView2.getCategory());
-        TestCase.assertEquals(loadView.getExternalId(), loadView2.getExternalId());
+            TestCase.assertEquals(loadView.getCategory(), loadView2.getCategory());
+            TestCase.assertEquals(loadView.getExternalId(), loadView2.getExternalId());
 
-        TestCase.assertEquals(loadView.getRowIdentifierColumnId(),       loadView2.getRowIdentifierColumnId());
+            TestCase.assertEquals(loadView.getRowIdentifierColumnId(), loadView2.getRowIdentifierColumnId());
 
 
-        TestCase.assertEquals(loadView.getMetadata().getCustom_fields().get("geostuff").get("stuff"), loadView2.getMetadata().getCustom_fields().get("geostuff").get("stuff"));
+            TestCase.assertEquals(loadView.getMetadata().getCustom_fields().get("geostuff").get("stuff"), loadView2.getMetadata().getCustom_fields().get("geostuff").get("stuff"));
 
-        TestCase.assertEquals(loadView.getAttribution(), loadView2.getAttribution());
-        TestCase.assertEquals(loadView.getAttributionLink(), loadView2.getAttributionLink());
+            TestCase.assertEquals(loadView.getAttribution(), loadView2.getAttribution());
+            TestCase.assertEquals(loadView.getAttributionLink(), loadView2.getAttributionLink());
 
-        final Dataset updateView3 = (Dataset) importer.updateDatasetInfo(loadView2);
-        final Dataset loadView3 = (Dataset) importer.loadDatasetInfo(createdView.getId());
-        TestCase.assertEquals(loadView.getLicenseId(), loadView3.getLicenseId());
-        TestCase.assertEquals(loadView.getLicense().getName(), loadView3.getLicense().getName());
-        TestCase.assertEquals(loadView.getLicense().getLogoUrl(), loadView3.getLicense().getLogoUrl());
-        TestCase.assertEquals(loadView.getLicense().getTermsLink(), loadView3.getLicense().getTermsLink());
+            final Dataset updateView3 = (Dataset) importer.updateDatasetInfo(loadView2);
+            final Dataset loadView3 = (Dataset) importer.loadDatasetInfo(createdView.getId());
+            TestCase.assertEquals(loadView.getLicenseId(), loadView3.getLicenseId());
+            TestCase.assertEquals(loadView.getLicense().getName(), loadView3.getLicense().getName());
+            TestCase.assertEquals(loadView.getLicense().getLogoUrl(), loadView3.getLicense().getLogoUrl());
+            TestCase.assertEquals(loadView.getLicense().getTermsLink(), loadView3.getLicense().getTermsLink());
 
-        TestCase.assertEquals(loadView.getCategory(), loadView3.getCategory());
-        TestCase.assertEquals(loadView.getExternalId(), loadView3.getExternalId());
-        TestCase.assertEquals(loadView2.getMetadata().getRowIdentifier(), loadView3.getMetadata().getRowIdentifier());
-        TestCase.assertEquals(loadView.getMetadata().getCustom_fields().get("geostuff").get("stuff"), loadView3.getMetadata().getCustom_fields().get("geostuff").get("stuff"));
+            TestCase.assertEquals(loadView.getCategory(), loadView3.getCategory());
+            TestCase.assertEquals(loadView.getExternalId(), loadView3.getExternalId());
+            TestCase.assertEquals(loadView2.getMetadata().getRowIdentifier(), loadView3.getMetadata().getRowIdentifier());
+            TestCase.assertEquals(loadView.getMetadata().getCustom_fields().get("geostuff").get("stuff"), loadView3.getMetadata().getCustom_fields().get("geostuff").get("stuff"));
 
-        TestCase.assertEquals(loadView.getAttribution(), loadView3.getAttribution());
-        TestCase.assertEquals(loadView.getAttributionLink(), loadView3.getAttributionLink());
-
-        importer.deleteDataset(createdView.getId());
+            TestCase.assertEquals(loadView.getAttribution(), loadView3.getAttribution());
+            TestCase.assertEquals(loadView.getAttributionLink(), loadView3.getAttributionLink());
+        } finally {
+            importer.deleteDataset(createdView.getId());
+        }
     }
 
     @Test
     public void testAttachments() throws LongRunningQueryException, SodaError, InterruptedException, IOException {
 
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testAttachments-" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
@@ -335,37 +337,39 @@ public class SodaImporterTest extends TestBase
         view.setFlags(new ArrayList<String>());
 
         final Dataset createdView = (Dataset) importer.createDataset(view);
-        TestCase.assertNotNull(createdView);
-        TestCase.assertNotNull(createdView.getId());
-        TestCase.assertEquals("unpublished", createdView.getPublicationStage());
+        try {
+            TestCase.assertNotNull(createdView);
+            TestCase.assertNotNull(createdView.getId());
+            TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
 
-        //
-        //  Test Adding and getting the Assets
-        final AssetResponse response = importer.addAsset(NOMINATIONS_CSV);
-        TestCase.assertNotNull(response);
-        TestCase.assertNotNull(response.getId());
+            //
+            //  Test Adding and getting the Assets
+            final AssetResponse response = importer.addAsset(NOMINATIONS_CSV);
+            TestCase.assertNotNull(response);
+            TestCase.assertNotNull(response.getId());
 
-        final InputStream inputStream = importer.getAsset(response.getId());
-        TestCase.assertNotNull(inputStream);
+            final InputStream inputStream = importer.getAsset(response.getId());
+            TestCase.assertNotNull(inputStream);
 
-        final String returnedAsset = IOUtils.toString(inputStream);
-        final String originalAsset = FileUtils.readFileToString(NOMINATIONS_CSV);
-        TestCase.assertEquals(returnedAsset, originalAsset);
+            final String returnedAsset = IOUtils.toString(inputStream);
+            final String originalAsset = FileUtils.readFileToString(NOMINATIONS_CSV);
+            TestCase.assertEquals(returnedAsset, originalAsset);
 
-        //
-        //  Test using assets for attachement
-        final Metadata    metadata = new Metadata(null, null, null, null, null, Lists.newArrayList(new Attachment(response.getId(), response.getNameForOutput(), response.getNameForOutput())));
-        final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
-        loadView.setMetadata(metadata);
-        importer.updateDatasetInfo(loadView);
+            //
+            //  Test using assets for attachement
+            final Metadata metadata = new Metadata(null, null, null, null, null, Lists.newArrayList(new Attachment(response.getId(), response.getNameForOutput(), response.getNameForOutput())));
+            final Dataset loadView = (Dataset) importer.loadDatasetInfo(createdView.getId());
+            loadView.setMetadata(metadata);
+            importer.updateDatasetInfo(loadView);
 
-        final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
-        final Metadata loadedMetadata = loadView2.getMetadata();
-        TestCase.assertEquals(1, loadedMetadata.getAttachments().size());
-        TestCase.assertEquals(response.getId(), loadedMetadata.getAttachments().get(0).getBlobId());
-
-
+            final Dataset loadView2 = (Dataset) importer.loadDatasetInfo(createdView.getId());
+            final Metadata loadedMetadata = loadView2.getMetadata();
+            TestCase.assertEquals(1, loadedMetadata.getAttachments().size());
+            TestCase.assertEquals(response.getId(), loadedMetadata.getAttachments().get(0).getBlobId());
+        } finally {
+            importer.deleteDataset(createdView.getId());
+        }
     }
 
     /* TODO: EN-45878 */
@@ -373,7 +377,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testImportWithPK() throws InterruptedException, SodaError, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testImportWithPK-" + UUID.randomUUID();
         final String description = name + "-Description";
 
         final HttpLowLevel connection = connect();
@@ -415,7 +419,7 @@ public class SodaImporterTest extends TestBase
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
 
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testCreatingFileDataset-" + UUID.randomUUID();
         final String description = "Description" + name;
 
         final NonDataFileDataset fileDataset = importer.importNonDataFile(name, description, NOMINATIONS_CSV);
@@ -476,7 +480,7 @@ public class SodaImporterTest extends TestBase
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
 
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "testCreatingExternalDataset-" + UUID.randomUUID();
         final String description = "Description" + name;
 
         final ExternalDataset dataset1 = new ExternalDatasetBuilder()
@@ -551,32 +555,32 @@ public class SodaImporterTest extends TestBase
         final String[] translation = new String[] {"col1", "col2","col3",
                 "col4","col5","col6","col7","col8","col9", "'(' + col6 + ',' + col7 + ',' + col8 + ',' + col9 + ')'"};
         DatasetInfo dataset = importer.importScanResults(blueprint, translation, BABY_NAMES_LOC, scanResults);
+        try {
+            dataset = importer.publish(dataset.getId());
 
-        dataset = importer.publish(dataset.getId());
+            //Verify the address got setup correctly
+            List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(4, results.size());
+            for (Object curr : results) {
+                Map currRow = (Map) curr;
+                Map location = (Map) currRow.get("location");
+                Map human_address = (Map) location.get("human_address");
 
-        //Verify the address got setup correctly
-        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(4, results.size());
-        for (Object curr : results) {
-            Map currRow = (Map)curr;
-            Map location = (Map) currRow.get("location");
-            Map human_address = (Map) location.get("human_address");
+                Address address = new Address((String) human_address.get("address"),
+                        (String) human_address.get("city"),
+                        (String) human_address.get("state"),
+                        (String) human_address.get("zip"));
 
-            Address address = new Address((String)human_address.get("address"),
-                                          (String)human_address.get("city"),
-                                          (String)human_address.get("state"),
-                                          (String)human_address.get("zip"));
-
-            TestCase.assertNotNull(location.get("longitude"));
-            TestCase.assertNotNull(location.get("latitude"));
-            TestCase.assertEquals(currRow.get("street"), address.getStreetAddress());
-            TestCase.assertEquals(currRow.get("city"), address.getCity());
-            TestCase.assertEquals(currRow.get("state"), address.getState());
-            TestCase.assertEquals(currRow.get("zipcode"), address.getZip());
+                TestCase.assertNotNull(location.get("longitude"));
+                TestCase.assertNotNull(location.get("latitude"));
+                TestCase.assertEquals(currRow.get("street"), address.getStreetAddress());
+                TestCase.assertEquals(currRow.get("city"), address.getCity());
+                TestCase.assertEquals(currRow.get("state"), address.getState());
+                TestCase.assertEquals(currRow.get("zipcode"), address.getZip());
+            }
+        } finally {
+            importer.deleteDataset(dataset.getId());
         }
-
-
-        importer.deleteDataset(dataset.getId());
     }
 
     //@Test
@@ -712,7 +716,7 @@ public class SodaImporterTest extends TestBase
     @Test
     public void testAsyncImports() throws LongRunningQueryException, SodaError, InterruptedException, IOException
     {
-        final String name = "Name" + UUID.randomUUID();
+        final String name = "Name-testAsyncImports-" + UUID.randomUUID();
 
         final HttpLowLevel connection = connect();
         final SodaImporter importer = new SodaImporter(connection);
@@ -736,17 +740,20 @@ public class SodaImporterTest extends TestBase
 
         final String[] translation = new String[] {"col1", "col2"};
         DatasetInfo dataset = importer.importScanResults(blueprint, translation, BABY_NAMES_LOC_3, scanResults, true);
+        try {
+            List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(results.size(), 4);
 
-        List results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(results.size(), 4);
+            importer.append(dataset.getId(), BABY_NAMES_LOC_3, 1, translation, true);
+            results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(results.size(), 8);
 
-        importer.append(dataset.getId(), BABY_NAMES_LOC_3, 1, translation, true);
-        results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(results.size(), 8);
-
-        importer.replace(dataset.getId(), NOMINATIONS_CSV, 1, translation, true);
-        results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(results.size(), 2);
+            importer.replace(dataset.getId(), NOMINATIONS_CSV, 1, translation, true);
+            results = consumer.query(dataset.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(results.size(), 2);
+        } finally {
+            importer.deleteDataset(dataset.getId());
+        }
     }
 
 }
