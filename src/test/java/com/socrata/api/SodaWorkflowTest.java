@@ -81,45 +81,45 @@ public class SodaWorkflowTest  extends TestBase
         final Soda2Consumer consumer = new Soda2Consumer(connection);
 
         final DatasetInfo datasetInfo = importer.createViewFromCsv("TestCrimes" + UUID.randomUUID().toString(), "Some Chicago Crimes", CRIMES_HEADER_CSV);
-        TestCase.assertNotNull(datasetInfo);
-        importer.publish(datasetInfo.getId());
 
-        //Work on append
-        final DatasetInfo unpublishedView = importer.createWorkingCopy(datasetInfo.getId());
-        final DatasetInfo appendResults = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
+        try {
+            TestCase.assertNotNull(datasetInfo);
+            importer.publish(datasetInfo.getId());
 
-
-        //Uncomment to test 202s
-        //final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_CSV, 1, null);
-        final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
-
-        final DatasetInfo publishedResults = importer.publish(appendResults.getId());
-
-        List results = consumer.query(publishedResults.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        //TestCase.assertEquals(6, results.size());
-
-        //
-        //  Now work on replace
-        final DatasetInfo unpublishedView2 = importer.createWorkingCopy(datasetInfo.getId());
-        TestCase.assertFalse(unpublishedView2.getId().equals(publishedResults.getId()));
-
-        //Uncomment to test 202s
-        //final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_CSV, 1, null);
-        final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
-        TestCase.assertNotNull(appendResults3);
-
-        importer.replace(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
-        final DatasetInfo publishedResults2 = importer.publish(unpublishedView2.getId());
-        TestCase.assertEquals(publishedResults.getId(), publishedResults2.getId());
+            //Work on append
+            final DatasetInfo unpublishedView = importer.createWorkingCopy(datasetInfo.getId());
+            final DatasetInfo appendResults = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
 
 
-        List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertTrue(results2.size() >= 2);
+            //Uncomment to test 202s
+            //final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_CSV, 1, null);
+            final DatasetInfo appendResults2 = importer.append(unpublishedView.getId(), CRIMES_HEADER_CSV, 1, null);
 
-        //
-        //  Now delete
-        importer.deleteDataset(publishedResults2.getId());
+            final DatasetInfo publishedResults = importer.publish(appendResults.getId());
 
+            List results = consumer.query(publishedResults.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            //TestCase.assertEquals(6, results.size());
+
+            //
+            //  Now work on replace
+            final DatasetInfo unpublishedView2 = importer.createWorkingCopy(datasetInfo.getId());
+            TestCase.assertFalse(unpublishedView2.getId().equals(publishedResults.getId()));
+
+            //Uncomment to test 202s
+            //final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_CSV, 1, null);
+            final DatasetInfo appendResults3 = importer.append(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
+            TestCase.assertNotNull(appendResults3);
+
+            importer.replace(unpublishedView2.getId(), CRIMES_HEADER_CSV, 1, null);
+            final DatasetInfo publishedResults2 = importer.publish(unpublishedView2.getId());
+            TestCase.assertEquals(publishedResults.getId(), publishedResults2.getId());
+
+
+            List results2 = consumer.query(publishedResults2.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertTrue(results2.size() >= 2);
+        } finally {
+            importer.deleteDataset(datasetInfo.getId());
+        }
     }
 
     @Test
@@ -161,29 +161,32 @@ public class SodaWorkflowTest  extends TestBase
         final String name = "BigDatasetName" + UUID.randomUUID();
 
         DatasetInfo di = importer.createViewFromCsv(name, name, CRIMES_CSV, "ID");
-        importer.publish(di.getId());
-        List ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(1000, ret.size());
+
+        try {
+            importer.publish(di.getId());
+            List ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1000, ret.size());
 
 
-        DatasetInfo workingCopy = importer.createWorkingCopy(di.getId());
-        workingCopy = importer.replace(workingCopy.getId(), CRIMES_CSV, 1, null);
-        importer.publish(workingCopy.getId());
-        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(1000, ret.size());
+            DatasetInfo workingCopy = importer.createWorkingCopy(di.getId());
+            workingCopy = importer.replace(workingCopy.getId(), CRIMES_CSV, 1, null);
+            importer.publish(workingCopy.getId());
+            ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1000, ret.size());
 
 
-        final Soda2Producer producer = new Soda2Producer(connection);
-        producer.upsertCsv(workingCopy.getId(), CRIMES_CSV);
-        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(1000, ret.size());
+            final Soda2Producer producer = new Soda2Producer(connection);
+            producer.upsertCsv(workingCopy.getId(), CRIMES_CSV);
+            ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1000, ret.size());
 
 
-        producer.replaceCsv(workingCopy.getId(), CRIMES_CSV);
-        ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
-        TestCase.assertEquals(1000, ret.size());
-
-
+            producer.replaceCsv(workingCopy.getId(), CRIMES_CSV);
+            ret = consumer.query(di.getId(), SoqlQuery.SELECT_ALL, Soda2Consumer.HASH_RETURN_TYPE);
+            TestCase.assertEquals(1000, ret.size());
+        } finally {
+            importer.deleteDataset(di.getId());
+        }
     }
 
     @Test
@@ -227,12 +230,16 @@ public class SodaWorkflowTest  extends TestBase
         view.setFlags(new ArrayList<String>());
 
         final Dataset createdView = (Dataset) importer.createDataset(view);
-        TestCase.assertEquals("unpublished", createdView.getPublicationStage());
+        try {
+            TestCase.assertEquals("unpublished", createdView.getPublicationStage());
 
-        importer.publish(createdView.getId(), true);
+            importer.publish(createdView.getId(), true);
 
-        final Dataset updatedView = (Dataset) importer.updateDatasetInfo(createdView);
-        TestCase.assertEquals("published", updatedView.getPublicationStage());
+            final Dataset updatedView = (Dataset) importer.updateDatasetInfo(createdView);
+            TestCase.assertEquals("published", updatedView.getPublicationStage());
+        } finally {
+            importer.deleteDataset(createdView.getId());
+        }
     }
 
 
