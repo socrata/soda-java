@@ -63,14 +63,18 @@ public class BulkUploadTest extends TestBase
 
 
         final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER);
-        TestCase.assertNotNull(dataset);
-        TestCase.assertNotNull(dataset.getId());
+        try {
+            TestCase.assertNotNull(dataset);
+            TestCase.assertNotNull(dataset.getId());
 
-        UpsertResult result = producer.upsertCsv(dataset.getId(), CRIMES_CSV_UPSERT);
-        TestCase.assertNotNull(result);
-        TestCase.assertEquals(0, result.errorCount());
-        TestCase.assertEquals(4999, result.getRowsCreated());
-        TestCase.assertEquals(0, result.getRowsUpdated());
+            UpsertResult result = producer.upsertCsv(dataset.getId(), CRIMES_CSV_UPSERT);
+            TestCase.assertNotNull(result);
+            TestCase.assertEquals(0, result.errorCount());
+            TestCase.assertEquals(4999, result.getRowsCreated());
+            TestCase.assertEquals(0, result.getRowsUpdated());
+        } finally {
+            importer.deleteDataset(dataset.getId());
+        }
     }
 
     // TODO: EN-45878
@@ -85,63 +89,71 @@ public class BulkUploadTest extends TestBase
         final String description = name + "-Description";
 
         final DatasetInfo dataset = importer.createViewFromCsv(name, description, CRIMES_CSV_HEADER);
-        TestCase.assertNotNull(dataset);
-        TestCase.assertNotNull(dataset.getId());
+        try {
+            TestCase.assertNotNull(dataset);
+            TestCase.assertNotNull(dataset.getId());
 
-        InputStream stream = new InputStream() {
-            boolean headerRead = false;
-            File file = CRIMES_CSV_UPSERT;
-            BufferedReader reader;
-            ByteArrayInputStream buffer;
-            int count = 0;
+            InputStream stream = new InputStream() {
+                boolean headerRead = false;
+                File file = CRIMES_CSV_UPSERT;
+                BufferedReader reader;
+                ByteArrayInputStream buffer;
+                int count = 0;
 
-            public int read() throws IOException {
-                byte[] b = new byte[1];
-                int count = read(b);
-                return (count <= 0) ? -1 : (b[0] & 0xff);
-            }
-
-            @Override
-            public int read(byte[] b) throws IOException {
-                return read(b, 0, b.length);
-            }
-
-            @Override
-            public int read(byte[] b, int off, int len) throws IOException {
-                if(!refill()) {
-                    return -1;
+                public int read() throws IOException {
+                    byte[] b = new byte[1];
+                    int count = read(b);
+                    return (count <= 0) ? -1 : (b[0] & 0xff);
                 }
-                return buffer.read(b, off, len);
-            }
 
-            @Override
-            public void close() throws IOException {
-                if(reader != null) reader.close();
-            }
+                @Override
+                public int read(byte[] b) throws IOException {
+                    return read(b, 0, b.length);
+                }
 
-            private boolean refill() throws IOException {
-                if(buffer == null || buffer.available() == 0) {
-                    if(reader == null) {
-                        if(count++ > 1000) {
-                            return false;
-                        }
-                        System.out.println("Producing copy " + count);
-                        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-                        if(headerRead) reader.readLine();
-                        else headerRead = true;
+                @Override
+                public int read(byte[] b, int off, int len) throws IOException {
+                    if (!refill()) {
+                        return -1;
                     }
-                    String line = reader.readLine();
-                    if(line == null) { reader.close(); reader = null; return refill(); }
-                    buffer = new ByteArrayInputStream((line + "\n").getBytes(StandardCharsets.UTF_8));
+                    return buffer.read(b, off, len);
                 }
-                return true;
-            }
-        };
-        UpsertResult result = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, stream);
-        TestCase.assertNotNull(result);
-        TestCase.assertEquals(0, result.errorCount());
-        TestCase.assertEquals(4999, result.getRowsCreated());
-        TestCase.assertEquals(0, result.getRowsUpdated());
+
+                @Override
+                public void close() throws IOException {
+                    if (reader != null) reader.close();
+                }
+
+                private boolean refill() throws IOException {
+                    if (buffer == null || buffer.available() == 0) {
+                        if (reader == null) {
+                            if (count++ > 1000) {
+                                return false;
+                            }
+                            System.out.println("Producing copy " + count);
+                            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+                            if (headerRead) reader.readLine();
+                            else headerRead = true;
+                        }
+                        String line = reader.readLine();
+                        if (line == null) {
+                            reader.close();
+                            reader = null;
+                            return refill();
+                        }
+                        buffer = new ByteArrayInputStream((line + "\n").getBytes(StandardCharsets.UTF_8));
+                    }
+                    return true;
+                }
+            };
+            UpsertResult result = producer.upsertStream(dataset.getId(), HttpLowLevel.CSV_TYPE, stream);
+            TestCase.assertNotNull(result);
+            TestCase.assertEquals(0, result.errorCount());
+            TestCase.assertEquals(4999, result.getRowsCreated());
+            TestCase.assertEquals(0, result.getRowsUpdated());
+        } finally {
+            importer.deleteDataset(dataset.getId());
+        }
     }
 
     @Test
