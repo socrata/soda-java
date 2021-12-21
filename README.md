@@ -34,7 +34,7 @@ soda-java is published to Maven Central.  The dependency is
 <dependency>
   <groupId>com.socrata</groupId>
   <artifactId>soda-api-java</artifactId>
-  <version>0.10.5</version>
+  <version>0.10.8</version>
 </dependency>
 ```
 
@@ -57,10 +57,6 @@ Before submitting pull requests, please set up and run the test suite to make su
 3. Run `sbt test` to run the test suite
 
 Tests are also run for all branches and PRs via [Travis-CI](https://travis-ci.org/socrata/soda-java).
-
-### Precompiled JARs
-
-Pre-built JAR files are also available at <https://github.com/socrata/soda-java/releases>.
 
 # Examples
 
