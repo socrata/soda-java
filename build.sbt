@@ -45,7 +45,7 @@ Test/testOptions ++= Seq(
 )
 
 Compile/sourceGenerators += Def.task {
-  val targetDir = (sourceManaged in Compile).value / "com" / "socrata" / "api"
+  val targetDir = (Compile/sourceManaged).value / "com" / "socrata" / "api"
   targetDir.mkdirs()
   val target = targetDir / "APIVersion.java"
   val out = new java.io.FileWriter(target)

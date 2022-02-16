@@ -17,18 +17,21 @@ public class UpsertResult
     public final long rowsDeleted;
     public final List<UpsertError> errors;
     public final Long truthDataVersion;
+    public final Long truthDataShapeVersion;
 
     @JsonCreator
     public UpsertResult(final @JsonProperty("rows_created") long rowsCreated,
                         final @JsonProperty("rows_updated") long rowsUpdated,
                         final @JsonProperty("rows_deleted") long rowsDeleted,
                         final @JsonProperty("errors") List<UpsertError> errors,
-                        final @JsonProperty("truth_data_version") Long truthDataVersion)
+                        final @JsonProperty("truth_data_version") Long truthDataVersion,
+                        final @JsonProperty("truth_data_shape_version") Long truthDataShapeVersion)
     {
         this.rowsCreated = rowsCreated;
         this.rowsUpdated = rowsUpdated;
         this.rowsDeleted = rowsDeleted;
         this.truthDataVersion = truthDataVersion;
+        this.truthDataShapeVersion = truthDataShapeVersion;
         this.errors = errors;
     }
 
@@ -37,7 +40,7 @@ public class UpsertResult
                         final long rowsDeleted,
                         final List<UpsertError> errors)
     {
-        this(rowsCreated, rowsUpdated, rowsDeleted, errors, null);
+        this(rowsCreated, rowsUpdated, rowsDeleted, errors, null, null);
     }
 
 
@@ -68,6 +71,10 @@ public class UpsertResult
 
     public Long getTruthDataVersion() {
         return truthDataVersion;
+    }
+
+    public Long getTruthDataShapeVersion() {
+        return truthDataShapeVersion;
     }
 
 }
