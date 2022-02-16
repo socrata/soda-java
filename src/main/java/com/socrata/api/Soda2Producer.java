@@ -482,7 +482,7 @@ public class Soda2Producer extends Soda2Consumer
      * @param is
      * @return
      */
-    UpsertResult deserializeUpsertResult(InputStream is, Long truthDataVersion) throws IOException
+    UpsertResult deserializeUpsertResult(InputStream is, Long truthDataVersion, Long truthShapeDataVersion) throws IOException
     {
         JsonParser parser = factory.createParser(is);
 
@@ -521,7 +521,7 @@ public class Soda2Producer extends Soda2Consumer
                 currToken = parser.nextToken();
             }
 
-            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null, truthDataVersion);
+            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null, truthDataVersion, truthShapeDataVersion);
         }
 
         return parser.readValueAs(UpsertResult.class);
@@ -537,7 +537,16 @@ public class Soda2Producer extends Soda2Consumer
         } catch (NumberFormatException nfe) {
             // ok, fine
         }
-        return deserializeUpsertResult(response.readEntity(InputStream.class), truthDataVersion);
+        Long truthShapeDataVersion = null;
+        try {
+            Object header = response.getHeaders().getFirst("X-SODA2-Truth-Version");
+            if (header != null) {
+                truthDataVersion = Long.parseLong(header.toString());
+            }
+        } catch (NumberFormatException nfe) {
+            // ok, fine
+        }
+        return deserializeUpsertResult(response.readEntity(InputStream.class), truthDataVersion, truthShapeDataVersion);
     }
 
     /**
