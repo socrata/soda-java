@@ -541,7 +541,7 @@ public class Soda2Producer extends Soda2Consumer
         try {
             Object header = response.getHeaders().getFirst("X-SODA2-Truth-Shape-Version");
             if (header != null) {
-                truthDataVersion = Long.parseLong(header.toString());
+                truthDataShapeVersion = Long.parseLong(header.toString());
             }
         } catch (NumberFormatException nfe) {
             // ok, fine
