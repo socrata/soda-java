@@ -5,7 +5,7 @@ organization := "com.socrata"
 name := "soda-api-java"
 
 // remember to update the README when you change this to a new release
-version := "0.10.8"
+version := "0.10.9"
 
 mimaPreviousArtifacts := Set("com.socrata" % "soda-api-java" % "0.9.13")
 
