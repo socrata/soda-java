@@ -197,8 +197,14 @@ public final class HttpLowLevel
             client.register(new SodaRequestIdFilter(requestId));
         }
         client.register(new UserAgentFilter());
+        Integer readTimeout;
+        try {
+            readTimeout = Integer.parseInt(System.getenv(ClientProperties.READ_TIMEOUT));
+        } catch (NumberFormatException ex) {
+            readTimeout = 6000000;
+        }
         client.property(ClientProperties.CONNECT_TIMEOUT, 1000);
-        client.property(ClientProperties.READ_TIMEOUT, 6000000);
+        client.property(ClientProperties.READ_TIMEOUT, readTimeout);
         return client;
     }
 
