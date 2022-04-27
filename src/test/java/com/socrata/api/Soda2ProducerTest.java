@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +27,52 @@ public class Soda2ProducerTest extends TestBase
     private static final File  CRIMES_HEADER_CSV = Resources.file("/testCrimesHeader.csv");
     private static final File  CRIMES_HEADER2_CSV = Resources.file("/testCrimesHeader2.csv");
     private static final File  DELETE_CRIMES_CSV = Resources.file("/testDeletingCrimes.csv");
+
+    @Test
+    public void testReplaceChi() throws LongRunningQueryException, SodaError, InterruptedException, IOException
+    {
+        final String name = "testReplace-" + UUID.randomUUID();
+        final String description = name + "-Description";
+
+        final HttpLowLevel  connection = connect();
+        final Soda2Producer producer = new Soda2Producer(connection);
+        final SodaImporter  sodaImporter = new SodaImporter(connection);
+        final Soda2Consumer consumer = new Soda2Consumer(connection);
+
+        File MY_FILE_CSV = new File("/Users/chitang/Downloads/2016-11-18T17_14_09.000Za.csv");
+//        DatasetInfo datasetCreated = sodaImporter.createViewFromCsv(name, description, MY_FILE_CSV, "ID");
+//        sodaImporter.
+//        DatasetInfo datasetPublished = sodaImporter.publish(datasetCreated.getId());
+
+        try {
+            System.out.printf("START: " + (new Date()).toString());
+            Date d1 = new Date();
+            System.out.println("start: " + d1.toString());
+            UpsertResult replaceResult = producer.replaceCsv("vshe-vufy", MY_FILE_CSV);
+            d1 = new Date();
+            System.out.println("end: " + d1.toString());
+            System.out.printf("\nDONE: " + (new Date()).toString());
+
+//            Thread.sleep(5000); // EN-45880
+//            results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+//            TestCase.assertEquals(2, results.size());
+//
+//            replaceResult = producer.replace(datasetPublished.getId(), Lists.newArrayList(results.get(0)));
+//            TestCase.assertEquals(1, replaceResult.getRowsCreated());
+//            TestCase.assertEquals(0, replaceResult.errorCount());
+//
+//            Thread.sleep(5000); // EN-45880
+//            results = consumer.query(datasetPublished.getId(), SoqlQuery.SELECT_ALL, Crime.LIST_TYPE);
+//            TestCase.assertEquals(1, results.size());
+
+            /* Test with larger dataset.
+             * replaceResult = producer.replaceCsv(datasetPublished.getId(), CRIMES_APPEND_CSV);
+             * TestCase.assertEquals(1000, replaceResult.getRowsCreated());
+             * TestCase.assertEquals(0, replaceResult.errorCount()); */
+        } finally {
+          //  sodaImporter.deleteDataset(datasetPublished.getId());
+        }
+    }
 
     /**
      * Tests a number of ways to connect using dataset name
