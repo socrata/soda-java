@@ -214,7 +214,7 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    public <T> UpsertResult upsert(String resourceId, List<T> objects) throws SodaError, InterruptedException
+    public <T, R> R upsert(String resourceId, List<T> objects, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaRequest<List<T>>(resourceId, objects)
@@ -226,17 +226,20 @@ public class Soda2Producer extends Soda2Consumer
         try {
             Response response = requester.issueRequest();
             try {
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response, accFactory);
             } finally {
                 response.close();
             }
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
+            return noLongRunningQueriesOnUpsert(e);
         } catch (IOException ioe) {
             throw new SodaError("Error upserting a dataset from this list of objects.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
+    public <T> UpsertResult upsert(String resourceId, List<T> objects) throws SodaError, InterruptedException {
+        return upsert(resourceId, objects, StandardResultAccumulator.FACTORY);
+    }
 
     /**
      * Replaces a dataset with a list of objects.  This is the same as doing a truncate, followed by an upsert, except
@@ -248,7 +251,7 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError
      * @throws InterruptedException
      */
-    public <T> UpsertResult replace(String resourceId, List<T> objects) throws SodaError, InterruptedException
+    public <T, R> R replace(String resourceId, List<T> objects, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaRequest<List<T>>(resourceId, objects)
@@ -260,15 +263,19 @@ public class Soda2Producer extends Soda2Consumer
         try {
             Response response = requester.issueRequest();
             try {
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response, accFactory);
             } finally {
                 response.close();
             }
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, e.timeToRetry, getHttpLowLevel().getMaxRetries(), UpsertResult.class, requester);
+            return noLongRunningQueriesOnUpsert(e);
         } catch (IOException ioe) {
             throw new SodaError("Error replacing dataset from this list of objects.  Error message: " + ioe.getLocalizedMessage());
         }
+    }
+
+    public <T> UpsertResult replace(String resourceId, List<T> objects) throws SodaError, InterruptedException {
+        return replace(resourceId, objects, StandardResultAccumulator.FACTORY);
     }
 
     /**
@@ -295,7 +302,12 @@ public class Soda2Producer extends Soda2Consumer
       return upsertStream(resourceId, mediaType, stream, new RowUpdateOption());
     }
 
-    public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption rowUpdateOption) throws SodaError, InterruptedException
+    public <R> R upsertStream(String resourceId, MediaType mediaType, InputStream stream, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
+    {
+        return upsertStream(resourceId, mediaType, stream, new RowUpdateOption(), accFactory);
+    }
+
+    public <R> R upsertStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption rowUpdateOption, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType, rowUpdateOption)
@@ -308,17 +320,21 @@ public class Soda2Producer extends Soda2Consumer
 
             Response response = requester.issueRequest();
             try {
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response, accFactory);
             } finally {
                 response.close();
             }
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+            return noLongRunningQueriesOnUpsert(e);
         } catch (IOException ioe) {
             throw new SodaError("Error upserting a dataset from this stream.  Error message: " + ioe.getLocalizedMessage());
         }
     }
 
+
+    public UpsertResult upsertStream(String resourceId, MediaType mediaType, InputStream stream, RowUpdateOption rowUpdateOption) throws SodaError, InterruptedException {
+        return upsertStream(resourceId, mediaType, stream, rowUpdateOption, StandardResultAccumulator.FACTORY);
+    }
 
     /**
      * Replaces a dataset with a the objects serialized in an input stream.  This is the same as doing a truncate, followed by an upsert, except
@@ -332,7 +348,7 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError
      * @throws InterruptedException
      */
-    public UpsertResult replaceStream(String resourceId, MediaType mediaType, InputStream stream) throws SodaError, InterruptedException
+    public <R> R replaceStream(String resourceId, MediaType mediaType, InputStream stream, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
 
         SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, stream, mediaType)
@@ -344,15 +360,20 @@ public class Soda2Producer extends Soda2Consumer
         try {
             Response response = requester.issueRequest();
             try {
-                return deserializeUpsertResult(response);
+                return deserializeUpsertResult(response, accFactory);
             } finally {
                 response.close();
             }
         } catch (LongRunningQueryException e) {
-            return getHttpLowLevel().getAsyncResults(e.location, mediaType, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+            return noLongRunningQueriesOnUpsert(e);
         } catch (IOException ioe) {
             throw new SodaError("Error replacing a dataset from this stream.  Error message: " + ioe.getLocalizedMessage());
         }
+    }
+
+    public UpsertResult replaceStream(String resourceId, MediaType mediaType, InputStream stream) throws SodaError, InterruptedException
+    {
+        return replaceStream(resourceId, mediaType, stream, StandardResultAccumulator.FACTORY);
     }
 
     /**
@@ -373,7 +394,7 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError  thrown if there is an error.  Investigate the structure for more information.
      * @throws InterruptedException throws is the thread is interrupted.
      */
-    public UpsertResult upsertCsv(String resourceId, File csvFile) throws SodaError, InterruptedException
+    public <R> R upsertCsv(String resourceId, File csvFile, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
         try {
             InputStream is = new FileInputStream(csvFile);
@@ -387,12 +408,12 @@ public class Soda2Producer extends Soda2Consumer
             try {
                 Response response = requester.issueRequest();
                 try {
-                    return deserializeUpsertResult(response);
+                    return deserializeUpsertResult(response, accFactory);
                 } finally {
                     response.close();
                 }
             } catch (LongRunningQueryException e) {
-                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+                return noLongRunningQueriesOnUpsert(e);
             } finally {
                 GeneralUtils.closeQuietly(is);
             }
@@ -401,6 +422,9 @@ public class Soda2Producer extends Soda2Consumer
         }
     }
 
+    public UpsertResult upsertCsv(String resourceId, File csvFile) throws SodaError, InterruptedException {
+        return upsertCsv(resourceId, csvFile, StandardResultAccumulator.FACTORY);
+    }
 
     /**
      * Replaces a dataset with the rows defined in the provided CSV.  This is logically the same thing
@@ -413,32 +437,35 @@ public class Soda2Producer extends Soda2Consumer
      * @throws SodaError
      * @throws InterruptedException
      */
-    public UpsertResult replaceCsv(String resourceId, File csvFile) throws SodaError, InterruptedException
+    public <R> R replaceCsv(String resourceId, File csvFile, UpsertResultAccumulatorFactory<R> accFactory) throws SodaError, InterruptedException
     {
         try {
             InputStream is = new FileInputStream(csvFile);
-
-            SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, is, HttpLowLevel.CSV_TYPE)
-            {
-                public Response issueRequest() throws LongRunningQueryException, SodaError
-                { return doReplaceStream(resourceId, mediaType, payload); }
-            };
-
             try {
+                SodaRequest requester = new SodaTypedRequest<InputStream>(resourceId, is, HttpLowLevel.CSV_TYPE)
+                {
+                    public Response issueRequest() throws LongRunningQueryException, SodaError
+                    { return doReplaceStream(resourceId, mediaType, payload); }
+                };
+
                 Response response = requester.issueRequest();
                 try {
-                    return deserializeUpsertResult(response);
+                    return deserializeUpsertResult(response, accFactory);
                 } finally {
                     response.close();
                 }
             } catch (LongRunningQueryException e) {
-                return getHttpLowLevel().getAsyncResults(e.location, HttpLowLevel.CSV_TYPE, e.timeToRetry, getHttpLowLevel().getMaxRetries(), new GenericType<UpsertResult>(InputStream.class), requester);
+                return noLongRunningQueriesOnUpsert(e);
             } finally {
                 GeneralUtils.closeQuietly(is);
             }
         } catch (IOException ioe) {
             throw new SodaError("Cannot load CSV from the file " + GeneralUtils.bestFilePath(csvFile) + ".  Error message: " + ioe.getLocalizedMessage());
         }
+    }
+
+    public UpsertResult replaceCsv(String resourceId, File csvFile) throws SodaError, InterruptedException {
+        return replaceCsv(resourceId, csvFile, StandardResultAccumulator.FACTORY);
     }
 
 
@@ -482,20 +509,11 @@ public class Soda2Producer extends Soda2Consumer
      * @param is
      * @return
      */
-    UpsertResult deserializeUpsertResult(InputStream is, Long truthDataVersion, Long truthDataShapeVersion) throws IOException
+    <R> R deserializeUpsertResult(InputStream is, UpsertResultAccumulator<R> acc) throws IOException
     {
         JsonParser parser = factory.createParser(is);
 
-
         if (parser.nextToken() == JsonToken.START_ARRAY) {
-
-            int     count = 0;
-            long    inserts = 0;
-            long    updates = 0;
-            long    deletes = 0;
-            List<UpsertError> errors = new LinkedList<UpsertError>();
-
-
             JsonToken   currToken = parser.nextToken();
 
             //Eliminate the nested array, in the case this is using an old SODA Server.
@@ -508,26 +526,25 @@ public class Soda2Producer extends Soda2Consumer
 
                 NewUpsertRow row = parser.readValueAs(NewUpsertRow.class);
                 if ("insert".equals(row.typ)) {
-                    inserts++;
+                    acc.insert(row);
                 } else if ("update".equals(row.typ)) {
-                    updates++;
+                    acc.update(row);
                 } else if ("delete".equals(row.typ)) {
-                    deletes++;
+                    acc.delete(row);
                 } else if ("error".equals(row.typ)) {
-                    errors.add(new UpsertError(row.err, count, row.id));
+                    acc.error(row);
                 }
 
-                count++;
                 currToken = parser.nextToken();
             }
 
-            return new UpsertResult(inserts, updates, deletes, errors.size() > 0 ? errors : null, truthDataVersion, truthDataShapeVersion);
+            return acc.result();
         }
 
-        return parser.readValueAs(UpsertResult.class);
+        return acc.deserializeSimple(parser);
     }
 
-    UpsertResult deserializeUpsertResult(Response response) throws IOException {
+    <R> R deserializeUpsertResult(Response response, UpsertResultAccumulatorFactory<R> accFactory) throws IOException {
         Long truthDataVersion = null;
         try {
             Object header = response.getHeaders().getFirst("X-SODA2-Truth-Version");
@@ -546,7 +563,11 @@ public class Soda2Producer extends Soda2Consumer
         } catch (NumberFormatException nfe) {
             // ok, fine
         }
-        return deserializeUpsertResult(response.readEntity(InputStream.class), truthDataVersion, truthDataShapeVersion);
+        return deserializeUpsertResult(response.readEntity(InputStream.class), accFactory.createAccumulator(truthDataVersion, truthDataShapeVersion));
+    }
+
+    private <T> T noLongRunningQueriesOnUpsert(LongRunningQueryException e) {
+        throw new RuntimeException("Upsert should have never returned a 202");
     }
 
     /**
